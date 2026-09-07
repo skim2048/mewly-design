@@ -1,15 +1,19 @@
 repo: skim2048/mewly
 branch: master
 
+design-repo: skim2048/mewly-design
+design-branch: master
+
 reference-repo: skim2048/babycat
 reference-branch: master
 
 ## Last sync
 
-date: 2026-09-07T05:45:00Z
+date: 2026-09-07T06:28:00Z
 
 ### Updated in this project
 
+- 이 디자인 프로젝트의 저장소 「skim2048/mewly-design」(master) 등록 — 사용자가 리포지터리를 만들고 프로젝트 zip으로 초기 커밋. 커밋·푸시는 사용자가 로컬에서 한다. 리포지토리에는 `.gitignore`·`README.md`가 더 있고 `uploads/`는 제외된다. `CLAUDE.md`·`skills/`는 로컬 `.claude/` 아래에 두어 `.gitignore`로 제외한다 — 지침과 스킬은 저장소에 올리지 않는다(사용자 의도)
 - 설정 웉 파일 이름 확정(사용자 승인, 안 A) — 「V3-8 카메라 설정」→「V3-7 Mewly 설정·카메라」, 「V3-9 설정 시트」→「V3-8 Mewly 설정·시트」, 「V3-7 알림 오버레이」→「V3-9」. 근거: MainView.vue에서 카메라·프롬프트·분석·비밀번호 모달과 알림 설정은 SettingsTab에서 열리고, 알림함은 상단 바 종 버튼에서 열린다(설정 웉 밖). 파일 내용은 시트 머리 라벨만 바꿈
 - V3-8 설정·시트 안의 깨진 링크 「V3-2 Mewly 로그인·전체화면」→「V3-2 Mewly 로그인」 수정
 - 카탈로그 대조(빈 상태 한 줄 등급 = 0.8125rem · 줄 간격 1.6): V3-3 회전 전체화면 「로그가 없습니다.」 0.75→0.8125, V3-5 「이 날은 감지된 이벤트가 없습니다」 0.875→0.8125, V3-5 「이 날의 추론 데이터가 없습니다」를 0.75 배지 자리에서 분리해 0.8125 한 줄로. 카메라 꺼짐·VLM 카드·알림함 빈 상태·「일정」 각주는 카탈로그와 일치
