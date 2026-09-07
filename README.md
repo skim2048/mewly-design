@@ -6,10 +6,10 @@
 
 ## 파일
 
-- `01_Component_Catalog.dc.html` — 모든 화면이 따르는 사양이다.
-- `02_Login` · `03_Home_Tab` · `04_Schedule_Tab` · `05_Analysis_Tab` · `06_Settings_Profile` · `07_Settings_Camera` · `08_Settings_Sheets` · `09_Notifications_Overlay` — 화면 시트다. 각 시트는 라이트와 다크를 나란히 둔다.
-- `Structure_Map.dc.html` — 원본 앱의 화면 계층·API·토큰 정리다.
-- `Handoff_Summary.md`, `github.md` — 작업 진행 기록이다.
+- `01-component-catalog.dc.html` — 모든 화면이 따르는 사양이다.
+- `02-login` · `03-home-tab` · `04-schedule-tab` · `05-analysis-tab` · `06-settings-profile` · `07-settings-camera` · `08-settings-sheets` · `09-notifications-overlay` — 화면 시트다. 각 시트는 라이트와 다크를 나란히 둔다.
+- `structure-map.dc.html` — 원본 앱의 화면 계층·API·토큰 정리다.
+- `handoff-summary.md`, `github.md` — 작업 진행 기록이다.
 
 ## 규칙
 
