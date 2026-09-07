@@ -23,9 +23,9 @@
   @keyframes sheetin { from { transform: translateY(100%); } to { transform: translateY(0); } }
   .sy { scrollbar-width: none; -ms-overflow-style: none; }
   .sy::-webkit-scrollbar { width: 0; height: 0; display: none; }
-  /* 고정 높이 flex 컨테이너에서 자식이 압축되어 스크롤 영역이 생기지 않는 것을 막는다 */
+  /* Prevent children of a fixed-height flex container from shrinking so the scroll area never disappears */
   .sy > * { flex: 0 0 auto; }
-  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  /* Scrollbars are never shown in any area — even a momentary flash counts as a defect */
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { width: 0; height: 0; display: none; }
   input[type='range'].r { -webkit-appearance:none; appearance:none; height:8px; width:100%; background-color:transparent; background-size:100% 8px; background-position:center; background-repeat:no-repeat; border-radius:999px; cursor:pointer; }
@@ -251,7 +251,7 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
 
-    // — 로그인 —
+    // — Login —
     const submitLogin = () => {
       if (s.loginBusy) return;
       this.setState({ loginBusy: true, loginNotice: '' });
@@ -265,7 +265,7 @@ class Component extends DCLogic {
       }, 900);
     };
 
-    // — 비밀번호 변경: 원본과 같은 순서로 검증한다 —
+    // — Change password: validate in the same order as the original —
     const submitPw = () => {
       if (s.pwBusy) return;
       if (s.pwCur && s.pwCur === s.pwNew) {
@@ -297,8 +297,8 @@ class Component extends DCLogic {
     const m = Math.floor(s.sessSec / 60);
     const sec = s.sessSec % 60;
 
-    // 플로팅 라벨 — 비어 있고 포커스도 없으면 라벨이 필드 내용 자리를 채우고,
-    // 포커스나 입력이 생기면 축소되며 위로 올라간다.
+    // Floating label — when empty and unfocused the label sits in the value slot;
+    // on focus or input it shrinks and rises.
     const field = (k) => {
       const up = s.focusKey === k || String(s[k] || '').length > 0;
       const on = s.focusKey === k;

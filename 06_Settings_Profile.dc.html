@@ -22,7 +22,7 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
   .sy > * { flex: 0 0 auto; }
-  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  /* Scrollbars are never shown in any area — even a momentary flash counts as a defect */
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { width: 0; height: 0; display: none; }
 </style>
@@ -505,7 +505,7 @@
 
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:950}}">
-// useProfile.js의 BREEDS 순서와 표기를 그대로 따른다 (+ 예약값 '기타')
+// Follows the order and spelling of BREEDS in useProfile.js (+ reserved value 'Other')
 const BREED_LIST = [
   '골든 리트리버', '닥스훈트', '말티즈', '말티푸', '비숑 프리제', '시바견', '시추',
   '진돗개', '치와와', '토이 푸들', '포메라니안', '웰시 코기', '기타',
@@ -540,8 +540,8 @@ class Component extends DCLogic {
     };
   }
 
-  // 휠 한 열 — 실제로 굴러간다. 줄 36 · 위아래 여백 72로 첫·끝 값도 가운데 올 수 있다.
-  // 멈추면 가운데 줄이 값이 된다(스냅). 줄을 눌러 고르는 길도 남긴다.
+  // One wheel column — actually scrolls. Row 36, top/bottom padding 72 so the first/last values can also reach the center.
+  // When scrolling stops the center row becomes the value (snap). Tapping a row still picks it.
   wheelCol(key, labels, curIndex, ink, onPick, offAt) {
     const K = '_w' + key;
     return {
@@ -553,8 +553,8 @@ class Component extends DCLogic {
         cursor: offAt && offAt(i) ? 'default' : 'pointer',
         pick: () => { if (!(offAt && offAt(i))) onPick(i); },
       })),
-      // 라이트·다크가 같은 열 데이터를 쓰므로 위치는 요소마다 따로 기억한다.
-      // 스크롤은 요소에 직접 걸어 굴림이 끊기지 않게 한다.
+      // Light and dark share the column data, so the position is stored per element.
+      // Scroll handling is attached to the element directly so scrolling is never interrupted.
       ref: (el) => {
         if (!el) return;
         el.__commit = () => {
@@ -570,7 +570,7 @@ class Component extends DCLogic {
           }, { passive: true });
           el.addEventListener('scrollend', () => el.__commit());
         }
-        // 줄이 다 그려지기 전엔 scrollTop이 잘린다 — 높이가 찰 때까지 미룬다
+        // scrollTop is clamped before all rows are laid out — defer until the height is complete
         const place = () => {
           if (!el.isConnected) return;
           if (el.scrollHeight < 144 + labels.length * 36) { requestAnimationFrame(place); return; }
@@ -581,10 +581,10 @@ class Component extends DCLogic {
     };
   }
 
-  // 연·월 휠 — 05-H. 생일이므로 오늘 이후는 고를 수 없다
+  // Year/month wheel — 05-H. This is a birthday, so nothing after today can be chosen
   ymWheel(dark, y, m) {
     const ink = dark ? '#f2efec' : '#17181a';
-    // 생년월도 미래를 고를 수 없다 — 올해 −50년 ~ 올해, 이번 달 이후는 비활성
+    // Birth year/month cannot be in the future — this year −50 to this year; months after the current one are disabled
     const t = new Date();
     const thisY = t.getFullYear(), thisM = t.getMonth();
     const years = Array.from({ length: 51 }, (_, i) => thisY - 50 + i);
@@ -642,7 +642,7 @@ class Component extends DCLogic {
       click: () => { if (r.danger) this.toast('로그아웃했습니다'); },
     }));
 
-    // 생일 달력 — 오늘 이후는 고를 수 없다
+    // Birthday calendar — nothing after today can be chosen
     const cur = s.cursor || { y: Number(s.birth.slice(0, 4)) || 2026, m: (Number(s.birth.slice(5, 7)) || 9) - 1 };
     const TODAY = '2026-09-02';
     const calCells = (dark) => {
@@ -689,11 +689,11 @@ class Component extends DCLogic {
       name: s.name, setName: (e) => this.setState({ name: e.target.value }),
       notes: s.notes, setNotes: (e) => this.setState({ notes: e.target.value }),
       breedLabel: s.breed || '—',
-      // 화면 표기는 카탈로그 05-G 날짜 규칙 YYYY. MM. DD. (내부는 ISO)
+      // Display uses the catalog 05-G date format YYYY. MM. DD. (ISO internally)
       birth: s.birth ? s.birth.slice(0, 4) + '. ' + s.birth.slice(5, 7) + '. ' + s.birth.slice(8, 10) + '.' : '—',
       ageText: age,
 
-      // 견종 = 드롭다운(13개 · 검색 불필요), 생일 = 달력 드롭다운
+      // Breed = dropdown (13 entries, no search needed); birthday = calendar dropdown
       breedOpen: s.open === 'breed',
       breedCaret: s.open === 'breed' ? 'rotate(180deg)' : 'rotate(0deg)',
       openBreed: () => this.setState({ open: s.open === 'breed' ? null : 'breed' }),
@@ -713,7 +713,7 @@ class Component extends DCLogic {
       birthOpen: s.open === 'birth',
       birthCaret: s.open === 'birth' ? 'rotate(180deg)' : 'rotate(0deg)',
       openBirth: () => this.setState(s.open === 'birth'
-        // 닫힐 때 휠에서 고른 연·월을 달력에 반영한다(05-H)
+        // On close, apply the year/month chosen in the wheel to the calendar (05-H)
         ? { open: null, ymMode: false, cursor: { y: s.ymMode ? (s.ymYear || cur.y) : cur.y, m: cur.m } }
         : {
           open: 'birth', ymMode: false,
@@ -727,13 +727,13 @@ class Component extends DCLogic {
       },
       calLight: calCells(false), calDark: calCells(true),
 
-      // 연·월 전환 — 같은 패널 안에서 달력과 두 열 휠을 바꾼다 (별도 시트로 빠지지 않는다 · 05-H)
+      // Year/month switch — swaps the calendar and the two-column wheel inside the same panel (no separate sheet, 05-H)
       ymMode: s.ymMode, dayMode: !s.ymMode,
-      // 접기·펼치기 스위치 — 접히면 꺾쇠가 오른쪽, 펼치면 아래를 본다(05-H)
+      // Fold/unfold switch — the chevron points right when folded, down when unfolded (05-H)
       ymCaretRot: s.ymMode ? 'rotate(90deg)' : 'rotate(0deg)',
       ymLabelColorL: s.ymMode ? '#b8452a' : '#17181a',
       ymLabelColorD: s.ymMode ? '#f0785a' : '#f2efec',
-      // 펼칠 때는 지금 값에서 시작하고, 접힐 때 고른 연·월을 달력에 반영한다(05-H)
+      // Unfolding starts from the current value; folding applies the chosen year/month to the calendar (05-H)
       toggleYm: () => this.setState(s.ymMode
         ? { ymMode: false, cursor: { y: s.ymYear || cur.y, m: cur.m } }
         : { ymMode: true, ymYear: cur.y }),

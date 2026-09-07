@@ -306,8 +306,8 @@ const fmt12 = (d) => {
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return mer + ' ' + String(h12).padStart(2, '0') + ':' + String(m).padStart(2, '0');
 };
-// 읽음 규칙 — 알림함을 열어 본 것이 읽음. 읽지 않음은 항상 최신 쪽에 연속으로만 있다(마지막으로 연 뒤 도착한 것).
-// 문구 틀 — 이벤트: 「{name} 감지됨」({name}은 영어 이벤트 키워드: barking · licking · scratching), 일정: 「{name} N분 전입니다.」({name}은 일정 제목)
+// Read rule — opening the inbox marks items read. Unread items are always a contiguous run at the newest end (arrived after the last open).
+// Text templates — event: "{name} 감지됨" ({name} is the English event keyword: barking, licking, scratching); schedule: "{name} N분 전입니다." ({name} is the schedule title)
 const SEED = [
   { id: 11, kind: 'abn', at: dayAt(0, 14, 32), text: 'licking 감지됨', read: false },
   { id: 10, kind: 'sched', at: dayAt(0, 9, 0), text: '병원 30분 전입니다.', read: false },
@@ -322,10 +322,10 @@ const SEED = [
   { id: 2, kind: 'sched', at: dayAt(2, 11, 30), text: '병원 1시간 전입니다.', read: true },
   { id: 1, kind: 'abn', at: dayAt(2, 6, 21), text: 'barking 감지됨', read: true },
 ];
-// 닫은 뒤 다시 열릴 때 도착해 있는 새 알림 — 규칙을 시연하기 위한 한 건
+// A new notification that has arrived by the time the inbox is reopened — one item to demonstrate the rule
 const ARRIVAL = { id: 13, kind: 'abn', text: 'barking 감지됨', read: false };
 const CLIP_LEN = 8;
-// 클립 설명 문장 — 05-I의 선택 항목. 분석 탭(V3-5)과 같은 문장 형식을 쓴다.
+// Clip description — optional in 05-I. Same sentence format as the analysis tab (05).
 const CLIP_TEXTS = {
   licking: 'The dog is licking its front paw repeatedly while sitting on the pad.',
   scratching: 'The dog scratches behind its ear with a hind leg, then lies back down.',
@@ -336,7 +336,7 @@ const fmtSec = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String
 class Component extends DCLogic {
   state = { filter: 'all', items: SEED, sched: true, abn: true, player: null, playing: false, t: 0, toast: '' };
 
-  // 뒤로 = 알림함 닫기 — 보인 항목을 모두 읽음으로 커밋한다. 시연을 위해 새 알림 한 건이 도착한 채로 다시 연다.
+  // Back = close inbox — commits all shown items as read. For the demo, it reopens with one new notification arrived.
   closeInbox() {
     this.setState((p) => {
       const items = p.items.map((x) => ({ ...x, read: true }));
@@ -349,7 +349,7 @@ class Component extends DCLogic {
     this.setState({ toast: msg });
     this.toastT = setTimeout(() => this.setState({ toast: '' }), 2400);
   }
-  // 이벤트 알림 → 클립 플레이어(카드 모달). 정지 상태로 열고, 화면 탭으로 재생/일시정지. 8초 모의 재생.
+  // Event notification → clip player (card modal). Opens paused; tap the screen to play/pause. 8-second simulated playback.
   startTick() {
     this.stopTick();
     this.tick = setInterval(() => {
@@ -407,7 +407,7 @@ class Component extends DCLogic {
       segW: 'calc((100% - 12px) / 3)',
       segX: 'translateX(calc(' + fi + ' * (100% + 3px)))',
       hasAny: items.length > 0,
-      // 종류 라벨은 「전체」에서만 — 한 종류로 좁힌 상태에서는 중복 정보다
+      // The kind label shows only under "All" — redundant when narrowed to one kind
       showKind: s.filter === 'all',
       isEmpty: shown.length === 0,
       emptyTitle: items.length === 0 ? '알림이 없습니다' : (s.filter === 'abn' ? '이벤트 알림이 없습니다' : '일정 알림이 없습니다'),

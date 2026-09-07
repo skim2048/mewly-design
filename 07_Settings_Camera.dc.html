@@ -22,7 +22,7 @@
   @keyframes modalin { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
-  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  /* Scrollbars are never shown in any area — even a momentary flash counts as a defect */
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { width: 0; height: 0; display: none; }
   .sy { scrollbar-width: none; -ms-overflow-style: none; }
@@ -260,7 +260,7 @@ class Component extends DCLogic {
     this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2400);
   }
 
-  // 카탈로그 02 입력 필드 — 라벨이 떠오르는 칸(한 줄 56 · 라벨 0.6875rem · 값 0.9375rem)
+  // Catalog 02 input field — floating-label field (single line 56, label 0.6875rem, value 0.9375rem)
   field(k, filled) {
     const s = this.state;
     const up = s.focusKey === k || filled || String(s[k] || '').length > 0;
@@ -283,7 +283,7 @@ class Component extends DCLogic {
     const s = this.state;
     const busy = s.saving || s.switching;
 
-    // 저장은 꺼진 동안에만 — 저장이 끝나면 이어서 켠다(원본 handleSave → turnOn).
+    // Save only while off — after saving, turn on (original handleSave → turnOn).
     const save = () => {
       if (busy || s.camOn) return;
       if (!s.host.trim()) { this.setState({ error: '호스트를 입력해야 저장할 수 있습니다.' }); return; }
@@ -299,7 +299,7 @@ class Component extends DCLogic {
       }, 700);
     };
 
-    // 켜기·끄기의 완료 판정은 요청 성공이 아니라 상태 전환이다 — 라벨과 안내가 같은 순간에 바뀐다.
+    // On/off completes on the state transition, not on request success — label and helper text change at the same moment.
     const toggleCam = () => {
       if (busy) return;
       this.setState({ switching: true, error: '' });
@@ -319,7 +319,7 @@ class Component extends DCLogic {
       yes: true, no: false,
       open: s.open,
       openModal: () => this.setState({ open: true }),
-      // X는 화면을 닫고 설정 탭의 「카메라」 행으로 돌아간다 — 그 행을 다시 누르면 열린다.
+      // X closes the screen and returns to the "Camera" row in the settings tab — tapping that row opens it again.
       close: () => this.setState({ open: false, focusKey: null }),
       f: {
         user: this.field('user'), pw: this.field('pw', s.pwKept), host: this.field('host'),

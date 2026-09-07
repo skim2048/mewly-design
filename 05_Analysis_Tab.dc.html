@@ -24,7 +24,7 @@
   input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border: none; border-radius: 8px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
   .sy { scrollbar-width: none; -ms-overflow-style: none; }
   .sy::-webkit-scrollbar { width: 0; height: 0; display: none; }
-  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  /* Scrollbars are never shown in any area — even a momentary flash counts as a defect */
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { width: 0; height: 0; display: none; }
 </style>
@@ -552,13 +552,13 @@ const W = ['일', '월', '화', '수', '목', '금', '토'];
 const rnd = (n) => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
 
 const hatch = (c, bg) => 'repeating-linear-gradient(45deg,' + c + ' 0 2px,' + bg + ' 2px 5px)';
-// 자세 3종 = 강조색 한 계열의 명도 램프(서기 진함 → 눕기 밝음), 레이블 없음 = 중립, 야간 뒤척임 = 그보다 어두운 중립
+// Three postures = a lightness ramp of one accent hue (standing dark → lying light); unlabeled = neutral; night restlessness = a darker neutral
 const SC_L = { lying: '#f0b7a5', sitting: '#d97a5c', standing: '#a03b23', restless: '#9c968d', unlabeled: '#e2dfda', unlabeledImg: 'none' };
-// 다크: 순서(서기 어둡게 → 눕기 밝게)는 유지하되 램프를 중간 톤에 압축한다.
-// 눕기가 면적 70%를 차지하므로 라이트와 같은 밝기로 두면 다크가 더 눈부셔진다.
-// 야간 뒤척임은 '레이블 없음'과 붙은 최저 단 — 배경보다 어두워질 수는 없어 보이는 선까지만 내린다.
+// Dark: keep the order (standing dark → lying light) but compress the ramp into mid tones.
+// Lying covers 70% of the area, so keeping the light-mode brightness would make dark mode glare.
+// Night restlessness is the lowest step next to 'unlabeled' — it cannot go darker than the background, so it stops at the visible limit.
 const SC_D = { lying: '#c08a72', sitting: '#a15c40', standing: '#7b3a24', restless: '#443e39', unlabeled: '#2b2724', unlabeledImg: 'none' };
-// 히트맵도 같은 강조색 램프 — 0단은 빈칸(중립), 이후 강조색으로 진해진다.
+// The heatmap uses the same accent ramp — step 0 is empty (neutral), then deepens in accent.
 const HEAT_L = ['#efece8', '#f7dcd2', '#eeb49d', '#d97a5c', '#a03b23'];
 const HEAT_D = ['#211e1c', '#3d2a23', '#65321f', '#94523a', '#c08a72'];
 
@@ -576,9 +576,9 @@ const fmtSec = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String
 
 class Component extends DCLogic {
   state = { seg: 'state', offset: 0, drill: null, page: 1, selecting: false, selected: [], cursor: null, calOpen: false, ymMode: false, ymY: null, player: null, playing: false, t: 0 };
-  // 재생 중에는 마커를 두지 않는다 — 정지 시에만 재생 마커
+  // No marker while playing — the play marker appears only when paused
 
-  // 클립 플레이어 — 실제 영상 대신 8초 타이머로 재생·시크를 모의한다(ClipPlayerModal의 play/pause/seek/ended와 같은 상태 흐름)
+  // Clip player — an 8-second timer simulates play/seek instead of real video (same state flow as ClipPlayerModal play/pause/seek/ended)
   CLIP_LEN = 8;
   startTick() {
     this.stopTick();
@@ -590,7 +590,7 @@ class Component extends DCLogic {
   }
   stopTick() { if (this.tick) { clearInterval(this.tick); this.tick = null; } }
   componentWillUnmount() { this.stopTick(); }
-  // 열 때 자동 재생하지 않는다 — 정지 상태(재생 마커)로 시작하고, 화면을 탭해야 재생된다
+  // No autoplay on open — starts paused (play marker); tapping the screen starts playback
   openPlayer(c) { this.stopTick(); this.setState({ player: c, t: 0, playing: false }); }
   closePlayer() { this.stopTick(); this.setState({ player: null, playing: false, t: 0 }); }
   togglePlay() {
@@ -616,8 +616,8 @@ class Component extends DCLogic {
     return out.sort((a, b) => (a.time < b.time ? -1 : 1));
   }
 
-  // 휠 한 열 — 실제로 굴러간다. 줄 36 · 위아래 여백 72로 첫·끝 값도 가운데 올 수 있다.
-  // 멈추면 가운데 줄이 값이 된다(스냅). 줄을 눌러 고르는 길도 남긴다.
+  // One wheel column — actually scrolls. Row 36, top/bottom padding 72 so the first/last values can also reach the center.
+  // When scrolling stops the center row becomes the value (snap). Tapping a row still picks it.
   wheelCol(key, labels, curIndex, ink, onPick, offAt) {
     const K = '_w' + key;
     return {
@@ -629,12 +629,12 @@ class Component extends DCLogic {
         cursor: offAt && offAt(i) ? 'default' : 'pointer',
         pick: () => { if (!(offAt && offAt(i))) onPick(i); },
       })),
-      // 라이트·다크가 같은 열 데이터를 쓰므로 위치는 요소마다 따로 기억한다.
-      // 스크롤은 요소에 직접 걸어 굴림이 끊기지 않게 한다.
+      // Light and dark share the column data, so the position is stored per element.
+      // Scroll handling is attached to the element directly so scrolling is never interrupted.
       ref: (el) => {
         if (!el) return;
         el.__commit = () => {
-          // 접혀서 떨어져 나간 뒤에는 커밋하지 않는다 — 분리된 요소의 scrollTop은 0이라 첫 값으로 덮어쓴다
+          // Do not commit after the wheel is folded and detached — a detached element has scrollTop 0 and would overwrite with the first value
           if (!el.isConnected) { clearTimeout(el.__t); return; }
           const i = Math.max(0, Math.min(labels.length - 1, Math.round(el.scrollTop / 36)));
           if (offAt && offAt(i)) { el.scrollTop = el.__wi * 36; return; }
@@ -700,7 +700,7 @@ class Component extends DCLogic {
     });
 
     const binsFor = (seed, peak) => Array.from({ length: 24 }, (_, h) => (Math.abs(h - peak) < 3 && rnd(seed + h) > 0.35 ? Math.ceil(rnd(seed + h + 5) * 3) : rnd(seed + h) > 0.88 ? 1 : 0));
-    // 원본 AnalysisTab.vue — 이벤트 없음(summary.cards 비어 있음 → highlight null → ana.empty), 추론 데이터 없음(dayStates.total 0 → ana.rhythm.noData, 본문·주간 활동 숨김)
+    // Original AnalysisTab.vue — no events (summary.cards empty → highlight null → ana.empty); no inference data (dayStates.total 0 → ana.rhythm.noData, body and weekly activity hidden)
     const noEvents = this.props.noEvents ?? false;
     const noData = this.props.noData ?? false;
     const cardDefs = noEvents ? [] : [{ keyword: 'licking', seed: 3, peak: 14 }, { keyword: 'scratching', seed: 21, peak: 9 }];
@@ -712,7 +712,7 @@ class Component extends DCLogic {
     const mkCards = (dark) => baseCards.map((c) => {
       const HEAT = dark ? HEAT_D : HEAT_L;
       const accent = dark ? '#f0785a' : '#b8452a';
-      const selRing = dark ? '#f2efec' : '#17181a'; // 셀이 강조색 램프라 선택 링은 중립으로
+      const selRing = dark ? '#f2efec' : '#17181a'; // Cells use the accent ramp, so the selection ring is neutral
       const max = Math.max(...c.bins, 1);
       const on = s.drill && s.drill.keyword === c.keyword;
       return {
@@ -769,11 +769,11 @@ class Component extends DCLogic {
     });
 
     const TODAY_D = new Date(2026, 8, 2);
-    // 날짜 칩을 누르면 그 아래에 달력이 펼쳐진다(05-G · 일정 편집기의 날짜 칩과 같은 부품)
+    // Tapping the date chip unfolds a calendar under it (05-G, same part as the schedule editor date chip)
     const pv = s.cursor || { y: d.getFullYear(), m: d.getMonth() };
     const ymY = s.ymY == null ? pv.y : s.ymY;
     const dayMs = 86400000;
-    // cur = 보고 있는 달, extra = 날짜를 고를 때 함께 바꿀 상태(펼침을 접는다)
+    // cur = visible month; extra = state to change together when a date is picked (folds the panel)
     const cellsFor = (dark, cur, extra) => {
       const cells = [];
       const lead = new Date(cur.y, cur.m, 1).getDay();
@@ -798,13 +798,13 @@ class Component extends DCLogic {
         };
       });
     };
-    // 날짜를 고르면 펼침이 접힌다 — 고른 결과(내용)를 바로 봐야 하는 탐색 화면이므로
+    // Picking a date folds the panel — this is a browsing screen where the picked content must be seen immediately
     const closeCal = { calOpen: false, ymMode: false, cursor: null, ymY: null };
     const mkPickCells = (dark) => cellsFor(dark, pv, closeCal);
 
-    // 연·월 휠 — 05-H. 두 열, 줄 36, 가운데가 지금 값. 미래 값은 흐리게 두고 누를 수 없다
+    // Year/month wheel — 05-H. Two columns, row 36, center is the current value. Future values are dimmed and not tappable
     const capM = new Date(TODAY_D.getFullYear(), TODAY_D.getMonth(), 1);
-    // 기록은 과거만 있으므로 상한을 오늘로 내린다 — 올해 −50년 ~ 올해, 이번 달 이후는 비활성
+    // Records exist only in the past, so the upper bound is today — this year −50 to this year; months after the current one are disabled
     const PYEARS = Array.from({ length: 51 }, (_, i) => TODAY_D.getFullYear() - 50 + i);
     const wheelFor = (dark, key, yv, cur, setY, setM) => {
       const ink = dark ? '#f2efec' : '#17181a';
@@ -820,9 +820,9 @@ class Component extends DCLogic {
     const mkPickYmWheel = (dark) => wheelFor(dark, 'p', ymY, pv,
       (y) => this.setState({ ymY: y }), (m) => this.setState({ cursor: { y: ymY, m } }));
     return {
-      // 원본 .weekday-row와 같이 7개 요일에 단일 중립색만 쓴다 — 주말 구분은 두지 않는다
+      // Like the original .weekday-row, one neutral color for all 7 weekdays — no weekend distinction
       weekdays: W.map((label) => ({ label, colorL: '#8a8d92', colorD: '#9a948d' })),
-      // 날짜 칩 — 일정 편집기의 날짜 칩과 같은 값(높이 36 · 반경 100 · 펼친 동안 강조 톤)
+      // Date chip — same values as the schedule editor date chip (height 36, radius 100, accent tone while unfolded)
       dateChip: d.getFullYear() + '. ' + String(d.getMonth() + 1).padStart(2, '0') + '. ' + String(d.getDate()).padStart(2, '0') + '.',
       dateChipBgL: s.calOpen ? 'rgba(184,69,42,0.10)' : '#e9e6e1',
       dateChipFgL: s.calOpen ? '#a3271f' : '#17181a',
@@ -835,7 +835,7 @@ class Component extends DCLogic {
       calLabelColorL: s.ymMode ? '#b8452a' : '#17181a',
       calLabelColorD: s.ymMode ? '#f0785a' : '#f2efec',
       ymMode: s.ymMode, dayMode: !s.ymMode,
-      // 휠은 고르는 층 — 접히는 순간 고른 연·월이 달력에 반영된다
+      // The wheel is a picking layer — the chosen year/month is applied to the calendar the moment it folds
       toggleYm: () => this.setState(s.ymMode
         ? { ymMode: false, cursor: { y: ymY, m: pv.m } }
         : { ymMode: true, ymY: pv.y }),
@@ -846,14 +846,14 @@ class Component extends DCLogic {
       ymWheelLight: mkPickYmWheel(false), ymWheelDark: mkPickYmWheel(true),
       pickCellsLight: mkPickCells(false), pickCellsDark: mkPickCells(true),
 
-      // 하루 이동은 원본 AnalysisTab의 동작(오늘에서 다음 날 비활성). 이동하면 펼침은 접힌다
+      // Day navigation follows the original AnalysisTab (next day disabled at today). Navigating folds the panel
       prevDay: () => this.setState((p) => ({ offset: p.offset + 1, drill: null, page: 1, ...closeCal })),
       nextDay: () => this.setState((p) => ({ offset: Math.max(0, p.offset - 1), drill: null, page: 1, ...closeCal })),
       atToday: s.offset === 0, nextOpacity: s.offset === 0 ? '0.35' : '1',
 
       onState: s.seg === 'state', onEvent: s.seg === 'event',
       segLight: mkSeg(false), segDark: mkSeg(true),
-      // 선택 알약이 미끄러진다 (2칸 · 트랙 padding 3 · gap 3)
+      // The selection pill slides (2 cells, track padding 3, gap 3)
       segW: 'calc((100% - 9px) / 2)',
       segX: s.seg === 'state' ? 'translateX(0)' : 'translateX(calc(100% + 3px))',
 
@@ -890,7 +890,7 @@ class Component extends DCLogic {
       prevPage: () => this.setState((p) => ({ page: Math.max(1, p.page - 1) })),
       nextPage: () => this.setState({ page: Math.min(totalPages, page + 1) }),
 
-      // 클립 플레이어(카드 모달) — 닫기·밖 누름·재생/일시정지·시크
+      // Clip player (card modal) — close, tap outside, play/pause, seek
       playerOpen: !!s.player,
       playerPaused: !s.playing,
       playLabel: s.playing ? '일시정지' : '재생',
@@ -901,7 +901,7 @@ class Component extends DCLogic {
       playerPct: Math.round((s.t / this.CLIP_LEN) * 100) + '%',
       playerCur: fmtSec(s.t), playerDur: fmtSec(this.CLIP_LEN),
       playerKeyword: s.player ? s.player.keyword : '',
-      // 시각은 칩 규칙(05-G)과 같은 오전/오후 hh:mm
+      // Time uses the chip rule (05-G): AM/PM hh:mm
       playerWhen: s.player ? fmt12(s.player.time) : '',
       playerText: s.player ? s.player.text : '',
     };

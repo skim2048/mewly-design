@@ -6,10 +6,10 @@
 
 ## 파일
 
-- `V3-1 Mewly 컴포넌트 카탈로그.dc.html` — 모든 화면이 따르는 사양이다.
-- `V3-2` 로그인 · `V3-3` 홈 탭 · `V3-4` 일정 탭 · `V3-5` 분석 탭 · `V3-6` 설정·프로필 · `V3-7` 설정·카메라 · `V3-8` 설정·시트 · `V3-9` 알림 오버레이 — 화면 시트다. 각 시트는 라이트와 다크를 나란히 둔다.
-- `Mewly 구조 지도.dc.html` — 원본 앱의 화면 계층·API·토큰 정리다.
-- `Mewly v3 인계 요약.md`, `github.md` — 작업 진행 기록이다.
+- `01_Component_Catalog.dc.html` — 모든 화면이 따르는 사양이다.
+- `02_Login` · `03_Home_Tab` · `04_Schedule_Tab` · `05_Analysis_Tab` · `06_Settings_Profile` · `07_Settings_Camera` · `08_Settings_Sheets` · `09_Notifications_Overlay` — 화면 시트다. 각 시트는 라이트와 다크를 나란히 둔다.
+- `Structure_Map.dc.html` — 원본 앱의 화면 계층·API·토큰 정리다.
+- `Handoff_Summary.md`, `github.md` — 작업 진행 기록이다.
 
 ## 규칙
 

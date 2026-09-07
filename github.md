@@ -9,12 +9,18 @@ reference-branch: master
 
 ## Last sync
 
-date: 2026-09-07T06:28:00Z
+date: 2026-09-07T07:05:00Z
 
 ### Updated in this project
 
+- 파일 이름을 영어·밑줄 형식 `NN_Screen_Name.dc.html`로 전환(사용자 지시). 「Mewly」「V3」 접두어 제거 — 리포지토리 이름이 mewly-design이고 남은 시트가 전부 v3라 구분 대상이 없다. 01 Component_Catalog · 02 Login · 03 Home_Tab · 04 Schedule_Tab · 05 Analysis_Tab · 06 Settings_Profile · 07 Settings_Camera · 08 Settings_Sheets · 09 Notifications_Overlay · Structure_Map · Handoff_Summary.md
+- 시트 10개의 코드 주석(JS `//`, CSS `/* */`) 146줄을 전부 영어로 전환(CLAUDE.md 「코딩」 규칙). 화면 안 텍스트 레이블·카탈로그 사양 문장·기록 문서는 한국어 유지(사용자 확정 1안). Structure_Map 안의 `/* 타입 스케일 */` `/* 최종 승자 */`는 원본 global.css를 인용해 보여 주는 화면 내용이라 그대로 둠
+- 08 안의 링크를 `02_Login.dc.html`로 갱신
+
+### 2026-09-07T06:28:00Z
+
 - 이 디자인 프로젝트의 저장소 「skim2048/mewly-design」(master) 등록 — 사용자가 리포지터리를 만들고 프로젝트 zip으로 초기 커밋. 커밋·푸시는 사용자가 로컬에서 한다. 리포지토리에는 `.gitignore`·`README.md`가 더 있고 `uploads/`는 제외된다. `CLAUDE.md`·`skills/`는 로컬 `.claude/` 아래에 두어 `.gitignore`로 제외한다 — 지침과 스킬은 저장소에 올리지 않는다(사용자 의도)
-- 설정 웉 파일 이름 확정(사용자 승인, 안 A) — 「V3-8 카메라 설정」→「V3-7 Mewly 설정·카메라」, 「V3-9 설정 시트」→「V3-8 Mewly 설정·시트」, 「V3-7 알림 오버레이」→「V3-9」. 근거: MainView.vue에서 카메라·프롬프트·분석·비밀번호 모달과 알림 설정은 SettingsTab에서 열리고, 알림함은 상단 바 종 버튼에서 열린다(설정 웉 밖). 파일 내용은 시트 머리 라벨만 바꿈
+- 설정 축 파일 이름 확정(사용자 승인, 안 A) — 「V3-8 카메라 설정」→「V3-7 Mewly 설정·카메라」, 「V3-9 설정 시트」→「V3-8 Mewly 설정·시트」, 「V3-7 알림 오버레이」→「V3-9」. 근거: MainView.vue에서 카메라·프롬프트·분석·비밀번호 모달과 알림 설정은 SettingsTab에서 열리고, 알림함은 상단 바 종 버튼에서 열린다(설정 축 밖). 파일 내용은 시트 머리 라벨만 바꿈
 - V3-8 설정·시트 안의 깨진 링크 「V3-2 Mewly 로그인·전체화면」→「V3-2 Mewly 로그인」 수정
 - 카탈로그 대조(빈 상태 한 줄 등급 = 0.8125rem · 줄 간격 1.6): V3-3 회전 전체화면 「로그가 없습니다.」 0.75→0.8125, V3-5 「이 날은 감지된 이벤트가 없습니다」 0.875→0.8125, V3-5 「이 날의 추론 데이터가 없습니다」를 0.75 배지 자리에서 분리해 0.8125 한 줄로. 카메라 꺼짐·VLM 카드·알림함 빈 상태·「일정」 각주는 카탈로그와 일치
 
@@ -122,18 +128,18 @@ date: 2026-09-07T06:28:00Z
 | 구조 지도 — 진단 | src/assets/global.css, src/endpoints.js, src/components/HomeTab.vue, src/components/AnalysisTab.vue | router/main.py |
 | 분석 탭 재현 (Mewly 분석 탭.dc.html) | src/components/AnalysisTab.vue, src/composables/useInferenceSummary.js, src/composables/analysisConfig.js, config/analysis.json, src/i18n/messages.js | router/main.py (/summary, /events, /clips, /inferences) |
 | 분석 설정 재현 (Mewly 분석 설정.dc.html) | src/components/AnalysisPanel.vue, src/composables/analysisConfig.js, config/analysis.json | router/main.py (/presets) |
-| 분석 탭 + 클립 플레이어 (V3-5 Mewly 분석 탭.dc.html) | src/components/AnalysisTab.vue, src/components/ClipPlayerModal.vue, src/composables/useClips.js, src/composables/analysisConfig.js | router/main.py (/summary, /events, /clips, /clips/{name}) |
-| 알림함·알림 설정 (V3-9 Mewly 알림 오버레이.dc.html) | src/components/NotificationsOverlay.vue, src/components/NotifSettingsOverlay.vue, src/composables/useNotifications.js, src/composables/useNotifSettings.js | — (서버 미지원 목업) |
+| 분석 탭 + 클립 플레이어 (05_Analysis_Tab.dc.html) | src/components/AnalysisTab.vue, src/components/ClipPlayerModal.vue, src/composables/useClips.js, src/composables/analysisConfig.js | router/main.py (/summary, /events, /clips, /clips/{name}) |
+| 알림함·알림 설정 (09_Notifications_Overlay.dc.html) | src/components/NotificationsOverlay.vue, src/components/NotifSettingsOverlay.vue, src/composables/useNotifications.js, src/composables/useNotifSettings.js | — (서버 미지원 목업) |
 | 알림 오버레이 재현 (Mewly 알림 오버레이.dc.html) | src/components/NotificationsOverlay.vue, src/components/NotifSettingsOverlay.vue, src/composables/useNotifications.js, src/composables/useNotifSettings.js, src/composables/dates.js | — (서버 미지원 목업) |
-| 홈 탭 + 기기 제어 시트(조명·온도·마이크·PTZ) + 회전 전체화면 (V3-3 Mewly 홈 탭.dc.html) | src/components/HomeTab.vue, src/views/MainView.vue, src/composables/useVlmStatus.js, src/composables/useInferLog.js, src/components/LightSheet.vue, src/components/TempSheet.vue, src/components/MicSheet.vue, src/components/PtzSheet.vue, src/components/SheetFrame.vue, src/composables/useDevices.js, src/composables/usePtz.js, config/ptz.json, src/i18n/messages.js | router/main.py (/ptz/*) · 기기 제어는 서버 미지원 목업(localStorage device.*) |
-| 설정·카메라 (V3-7 Mewly 설정·카메라.dc.html) | src/components/CameraPanel.vue, src/composables/useCamera.js, src/i18n/messages.js | router/main.py (/camera, /streaming/start·stop) |
+| 홈 탭 + 기기 제어 시트(조명·온도·마이크·PTZ) + 회전 전체화면 (03_Home_Tab.dc.html) | src/components/HomeTab.vue, src/views/MainView.vue, src/composables/useVlmStatus.js, src/composables/useInferLog.js, src/components/LightSheet.vue, src/components/TempSheet.vue, src/components/MicSheet.vue, src/components/PtzSheet.vue, src/components/SheetFrame.vue, src/composables/useDevices.js, src/composables/usePtz.js, config/ptz.json, src/i18n/messages.js | router/main.py (/ptz/*) · 기기 제어는 서버 미지원 목업(localStorage device.*) |
+| 설정·카메라 (07_Settings_Camera.dc.html) | src/components/CameraPanel.vue, src/composables/useCamera.js, src/i18n/messages.js | router/main.py (/camera, /streaming/start·stop) |
 | 로그인·계정 재현 (Mewly 로그인.dc.html) | src/views/LoginView.vue, src/components/ChangePasswordPanel.vue, src/components/SessionExpiryModal.vue, src/composables/useAuth.js, src/i18n/messages.js | router/main.py (/login, /change-password, /refresh) |
 | 설정 탭 재현 (Mewly 설정 탭.dc.html) | src/components/SettingsTab.vue, src/components/ProfileOverlay.vue, src/components/ServerPanel.vue, src/components/ModalFrame.vue, src/composables/useProfile.js, src/composables/useTheme.js, src/composables/useLocale.js, src/assets/global.css | router/main.py (/client-storage/pet_profile) |
 | 일정 탭 재현 (Mewly 일정 탭.dc.html) | src/components/CalendarTab.vue, src/components/ScheduleEditor.vue, src/components/OverlayFrame.vue, src/components/ToggleSwitch.vue, src/composables/useSchedules.js, src/composables/dates.js | — (서버 미지원) |
-| 로그인·밀밀번호 변경·세션 만료 (V3-2 Mewly 로그인.dc.html) | src/views/LoginView.vue, src/components/ChangePasswordPanel.vue, src/components/SessionExpiryModal.vue, src/i18n/messages.js | router/main.py (/login, /change-password, /refresh) |
-| 설정·시트 — 분석·프롬프트·비밀번호·사진 조정 (V3-8 Mewly 설정·시트.dc.html) | src/components/AnalysisPanel.vue, src/components/PromptSheet.vue, src/components/ChangePasswordPanel.vue, src/components/ProfileOverlay.vue, src/composables/analysisConfig.js, config/analysis.json, config/ui.json | router/main.py (/presets, /prompt, /change-password) |
-| 일정 탭·편집기 재현 (V3-4 Mewly 일정 탭.dc.html) | src/components/CalendarTab.vue, src/components/ScheduleEditor.vue, src/composables/useSchedules.js, src/composables/dates.js | — (서버 미지원, localStorage) |
-| 설정·프로필 재현 (V3-6 Mewly 설정·프로필.dc.html) | src/components/SettingsTab.vue, src/components/ProfileOverlay.vue, src/composables/useProfile.js | — (localStorage) |
+| 로그인·밀밀번호 변경·세션 만료 (02_Login.dc.html) | src/views/LoginView.vue, src/components/ChangePasswordPanel.vue, src/components/SessionExpiryModal.vue, src/i18n/messages.js | router/main.py (/login, /change-password, /refresh) |
+| 설정·시트 — 분석·프롬프트·비밀번호·사진 조정 (08_Settings_Sheets.dc.html) | src/components/AnalysisPanel.vue, src/components/PromptSheet.vue, src/components/ChangePasswordPanel.vue, src/components/ProfileOverlay.vue, src/composables/analysisConfig.js, config/analysis.json, config/ui.json | router/main.py (/presets, /prompt, /change-password) |
+| 일정 탭·편집기 재현 (04_Schedule_Tab.dc.html) | src/components/CalendarTab.vue, src/components/ScheduleEditor.vue, src/composables/useSchedules.js, src/composables/dates.js | — (서버 미지원, localStorage) |
+| 설정·프로필 재현 (06_Settings_Profile.dc.html) | src/components/SettingsTab.vue, src/components/ProfileOverlay.vue, src/composables/useProfile.js | — (localStorage) |
 
 ## Notes
 

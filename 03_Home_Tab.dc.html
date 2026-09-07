@@ -21,14 +21,14 @@
   @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
   @keyframes spin { to { transform: rotate(360deg); } }
   .sy > * { flex: 0 0 auto; }
-  /* 02 슬라이더 — 트랙 8 · 손잡이 22 · 후광 4 */
+  /* 02 slider — track 8, thumb 22, halo 4 */
   input[type='range'].r { -webkit-appearance:none; appearance:none; height:8px; width:100%; background-color:transparent; background-size:100% 8px; background-position:center; background-repeat:no-repeat; border-radius:999px; cursor:pointer; }
   input[type='range'].r::-webkit-slider-runnable-track { height:8px; border-radius:999px; background:transparent; }
   input[type='range'].r::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; margin-top:-7px; border-radius:50%; background:#b8452a; box-shadow:0 0 0 4px rgba(184,69,42,0.18); }
   input[type='range'].rd::-webkit-slider-thumb { background:#f0785a; box-shadow:0 0 0 4px rgba(240,120,90,0.20); }
   main, .sy { scrollbar-width: none; -ms-overflow-style: none; }
   main::-webkit-scrollbar, .sy::-webkit-scrollbar { width: 0; height: 0; display: none; }
-  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  /* Scrollbars are never shown in any area — even a momentary flash counts as a defect */
   * { scrollbar-width: none; -ms-overflow-style: none; }
   *::-webkit-scrollbar { width: 0; height: 0; display: none; }
   body { margin: 0; background: #08090a; }
@@ -1153,7 +1153,7 @@ class Component extends DCLogic {
     };
   }
 
-  // 휠 한 열 — 실제로 굴러간다. 줄 36 · 위아래 여백 72로 첫·끝 값도 가운데 올 수 있다(05-H).
+  // One wheel column — actually scrolls. Row 36, top/bottom padding 72 so the first/last values can also reach the center (05-H).
   wheelCol(key, labels, curIndex, ink, onPick, offAt) {
     return {
       items: labels.map((label, i) => ({
@@ -1191,7 +1191,7 @@ class Component extends DCLogic {
     };
   }
 
-  // 정각만 고르므로 분 열은 두지 않는다 — 오전·오후 열과 12시 열 두 열이다.
+  // Only whole hours are selectable, so there is no minute column — two columns: AM/PM and 12-hour.
   mkWheel(key, dark, cur, other, onPick) {
     const ink = dark ? '#f2efec' : '#17181a';
     const to24 = (h12, pm) => (h12 === 12 ? (pm ? 12 : 0) : (pm ? h12 + 12 : h12));
@@ -1207,7 +1207,7 @@ class Component extends DCLogic {
     ];
   }
 
-  // 열린 휠이 시트 바닥 아래로 나가면 그만큼 시트를 굴린다(휠 아래 여백 12).
+  // If the open wheel extends below the sheet bottom, scroll the sheet by that amount (12px margin under the wheel).
   revealRef = (el) => {
     if (!el) return;
     requestAnimationFrame(() => {
@@ -1225,7 +1225,7 @@ class Component extends DCLogic {
     this['toast_' + key] = setTimeout(() => this.setState({ [key]: '' }), 2400);
   }
 
-  // 방향 해제 → 노브 복귀(150ms) 직후 STOP이 눌렸다 떼지는 연출
+  // Direction released → knob returns (150ms), then STOP flashes as if pressed and released
   flash(padKey, flashKey) {
     clearTimeout(this['f1_' + flashKey]);
     clearTimeout(this['f2_' + flashKey]);
@@ -1258,7 +1258,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const p = this.props, s = this.state;
-    // 카메라 상태(원본 HomeTab.vue 604행): 미등록 / 서버가 꺼 둠(stopped && !streaming_active) / 켜짐
+    // Camera state (original HomeTab.vue line 604): not configured / turned off by server (stopped && !streaming_active) / on
     const camera = p.camera ?? 'on';
     const configured = camera !== 'none';
     const camOff = camera === 'off';
@@ -1305,7 +1305,7 @@ class Component extends DCLogic {
     const setAc = (patch) => this.setState({ ac: { ...s.ac, ...patch, on: true } });
 
     const patrolOn = s.patrolSec > 0;
-    // — 전체화면 패드 —
+    // — Fullscreen pad —
     const fsDown = (d) => this.setState({ fsPad: d });
     const fsRelease = () => {
       if (!s.fsPad) return;
@@ -1313,7 +1313,7 @@ class Component extends DCLogic {
       this.flash('fsPad', 'fsFlash');
     };
 
-    // — PTZ 시트 —
+    // — PTZ sheet —
     const lock = () => this.toast('ptzToast', '자동 순찰 중 — 수동 조작이 잠겨 있습니다');
     const ptzDown = (d) => { if (patrolOn) { lock(); return; } this.setState({ ptzPad: d }); };
     const ptzRelease = () => {
@@ -1392,7 +1392,7 @@ class Component extends DCLogic {
       streamMeta: 'HLS · 1280×720 · 30 FPS',
       hasUnread: p.hasUnread ?? true,
 
-      // 점 색은 카탈로그 값만 쓴다 — 구동 중=완료, 오류=주의, 대기=강조, 정지=비활성
+      // Dot colors use catalog values only — running=success, error=warning, waiting=accent, stopped=disabled
       vlmDotL: kind === 'on' ? '#2f7d52' : kind === 'err' ? '#7a2118' : kind === 'wait' ? '#b8452a' : '#c9c5bf',
       vlmDotD: kind === 'on' ? '#6fc190' : kind === 'err' ? '#ffc7b8' : kind === 'wait' ? '#f0785a' : '#4a443f',
       vlmPulse: kind === 'on' || kind === 'wait' ? 'pulse 2s ease-in-out infinite' : 'none',
@@ -1498,7 +1498,7 @@ class Component extends DCLogic {
         patrolValColorL: patrolOn ? '#b8452a' : '#8a8d92',
         patrolValColorD: patrolOn ? '#f0785a' : '#9a948d',
         patrolValWeight: patrolOn ? '600' : '400',
-        // 선택 알약이 미끄러진다 (2칸 · 트랙 padding 3 · gap 3)
+        // The selection pill slides (2 cells, track padding 3, gap 3)
         segW: 'calc((100% - 9px) / 2)',
         segX: s.speed === 1 ? 'translateX(0)' : 'translateX(calc(100% + 3px))',
       },
@@ -1508,7 +1508,7 @@ class Component extends DCLogic {
       closeWheel: () => this.setState({ wheel: null }),
       revealRef: this.revealRef,
 
-      // 01 조명 — 끄기 전 밝기를 기억해 다시 켤 때 되돌린다
+      // 01 Light — remember the brightness before turning off and restore it on turning on
       lPct: pct,
       lNumColL: pct > 0 ? '#17181a' : '#c9c5bf',
       lNumColD: pct > 0 ? '#f2efec' : '#4a443f',
@@ -1543,7 +1543,7 @@ class Component extends DCLogic {
       neWheelL: this.mkWheel('ne', false, s.night.end, s.night.start, (h) => setNight({ end: h })),
       neWheelD: this.mkWheel('ne', true, s.night.end, s.night.start, (h) => setNight({ end: h })),
 
-      // 02 온도 — 목표가 현재와 다르면 가동 중으로 적는다(원본 판정과 같다)
+      // 02 Temperature — shown as running when target differs from current (same rule as the original)
       tTarget: s.tTarget, tCurrent: s.tCurrent,
       tRunning: running,
       tRunLabel: running ? (s.tMode === 'cool' ? '냉방 가동 중' : '난방 가동 중') : '대기 중',
@@ -1585,7 +1585,7 @@ class Component extends DCLogic {
       aDec: () => setAc({ target: Math.max(16, s.ac.target - 1) }),
       aInc: () => setAc({ target: Math.min(30, s.ac.target + 1) }),
 
-      // 03 마이크 — 누른 동안만 동작한다(목업)
+      // 03 Mic — active only while pressed (mock)
       talking: s.talking,
       startTalk: (e) => { e.preventDefault(); this.setState({ talking: true }); },
       endTalk: () => this.setState((p) => (p.talking ? { talking: false } : null)),
