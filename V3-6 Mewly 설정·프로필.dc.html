@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="./public/icons/phosphor/regular/style.css">
+<link rel="stylesheet" href="./public/icons/phosphor/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  body { margin: 0; background: #08090a; }
+  a { color: #f0785a; text-decoration: none; }
+  a:hover { color: #ff9276; }
+  @font-face { font-family: 'Patrick Hand'; font-weight: 400; font-display: swap; src: url('./public/fonts/patrickhand/patrickhand-latin.woff2') format('woff2'); }
+  button { transition: opacity 0.18s ease; }
+  button:active:not(:disabled) { opacity: 0.65; transition: opacity 0s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  .sy > * { flex: 0 0 auto; }
+  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+</style>
+</helmet>
+
+<section style="min-height:100vh;background:#08090a;display:flex;flex-direction:column;align-items:center;gap:30px;padding:52px 32px 90px;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif">
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+    <span style="font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:#6b7178">Mewly · 설정 탭 · 프로필 오버레이 — v3 컴포넌트 적용</span>
+    <span style="max-width:66ch;font-size:0.8125rem;color:#8a9099;line-height:1.7;text-wrap:pretty">3단계 세 번째 묶음입니다. 설정은 프로필 카드와 두 묶음 리스트, 프로필은 편집 화면을 라이트·다크로 재현했습니다. 언어 전환·이름 입력·견종 드롭다운·생일 달력이 실제로 동작하고 두 기기가 같은 상태를 공유합니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">01 · 설정 탭 — SettingsTab</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="설정 탭 · 라이트" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px">
+              <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em">설정</span>
+              <button style="width:44px;height:44px;border:none;background:none;color:#5c5f63;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-bell"></i></button>
+            </header>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:2px 16px 20px;display:flex;flex-direction:column;gap:14px">
+
+              <button style="display:flex;align-items:center;gap:13px;min-height:80px;padding:14px;border:none;border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);cursor:pointer;font-family:inherit;text-align:left">
+                <span style="flex:none;width:52px;height:52px;border-radius:26px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#8a8d92;font-size:1.375rem"><i class="ph ph-dog"></i></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:1.0625rem;font-weight:700;color:#17181a">{{ profileName }}</span>
+                  <span style="font-size:0.75rem;color:#8a8d92">{{ profileSub }}</span>
+                </span>
+                <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#b3b6ba"></i>
+              </button>
+
+              <div style="border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);overflow:hidden;display:flex;flex-direction:column">
+                <sc-for list="{{ group1Light }}" as="r" hint-placeholder-count="7">
+                  <button onClick="{{ r.click }}" style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:10px 16px;border:none;border-bottom:{{ r.divider }};background:none;cursor:pointer;font-family:inherit;text-align:left;color:#17181a">
+                    <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#5c5f63;font-size:1.0625rem"><i class="{{ r.icon }}"></i></span>
+                    <span style="flex:1;min-width:0;font-size:0.9375rem">{{ r.label }}</span>
+                    <span style="flex:none;font-size:0.8125rem;color:#8a8d92;white-space:nowrap">{{ r.value }}</span>
+                    <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#b3b6ba"></i>
+                  </button>
+                </sc-for>
+              </div>
+
+              <div style="border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);overflow:hidden;display:flex;flex-direction:column">
+                <sc-for list="{{ group2Light }}" as="r" hint-placeholder-count="3">
+                  <button onClick="{{ r.click }}" style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:10px 16px;border:none;border-bottom:{{ r.divider }};background:none;cursor:pointer;font-family:inherit;text-align:left;color:{{ r.fg }}">
+                    <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#efece8;display:flex;align-items:center;justify-content:center;font-size:1.0625rem;color:{{ r.iconColor }}"><i class="{{ r.icon }}"></i></span>
+                    <span style="flex:1;min-width:0;font-size:0.9375rem">{{ r.label }}</span>
+                    <sc-if value="{{ r.caret }}" hint-placeholder-val="{{ yes }}"><i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#b3b6ba"></i></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <nav style="flex:none;height:64px;border-top:1px solid rgba(23,24,26,0.09);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:#f6f5f3">
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8a8d92;font-family:inherit"><i class="ph ph-house" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">홈</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8a8d92;font-family:inherit"><i class="ph ph-calendar-blank" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">일정</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8a8d92;font-family:inherit"><i class="ph ph-chart-bar" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">분석</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#b8452a;font-family:inherit"><i class="ph-fill ph-gear" style="font-size:1.25rem"></i><span style="font-size:0.6875rem;font-weight:700">설정</span></button>
+            </nav>
+
+            <sc-if value="{{ toast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:88px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;color:#f4f3f1">{{ toast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="설정 탭 · 다크" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px">
+              <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em">설정</span>
+              <button style="width:44px;height:44px;border:none;background:none;color:#c2bbb3;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-bell"></i></button>
+            </header>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:2px 16px 20px;display:flex;flex-direction:column;gap:14px">
+
+              <button style="display:flex;align-items:center;gap:13px;min-height:80px;padding:14px;border:none;border-radius:18px;background:#1c1a18;cursor:pointer;font-family:inherit;text-align:left">
+                <span style="flex:none;width:52px;height:52px;border-radius:26px;background:#2b2724;display:flex;align-items:center;justify-content:center;color:#9a948d;font-size:1.375rem"><i class="ph ph-dog"></i></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:1.0625rem;font-weight:700;color:#f2efec">{{ profileName }}</span>
+                  <span style="font-size:0.75rem;color:#9a948d">{{ profileSub }}</span>
+                </span>
+                <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#6f6862"></i>
+              </button>
+
+              <div style="border-radius:18px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column">
+                <sc-for list="{{ group1Dark }}" as="r" hint-placeholder-count="7">
+                  <button onClick="{{ r.click }}" style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:10px 16px;border:none;border-bottom:{{ r.divider }};background:none;cursor:pointer;font-family:inherit;text-align:left;color:#f2efec">
+                    <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#272320;display:flex;align-items:center;justify-content:center;color:#c2bbb3;font-size:1.0625rem"><i class="{{ r.icon }}"></i></span>
+                    <span style="flex:1;min-width:0;font-size:0.9375rem">{{ r.label }}</span>
+                    <span style="flex:none;font-size:0.8125rem;color:#9a948d;white-space:nowrap">{{ r.value }}</span>
+                    <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#6f6862"></i>
+                  </button>
+                </sc-for>
+              </div>
+
+              <div style="border-radius:18px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column">
+                <sc-for list="{{ group2Dark }}" as="r" hint-placeholder-count="3">
+                  <button onClick="{{ r.click }}" style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:10px 16px;border:none;border-bottom:{{ r.divider }};background:none;cursor:pointer;font-family:inherit;text-align:left;color:{{ r.fg }}">
+                    <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#272320;display:flex;align-items:center;justify-content:center;font-size:1.0625rem;color:{{ r.iconColor }}"><i class="{{ r.icon }}"></i></span>
+                    <span style="flex:1;min-width:0;font-size:0.9375rem">{{ r.label }}</span>
+                    <sc-if value="{{ r.caret }}" hint-placeholder-val="{{ yes }}"><i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#6f6862"></i></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <nav style="flex:none;height:64px;border-top:1px solid rgba(255,255,255,0.07);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:#121110">
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a948d;font-family:inherit"><i class="ph ph-house" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">홈</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a948d;font-family:inherit"><i class="ph ph-calendar-blank" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">일정</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a948d;font-family:inherit"><i class="ph ph-chart-bar" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">분석</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#f0785a;font-family:inherit"><i class="ph-fill ph-gear" style="font-size:1.25rem"></i><span style="font-size:0.6875rem;font-weight:700">설정</span></button>
+            </nav>
+
+            <sc-if value="{{ toast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:88px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;color:#f2efec">{{ toast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">프로필 카드는 이름과 「견종 · 나이」를 보여주고, 비어 있으면 등록 안내를 대신 씁니다. 언어 행을 누르면 한국어와 English가 바뀝니다. 로그아웃은 위험 동작이라 꺾쇠 없이 적색 글자로 끝냅니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">02 · 프로필 오버레이 — ProfileOverlay (편집 · 견종 선택)</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT · 편집</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="프로필 오버레이 · 편집" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="닫기" style="width:44px;height:44px;border:none;background:none;color:#5c5f63;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">프로필</span>
+              <button onClick="{{ save }}" disabled="{{ saving }}" style="height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px;opacity:{{ saveOpacity }}">
+                <sc-if value="{{ saving }}" hint-placeholder-val="{{ no }}"><span style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;animation:spin 0.7s linear infinite"></span></sc-if>저장
+              </button>
+            </header>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:20px">
+
+              <div style="display:flex;flex-direction:column;align-items:center;gap:9px">
+                <button style="position:relative;width:100px;height:100px;border:none;background:none;padding:0;cursor:pointer">
+                  <span style="position:absolute;inset:0;border-radius:50px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#8a8d92;font-size:2.125rem"><i class="ph ph-dog"></i></span>
+                  <span style="position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:16px;background:#e9e6e1;border:2px solid #f6f5f3;display:flex;align-items:center;justify-content:center;font-size:0.9375rem;color:#5c5f63"><i class="ph ph-camera"></i></span>
+                </button>
+                <span style="font-size:0.75rem;color:#8a8d92;text-align:center">사진을 눌러 바꿉니다</span>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.name.top }};font-size:{{ f.name.size }};color:{{ f.name.colorL }}">이름</span>
+                  <input value="{{ name }}" onChange="{{ setName }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a" onFocus="{{ f.name.focus }}" onBlur="{{ f.name.blur }}">
+                </label>
+              </div>
+
+              <div style="position:relative">
+                <button onClick="{{ openBreed }}" style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#e9e6e1;cursor:pointer;font-family:inherit;text-align:left">
+                  <span style="font-size:0.6875rem;color:#7d8085">견종</span>
+                  <span style="display:flex;align-items:center;gap:6px">
+                    <span style="flex:1;min-width:0;color:#17181a;font-size:0.9375rem">{{ breedLabel }}</span>
+                    <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#8a8d92;display:block;transition:transform 0.24s ease;transform:{{ breedCaret }}"></i>
+                  </span>
+                </button>
+                <sc-if value="{{ breedOpen }}" hint-placeholder-val="{{ no }}">
+                  <div class="sy" ref="{{ breedRef }}" style="position:absolute;z-index:20;top:calc(100% + 6px);left:0;right:0;max-height:212px;overflow-y:auto;padding:6px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(23,24,26,0.18);display:flex;flex-direction:column">
+                    <sc-for list="{{ breedOptions }}" as="b" hint-placeholder-count="6">
+                      <button onClick="{{ b.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:0 12px;border:none;border-radius:10px;background:{{ b.bgL }};color:{{ b.fgL }};font-size:0.875rem;font-weight:{{ b.fw }};font-family:inherit;cursor:pointer;text-align:left">
+                        {{ b.label }}
+                        <sc-if value="{{ b.on }}" hint-placeholder-val="{{ no }}"><svg viewBox="0 0 12 12" style="flex:none;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="2.5,6.5 5,9 9.5,3.5"></polyline></svg></sc-if>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="position:relative">
+                <button onClick="{{ openBirth }}" style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#e9e6e1;cursor:pointer;font-family:inherit;text-align:left">
+                  <span style="font-size:0.6875rem;color:#7d8085">생일</span>
+                  <span style="display:flex;align-items:center;gap:6px">
+                    <span style="flex:1;min-width:0;color:#17181a;font-size:0.9375rem;font-variant-numeric:tabular-nums">{{ birth }}</span>
+                    <span style="flex:none;font-size:0.8125rem;color:#8a8d92">{{ ageText }}</span>
+                    <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#8a8d92;display:block;transition:transform 0.24s ease;transform:{{ birthCaret }}"></i>
+                  </span>
+                </button>
+                <sc-if value="{{ birthOpen }}" hint-placeholder-val="{{ no }}">
+                  <div style="position:absolute;z-index:20;top:calc(100% + 6px);left:0;right:0;padding:12px 12px 8px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(23,24,26,0.18);display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px">
+                      <button onClick="{{ toggleYm }}" style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;border:none;border-radius:12px;background:none;font-family:inherit;cursor:pointer;color:{{ ymLabelColorL }}">
+                        <span style="font-size:1.0625rem;font-weight:700;font-variant-numeric:tabular-nums">{{ cal.label }}</span>
+                        <i class="ph ph-caret-right" style="font-size:0.8125rem;display:inline-block;transition:transform 0.24s ease;transform:{{ ymCaretRot }}"></i>
+                      </button>
+                      <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+                        <span style="display:flex;animation:fadein 0.24s ease">
+                          <button onClick="{{ cal.prev }}" aria-label="이전 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#5c5f63;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+                          <button onClick="{{ cal.next }}" aria-label="다음 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#5c5f63;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+                        </span>
+                      </sc-if>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;overflow:hidden;interpolate-size:allow-keywords;transition:height 0.28s ease">
+                    <sc-if value="{{ ymMode }}" hint-placeholder-val="{{ no }}">
+                      <div style="position:relative;height:180px;display:grid;grid-template-columns:repeat(2,72px);column-gap:12px;justify-content:center;animation:fadein 0.24s ease">
+                        <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#e9e6e1"></span>
+                        <sc-for list="{{ ymWheelLight }}" as="col" hint-placeholder-count="2">
+                          <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                            <div style="height:72px"></div>
+                            <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                              <button onClick="{{ it.pick }}" disabled="{{ it.off }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                            </sc-for>
+                            <div style="height:72px"></div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease;font-size:0.75rem;color:#8a8d92;text-align:center">
+                      <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7"><span>{{ w.label }}</span></sc-for>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease">
+                      <sc-for list="{{ calLight }}" as="c" hint-placeholder-count="42">
+                        <button onClick="{{ c.pick }}" disabled="{{ c.dim }}" style="height:44px;border:none;background:none;padding:0;cursor:{{ c.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center">
+                          <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                    </sc-if>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+
+              <label style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:0.75rem;color:#7d8085">특징</span>
+                <textarea value="{{ notes }}" onChange="{{ setNotes }}" rows="4" placeholder="알레르기, 복용 중인 약, 겁내는 소리 등" style="box-sizing:border-box;width:100%;border:none;border-radius:14px;background:#e9e6e1;color:#17181a;padding:12px 14px;font-size:0.9375rem;font-family:inherit;line-height:1.55;resize:none;outline:none;caret-color:#b8452a"></textarea>
+              </label>
+            </div>
+
+            <sc-if value="{{ toast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;color:#f4f3f1">{{ toast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK · 편집</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="프로필 오버레이 · 편집 · 다크" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="닫기" style="width:44px;height:44px;border:none;background:none;color:#c2bbb3;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">프로필</span>
+              <button onClick="{{ save }}" disabled="{{ saving }}" style="height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px;opacity:{{ saveOpacity }}">
+                <sc-if value="{{ saving }}" hint-placeholder-val="{{ no }}"><span style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(18,17,16,0.25);border-top-color:#121110;animation:spin 0.7s linear infinite"></span></sc-if>저장
+              </button>
+            </header>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:20px">
+
+              <div style="display:flex;flex-direction:column;align-items:center;gap:9px">
+                <button style="position:relative;width:100px;height:100px;border:none;background:none;padding:0;cursor:pointer">
+                  <span style="position:absolute;inset:0;border-radius:50px;background:#2b2724;display:flex;align-items:center;justify-content:center;color:#9a948d;font-size:2.125rem"><i class="ph ph-dog"></i></span>
+                  <span style="position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:16px;background:#3a332e;border:2px solid #121110;display:flex;align-items:center;justify-content:center;font-size:0.9375rem;color:#c2bbb3"><i class="ph ph-camera"></i></span>
+                </button>
+                <span style="font-size:0.75rem;color:#9a948d;text-align:center">사진을 눌러 바꿉니다</span>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#211e1c;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.name.top }};font-size:{{ f.name.size }};color:{{ f.name.colorD }}">이름</span>
+                  <input value="{{ name }}" onChange="{{ setName }}" onFocus="{{ f.name.focus }}" onBlur="{{ f.name.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+                </label>
+              </div>
+
+              <div style="position:relative">
+                <button onClick="{{ openBreed }}" style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#211e1c;cursor:pointer;font-family:inherit;text-align:left">
+                  <span style="font-size:0.6875rem;color:#8f8880">견종</span>
+                  <span style="display:flex;align-items:center;gap:6px">
+                    <span style="flex:1;min-width:0;color:#f2efec;font-size:0.9375rem">{{ breedLabel }}</span>
+                    <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#9a948d;display:block;transition:transform 0.24s ease;transform:{{ breedCaret }}"></i>
+                  </span>
+                </button>
+                <sc-if value="{{ breedOpen }}" hint-placeholder-val="{{ no }}">
+                  <div class="sy" ref="{{ breedRefD }}" style="position:absolute;z-index:20;top:calc(100% + 6px);left:0;right:0;max-height:212px;overflow-y:auto;padding:6px;border-radius:14px;background:#2b2724;box-shadow:0 10px 30px rgba(0,0,0,0.5);display:flex;flex-direction:column">
+                    <sc-for list="{{ breedOptions }}" as="b" hint-placeholder-count="6">
+                      <button onClick="{{ b.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:0 12px;border:none;border-radius:10px;background:{{ b.bgD }};color:{{ b.fgD }};font-size:0.875rem;font-weight:{{ b.fw }};font-family:inherit;cursor:pointer;text-align:left">
+                        {{ b.label }}
+                        <sc-if value="{{ b.on }}" hint-placeholder-val="{{ no }}"><svg viewBox="0 0 12 12" style="flex:none;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="2.5,6.5 5,9 9.5,3.5"></polyline></svg></sc-if>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="position:relative">
+                <button onClick="{{ openBirth }}" style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#211e1c;cursor:pointer;font-family:inherit;text-align:left">
+                  <span style="font-size:0.6875rem;color:#8f8880">생일</span>
+                  <span style="display:flex;align-items:center;gap:6px">
+                    <span style="flex:1;min-width:0;color:#f2efec;font-size:0.9375rem;font-variant-numeric:tabular-nums">{{ birth }}</span>
+                    <span style="flex:none;font-size:0.8125rem;color:#9a948d">{{ ageText }}</span>
+                    <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#9a948d;display:block;transition:transform 0.24s ease;transform:{{ birthCaret }}"></i>
+                  </span>
+                </button>
+                <sc-if value="{{ birthOpen }}" hint-placeholder-val="{{ no }}">
+                  <div style="position:absolute;z-index:20;top:calc(100% + 6px);left:0;right:0;padding:12px 12px 8px;border-radius:14px;background:#2b2724;box-shadow:0 10px 30px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px">
+                      <button onClick="{{ toggleYm }}" style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;border:none;border-radius:12px;background:none;font-family:inherit;cursor:pointer;color:{{ ymLabelColorD }}">
+                        <span style="font-size:1.0625rem;font-weight:700;font-variant-numeric:tabular-nums">{{ cal.label }}</span>
+                        <i class="ph ph-caret-right" style="font-size:0.8125rem;display:inline-block;transition:transform 0.24s ease;transform:{{ ymCaretRot }}"></i>
+                      </button>
+                      <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+                        <span style="display:flex;animation:fadein 0.24s ease">
+                          <button onClick="{{ cal.prev }}" aria-label="이전 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#c2bbb3;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+                          <button onClick="{{ cal.next }}" aria-label="다음 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#c2bbb3;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+                        </span>
+                      </sc-if>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;overflow:hidden;interpolate-size:allow-keywords;transition:height 0.28s ease">
+                    <sc-if value="{{ ymMode }}" hint-placeholder-val="{{ no }}">
+                      <div style="position:relative;height:180px;display:grid;grid-template-columns:repeat(2,72px);column-gap:12px;justify-content:center;animation:fadein 0.24s ease">
+                        <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#3a332e"></span>
+                        <sc-for list="{{ ymWheelDark }}" as="col" hint-placeholder-count="2">
+                          <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                            <div style="height:72px"></div>
+                            <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                              <button onClick="{{ it.pick }}" disabled="{{ it.off }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                            </sc-for>
+                            <div style="height:72px"></div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease;font-size:0.75rem;color:#9a948d;text-align:center">
+                      <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7"><span>{{ w.label }}</span></sc-for>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease">
+                      <sc-for list="{{ calDark }}" as="c" hint-placeholder-count="42">
+                        <button onClick="{{ c.pick }}" disabled="{{ c.dim }}" style="height:44px;border:none;background:none;padding:0;cursor:{{ c.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center">
+                          <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                    </sc-if>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+
+              <label style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:0.75rem;color:#8f8880">특징</span>
+                <textarea value="{{ notes }}" onChange="{{ setNotes }}" rows="4" placeholder="알레르기, 복용 중인 약, 곁내는 소리 등" style="box-sizing:border-box;width:100%;border:none;border-radius:14px;background:#211e1c;color:#f2efec;padding:12px 14px;font-size:0.9375rem;font-family:inherit;line-height:1.55;resize:none;outline:none;caret-color:#f0785a"></textarea>
+              </label>
+            </div>
+
+            <sc-if value="{{ toast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;color:#f2efec">{{ toast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">견종은 13개라 검색 없는 드롭다운으로, 생일은 카탈로그의 달력 부품으로 고릅니다 — 둘 다 별도 화면으로 빠지지 않습니다. 오늘 이후 날짜는 고를 수 없고, 저장은 화면을 닫지 않고 토스트로만 알립니다. 두 기기가 같은 프로필을 공유합니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">03 · 프로필 오버레이 — 빈 초기값 (첫 등록)</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT · 빈 값</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="프로필 오버레이 · 빈 초기값" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="닫기" style="width:44px;height:44px;border:none;background:none;color:#5c5f63;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">프로필</span>
+              <button style="height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px">저장</button>
+            </header>
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:9px">
+                <button style="position:relative;width:100px;height:100px;border:none;background:none;padding:0;cursor:pointer">
+                  <span style="position:absolute;inset:0;border-radius:50px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#8a8d92;font-size:2.125rem"><i class="ph ph-dog"></i></span>
+                  <span style="position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:16px;background:#e9e6e1;border:2px solid #f6f5f3;display:flex;align-items:center;justify-content:center;font-size:0.9375rem;color:#5c5f63"><i class="ph ph-camera"></i></span>
+                </button>
+                <span style="font-size:0.75rem;color:#8a8d92;text-align:center">사진을 눌러 바꿉니다</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                  <span style="position:absolute;left:14px;top:18px;pointer-events:none;font-size:0.9375rem;color:#8a8d92">이름</span>
+                  <input value="" readOnly="{{ yes }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+                </label>
+              </div>
+              <button style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#e9e6e1;cursor:pointer;font-family:inherit;text-align:left">
+                <span style="font-size:0.6875rem;color:#7d8085">견종</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                  <span style="flex:1;min-width:0;color:#17181a;font-size:0.9375rem">—</span>
+                  <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#8a8d92;display:block"></i>
+                </span>
+              </button>
+              <button style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#e9e6e1;cursor:pointer;font-family:inherit;text-align:left">
+                <span style="font-size:0.6875rem;color:#7d8085">생일</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                  <span style="flex:1;min-width:0;color:#17181a;font-size:0.9375rem;font-variant-numeric:tabular-nums">—</span>
+                  <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#8a8d92;display:block"></i>
+                </span>
+              </button>
+              <label style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:0.75rem;color:#7d8085">특징</span>
+                <textarea rows="4" readOnly="{{ yes }}" placeholder="알레르기, 복용 중인 약, 겁내는 소리 등" style="box-sizing:border-box;width:100%;border:none;border-radius:14px;background:#e9e6e1;color:#17181a;padding:12px 14px;font-size:0.9375rem;font-family:inherit;line-height:1.55;resize:none;outline:none;caret-color:#b8452a"></textarea>
+              </label>
+            </div>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK · 빈 값</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="프로필 오버레이 · 빈 초기값 · 다크" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="닫기" style="width:44px;height:44px;border:none;background:none;color:#c2bbb3;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">프로필</span>
+              <button style="height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px">저장</button>
+            </header>
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:9px">
+                <button style="position:relative;width:100px;height:100px;border:none;background:none;padding:0;cursor:pointer">
+                  <span style="position:absolute;inset:0;border-radius:50px;background:#2b2724;display:flex;align-items:center;justify-content:center;color:#9a948d;font-size:2.125rem"><i class="ph ph-dog"></i></span>
+                  <span style="position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:16px;background:#3a332e;border:2px solid #121110;display:flex;align-items:center;justify-content:center;font-size:0.9375rem;color:#c2bbb3"><i class="ph ph-camera"></i></span>
+                </button>
+                <span style="font-size:0.75rem;color:#9a948d;text-align:center">사진을 눌러 바꿉니다</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#211e1c;cursor:text">
+                  <span style="position:absolute;left:14px;top:18px;pointer-events:none;font-size:0.9375rem;color:#9a948d">이름</span>
+                  <input value="" readOnly="{{ yes }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+                </label>
+              </div>
+              <button style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#211e1c;cursor:pointer;font-family:inherit;text-align:left">
+                <span style="font-size:0.6875rem;color:#8f8880">견종</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                  <span style="flex:1;min-width:0;color:#f2efec;font-size:0.9375rem">—</span>
+                  <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#9a948d;display:block"></i>
+                </span>
+              </button>
+              <button style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;box-sizing:border-box;height:56px;padding:0 34px 0 14px;border-radius:14px;border:none;background:#211e1c;cursor:pointer;font-family:inherit;text-align:left">
+                <span style="font-size:0.6875rem;color:#8f8880">생일</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                  <span style="flex:1;min-width:0;color:#f2efec;font-size:0.9375rem;font-variant-numeric:tabular-nums">—</span>
+                  <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#9a948d;display:block"></i>
+                </span>
+              </button>
+              <label style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:0.75rem;color:#8f8880">특징</span>
+                <textarea rows="4" readOnly="{{ yes }}" placeholder="알레르기, 복용 중인 약, 겁내는 소리 등" style="box-sizing:border-box;width:100%;border:none;border-radius:14px;background:#211e1c;color:#f2efec;padding:12px 14px;font-size:0.9375rem;font-family:inherit;line-height:1.55;resize:none;outline:none;caret-color:#f0785a"></textarea>
+              </label>
+            </div>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">첫 등록 상태입니다 — 이름 라벨은 필드 가운데에 내려와 있고, 견종·생일은 「—」, 특징은 안내 문구만 보입니다. 정적 예시이므로 위 02와 값을 공유하지 않습니다.</span>
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:950}}">
+// useProfile.js의 BREEDS 순서와 표기를 그대로 따른다 (+ 예약값 '기타')
+const BREED_LIST = [
+  '골든 리트리버', '닥스훈트', '말티즈', '말티푸', '비숑 프리제', '시바견', '시추',
+  '진돗개', '치와와', '토이 푸들', '포메라니안', '웰시 코기', '기타',
+];
+
+class Component extends DCLogic {
+  state = {
+    name: '초코', breed: '토이 푸들', birth: '2021-04-18',
+    notes: '', query: '', focusKey: null, saving: false, toast: '', lang: '한국어',
+    open: null, cursor: null, ymMode: false, ymYear: null,
+  };
+
+  componentWillUnmount() { clearTimeout(this.toastTimer); }
+
+  toast(text) {
+    this.setState({ toast: text });
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+
+  field(k) {
+    const s = this.state;
+    const up = s.focusKey === k || String(s[k] || '').length > 0;
+    const on = s.focusKey === k;
+    return {
+      top: up ? '9px' : '18px',
+      size: up ? '0.6875rem' : '0.9375rem',
+      colorL: on ? '#b8452a' : (up ? '#7d8085' : '#8a8d92'),
+      colorD: on ? '#f0785a' : (up ? '#8f8880' : '#9a948d'),
+      focus: () => this.setState({ focusKey: k }),
+      blur: () => this.setState((st) => (st.focusKey === k ? { focusKey: null } : null)),
+    };
+  }
+
+  // 휠 한 열 — 실제로 굴러간다. 줄 36 · 위아래 여백 72로 첫·끝 값도 가운데 올 수 있다.
+  // 멈추면 가운데 줄이 값이 된다(스냅). 줄을 눌러 고르는 길도 남긴다.
+  wheelCol(key, labels, curIndex, ink, onPick, offAt) {
+    const K = '_w' + key;
+    return {
+      items: labels.map((label, i) => ({
+        label, color: ink,
+        size: i === curIndex ? '1.0625rem' : '0.9375rem',
+        fw: '400',
+        off: offAt ? !!offAt(i) : false,
+        cursor: offAt && offAt(i) ? 'default' : 'pointer',
+        pick: () => { if (!(offAt && offAt(i))) onPick(i); },
+      })),
+      // 라이트·다크가 같은 열 데이터를 쓰므로 위치는 요소마다 따로 기억한다.
+      // 스크롤은 요소에 직접 걸어 굴림이 끊기지 않게 한다.
+      ref: (el) => {
+        if (!el) return;
+        el.__commit = () => {
+          const i = Math.max(0, Math.min(labels.length - 1, Math.round(el.scrollTop / 36)));
+          if (offAt && offAt(i)) { el.scrollTop = el.__wi * 36; return; }
+          if (i !== el.__wi) { el.__wi = i; onPick(i); }
+        };
+        if (!el.__bound) {
+          el.__bound = true;
+          el.addEventListener('scroll', () => {
+            clearTimeout(el.__t);
+            el.__t = setTimeout(() => el.__commit(), 130);
+          }, { passive: true });
+          el.addEventListener('scrollend', () => el.__commit());
+        }
+        // 줄이 다 그려지기 전엔 scrollTop이 잘린다 — 높이가 찰 때까지 미룬다
+        const place = () => {
+          if (!el.isConnected) return;
+          if (el.scrollHeight < 144 + labels.length * 36) { requestAnimationFrame(place); return; }
+          el.__wi = curIndex; el.scrollTop = curIndex * 36;
+        };
+        if (el.__wi !== curIndex) place();
+      },
+    };
+  }
+
+  // 연·월 휠 — 05-H. 생일이므로 오늘 이후는 고를 수 없다
+  ymWheel(dark, y, m) {
+    const ink = dark ? '#f2efec' : '#17181a';
+    // 생년월도 미래를 고를 수 없다 — 올해 −50년 ~ 올해, 이번 달 이후는 비활성
+    const t = new Date();
+    const thisY = t.getFullYear(), thisM = t.getMonth();
+    const years = Array.from({ length: 51 }, (_, i) => thisY - 50 + i);
+    const isOff = (yy, mm) => yy > thisY || (yy === thisY && mm > thisM);
+    return [
+      this.wheelCol('by', years.map((v) => v + '년'), Math.max(0, years.indexOf(y)), ink,
+        (i) => this.setState({ ymYear: years[i] }), (i) => isOff(years[i], m)),
+      this.wheelCol('bm', Array.from({ length: 12 }, (_, i) => (i + 1) + '월'), m, ink,
+        (i) => this.setState((p) => ({ cursor: { y: p.ymYear || y, m: i } })), (i) => isOff(y, i)),
+    ];
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const age = (() => {
+      if (!s.birth) return '';
+      const b = new Date(s.birth);
+      const now = new Date(2026, 8, 2);
+      let months = (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
+      if (now.getDate() < b.getDate()) months -= 1;
+      const y = Math.floor(months / 12);
+      const m = months % 12;
+      return y > 0 ? (m > 0 ? y + '살 ' + m + '개월' : y + '살') : m + '개월';
+    })();
+
+    const rows1 = [
+      { icon: 'ph ph-bell', label: '알림', value: '' },
+      { icon: 'ph ph-video-camera', label: '카메라', value: '' },
+      { icon: 'ph ph-lightbulb', label: '추론 프롬프트', value: '' },
+      { icon: 'ph ph-chart-bar', label: '분석', value: '' },
+      { icon: 'ph ph-cpu', label: '시스템 리소스', value: '' },
+      { icon: 'ph ph-translate', label: '언어', value: s.lang, click: () => this.setState({ lang: s.lang === '한국어' ? 'English' : '한국어' }) },
+      { icon: 'ph ph-moon', label: '테마', value: '' },
+    ];
+
+    const mk1 = (dark, themeValue) => rows1.map((r, i) => ({
+      icon: r.icon, label: r.label,
+      value: r.label === '테마' ? themeValue : r.value,
+      divider: i < rows1.length - 1 ? '1px solid ' + (dark ? 'rgba(255,255,255,0.07)' : 'rgba(23,24,26,0.07)') : 'none',
+      click: r.click || (() => {}),
+    }));
+
+    const rows2 = [
+      { icon: 'ph ph-password', label: '비밀번호 변경', danger: false },
+      { icon: 'ph ph-hard-drives', label: '서버 주소', danger: false },
+      { icon: 'ph ph-sign-out', label: '로그아웃', danger: true },
+    ];
+    const mk2 = (dark) => rows2.map((r, i) => ({
+      icon: r.icon, label: r.label,
+      caret: !r.danger,
+      fg: r.danger ? (dark ? '#ff8b8b' : '#a3271f') : (dark ? '#f2efec' : '#17181a'),
+      iconColor: r.danger ? (dark ? '#ff8b8b' : '#a3271f') : (dark ? '#c2bbb3' : '#5c5f63'),
+      divider: i < rows2.length - 1 ? '1px solid ' + (dark ? 'rgba(255,255,255,0.07)' : 'rgba(23,24,26,0.07)') : 'none',
+      click: () => { if (r.danger) this.toast('로그아웃했습니다'); },
+    }));
+
+    // 생일 달력 — 오늘 이후는 고를 수 없다
+    const cur = s.cursor || { y: Number(s.birth.slice(0, 4)) || 2026, m: (Number(s.birth.slice(5, 7)) || 9) - 1 };
+    const TODAY = '2026-09-02';
+    const calCells = (dark) => {
+      const lead = new Date(cur.y, cur.m, 1).getDay();
+      const prevLast = new Date(cur.y, cur.m, 0).getDate();
+      const last = new Date(cur.y, cur.m + 1, 0).getDate();
+      const out = [];
+      for (let i = lead - 1; i >= 0; i--) out.push({ n: prevLast - i, dim: true });
+      for (let n = 1; n <= last; n++) {
+        const iso = cur.y + '-' + String(cur.m + 1).padStart(2, '0') + '-' + String(n).padStart(2, '0');
+        out.push({ n, iso, today: iso === TODAY, picked: iso === s.birth, future: iso > TODAY });
+      }
+      let trail = 1;
+      while (out.length % 7 !== 0 || out.length < 42) out.push({ n: trail++, dim: true });
+      return out.map((c) => {
+        const off = c.dim || c.future;
+        return {
+          n: String(c.n), dim: !!off, cursor: off ? 'default' : 'pointer',
+          numBg: c.picked ? (c.today ? (dark ? '#f0785a' : '#b8452a') : (dark ? '#f2efec' : '#17181a')) : 'transparent',
+          numColor: off ? (dark ? '#4a443f' : '#c9c5bf')
+            : (c.picked ? (dark ? '#121110' : '#fff') : (c.today ? (dark ? '#f0785a' : '#b8452a') : (dark ? '#f2efec' : '#17181a'))),
+          numWeight: c.today || c.picked ? '700' : '400',
+          pick: () => { if (!off) this.setState({ birth: c.iso, open: null }); },
+        };
+      });
+    };
+
+    const centerPick = (el) => {
+      if (!el) return;
+      const i = BREED_LIST.indexOf(s.breed);
+      const child = i >= 0 && el.children[i];
+      if (child) el.scrollTop = Math.max(0, child.offsetTop + child.offsetHeight / 2 - el.clientHeight / 2);
+    };
+
+    return {
+      yes: true, no: false,
+      f: { name: this.field('name') },
+
+      profileName: s.name || '프로필',
+      profileSub: s.name ? [s.breed, age].filter(Boolean).join(' · ') : '프로필을 등록하세요',
+      group1Light: mk1(false, '라이트'), group1Dark: mk1(true, '다크'),
+      group2Light: mk2(false), group2Dark: mk2(true),
+
+      name: s.name, setName: (e) => this.setState({ name: e.target.value }),
+      notes: s.notes, setNotes: (e) => this.setState({ notes: e.target.value }),
+      breedLabel: s.breed || '—',
+      // 화면 표기는 카탈로그 05-G 날짜 규칙 YYYY. MM. DD. (내부는 ISO)
+      birth: s.birth ? s.birth.slice(0, 4) + '. ' + s.birth.slice(5, 7) + '. ' + s.birth.slice(8, 10) + '.' : '—',
+      ageText: age,
+
+      // 견종 = 드롭다운(13개 · 검색 불필요), 생일 = 달력 드롭다운
+      breedOpen: s.open === 'breed',
+      breedCaret: s.open === 'breed' ? 'rotate(180deg)' : 'rotate(0deg)',
+      openBreed: () => this.setState({ open: s.open === 'breed' ? null : 'breed' }),
+      breedRef: centerPick, breedRefD: centerPick,
+      breedOptions: BREED_LIST.map((b) => {
+        const on = b === s.breed;
+        return {
+          label: b, on, fw: on ? '700' : '400',
+          bgL: on ? 'rgba(184,69,42,0.10)' : 'transparent',
+          fgL: on ? '#a3271f' : '#17181a',
+          bgD: on ? 'rgba(240,120,90,0.2)' : 'transparent',
+          fgD: on ? '#f0785a' : '#f2efec',
+          pick: () => this.setState({ breed: b, open: null }),
+        };
+      }),
+
+      birthOpen: s.open === 'birth',
+      birthCaret: s.open === 'birth' ? 'rotate(180deg)' : 'rotate(0deg)',
+      openBirth: () => this.setState(s.open === 'birth'
+        // 닫힐 때 휠에서 고른 연·월을 달력에 반영한다(05-H)
+        ? { open: null, ymMode: false, cursor: { y: s.ymMode ? (s.ymYear || cur.y) : cur.y, m: cur.m } }
+        : {
+          open: 'birth', ymMode: false,
+          cursor: s.cursor || { y: Number(s.birth.slice(0, 4)), m: Number(s.birth.slice(5, 7)) - 1 },
+        }),
+      weekdays: ['일', '월', '화', '수', '목', '금', '토'].map((label) => ({ label })),
+      cal: {
+        label: (s.ymMode ? (s.ymYear || cur.y) : cur.y) + '년 ' + (cur.m + 1) + '월',
+        prev: () => { const d = new Date(cur.y, cur.m - 1, 1); this.setState({ cursor: { y: d.getFullYear(), m: d.getMonth() } }); },
+        next: () => { const d = new Date(cur.y, cur.m + 1, 1); this.setState({ cursor: { y: d.getFullYear(), m: d.getMonth() } }); },
+      },
+      calLight: calCells(false), calDark: calCells(true),
+
+      // 연·월 전환 — 같은 패널 안에서 달력과 두 열 휠을 바꾼다 (별도 시트로 빠지지 않는다 · 05-H)
+      ymMode: s.ymMode, dayMode: !s.ymMode,
+      // 접기·펼치기 스위치 — 접히면 꺾쇠가 오른쪽, 펼치면 아래를 본다(05-H)
+      ymCaretRot: s.ymMode ? 'rotate(90deg)' : 'rotate(0deg)',
+      ymLabelColorL: s.ymMode ? '#b8452a' : '#17181a',
+      ymLabelColorD: s.ymMode ? '#f0785a' : '#f2efec',
+      // 펼칠 때는 지금 값에서 시작하고, 접힐 때 고른 연·월을 달력에 반영한다(05-H)
+      toggleYm: () => this.setState(s.ymMode
+        ? { ymMode: false, cursor: { y: s.ymYear || cur.y, m: cur.m } }
+        : { ymMode: true, ymYear: cur.y }),
+      ymWheelLight: this.ymWheel(false, s.ymYear || cur.y, cur.m),
+      ymWheelDark: this.ymWheel(true, s.ymYear || cur.y, cur.m),
+
+      saving: s.saving,
+      saveOpacity: s.saving ? '0.6' : '1',
+      save: () => {
+        if (s.saving) return;
+        this.setState({ saving: true });
+        clearTimeout(this.saveTimer);
+        this.saveTimer = setTimeout(() => {
+          this.setState({ saving: false });
+          this.toast('프로필을 저장했습니다');
+        }, 900);
+      },
+      toast: s.toast,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="./public/icons/phosphor/regular/style.css">
+<link rel="stylesheet" href="./public/icons/phosphor/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  body { margin: 0; background: #08090a; }
+  a { color: #f0785a; text-decoration: none; }
+  a:hover { color: #ff9276; }
+  button { transition: opacity 0.18s ease; }
+  button:active:not(:disabled) { opacity: 0.65; transition: opacity 0s; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 8px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border: none; border-radius: 8px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  .sy > * { flex: 0 0 auto; }
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+</style>
+</helmet>
+
+<section style="min-height:100vh;background:#08090a;display:flex;flex-direction:column;align-items:center;gap:30px;padding:52px 32px 90px;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif">
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+    <span style="font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:#6b7178">Mewly · 알림함 · 알림 설정 — v3 컴포넌트 적용</span>
+    <span style="max-width:66ch;font-size:0.8125rem;color:#8a9099;line-height:1.7;text-wrap:pretty">헤더의 종 아이콘에서 열리는 두 오버레이입니다. 알림함은 종류 세그먼트·날짜 묶음·읽음 처리·개별 삭제·전체 삭제가 동작하고, 알림 설정의 두 스위치는 알림함과 상태를 공유합니다. 라이트·다크 두 기기가 같은 상태를 봅니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">01 · 알림함 — NotificationsOverlay</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="알림함 · 라이트" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button onClick="{{ closeInbox }}" aria-label="뒤로" style="width:44px;height:44px;border:none;background:none;color:#5c5f63;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-arrow-left"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">알림</span>
+              <sc-if value="{{ hasAny }}" hint-placeholder-val="{{ yes }}">
+                <button onClick="{{ clearAll }}" style="height:40px;box-sizing:border-box;padding:0 16px;border-radius:100px;border:none;background:#e9e6e1;color:#17181a;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">전체 삭제</button>
+              </sc-if>
+            </header>
+
+            <div style="flex:none;margin:2px 16px 0;position:relative;display:flex;padding:3px;border-radius:100px;background:#e9e6e1;gap:3px">
+              <span aria-hidden="true" style="position:absolute;top:3px;bottom:3px;left:3px;width:{{ segW }};border-radius:100px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.10);transition:transform 0.22s cubic-bezier(0.2,0,0,1);transform:{{ segX }}"></span>
+              <sc-for list="{{ segLight }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.pick }}" style="position:relative;flex:1;height:36px;box-sizing:border-box;border-radius:100px;border:none;background:none;color:{{ c.fg }};font-size:0.8125rem;font-weight:{{ c.fw }};font-family:inherit;cursor:pointer">{{ c.label }}</button>
+              </sc-for>
+            </div>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px 24px;display:flex;flex-direction:column;gap:18px">
+              <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ no }}">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:56px 16px 26px;text-align:center">
+                  <span style="font-size:1.0625rem;font-weight:700;color:#17181a">{{ emptyTitle }}</span>
+                  <span style="font-size:0.8125rem;color:#8a8d92;line-height:1.6;max-width:30ch">이상행동이 감지되거나 일정 알람이 울리면 여기에 쌓입니다.</span>
+                  <button style="margin-top:6px;height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">알림 설정 열기</button>
+                </div>
+              </sc-if>
+              <sc-for list="{{ groupsLight }}" as="g" hint-placeholder-count="2">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <span style="font-size:0.9375rem;font-weight:700;color:#33383f">{{ g.title }}</span>
+                  <div style="border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);overflow:hidden;display:flex;flex-direction:column">
+                    <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:center;gap:8px;min-height:56px;box-sizing:border-box;padding:5px 6px 5px 16px;border-bottom:{{ n.divider }}">
+                        <button onClick="{{ n.open }}" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;border:none;background:none;padding:0;font-family:inherit;text-align:left;cursor:pointer">
+                          <span style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:{{ n.kindColor }}"><sc-if value="{{ n.unread }}" hint-placeholder-val="{{ no }}"><span aria-label="읽지 않음" style="flex:none;width:8px;height:8px;border-radius:4px;background:#b8452a"></span></sc-if><sc-if value="{{ showKind }}" hint-placeholder-val="{{ yes }}"><span style="font-weight:{{ n.kindFw }}">{{ n.kindLabel }}</span></sc-if><span style="color:#8a8d92;font-variant-numeric:tabular-nums">{{ n.time }}</span></span>
+                          <span style="font-size:0.9375rem;line-height:1.5;color:{{ n.textColor }};text-wrap:pretty">{{ n.text }}</span>
+                        </button>
+                        <button onClick="{{ n.remove }}" aria-label="삭제" style="flex:none;width:44px;height:44px;border:none;background:none;color:#8a8d92;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:16px;right:16px;bottom:24px;z-index:40;display:flex;justify-content:center;pointer-events:none;animation:fadein 0.16s ease-out"><span style="padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;color:#f4f3f1">{{ toastText }}</span></div>
+            </sc-if>
+
+            <sc-if value="{{ playerOpen }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadein 0.16s ease-out">
+                <div onClick="{{ closePlayer }}" style="position:absolute;inset:0;background:rgba(23,24,26,0.42)"></div>
+                <div style="position:relative;width:100%;background:#f6f5f3;border-radius:28px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.3)">
+                  <button onClick="{{ togglePlay }}" aria-label="{{ playLabel }}" style="position:relative;display:block;width:100%;aspect-ratio:16/9;border:none;padding:0;background:#000;cursor:pointer">
+                    <span style="position:absolute;inset:0;background:linear-gradient(160deg,#2a2622 0%,#161412 100%)"></span>
+                    <sc-if value="{{ playerPaused }}" hint-placeholder-val="{{ yes }}">
+                      <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:28px;background:rgba(0,0,0,0.55);border:1.5px solid #f0785a;color:#f0785a;display:flex;align-items:center;justify-content:center;animation:fadein 0.16s ease-out"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:24px;height:24px;margin-left:3px;fill:currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"></path></svg></span>
+                    </sc-if>
+                    <span style="position:absolute;right:10px;bottom:10px;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,0.5);color:#e9e9ed;font-size:0.75rem;font-variant-numeric:tabular-nums">{{ playerDur }}</span>
+                  </button>
+                  <button onClick="{{ closePlayer }}" aria-label="닫기" style="position:absolute;top:6px;right:6px;width:44px;height:44px;border:none;border-radius:22px;background:rgba(0,0,0,0.45);color:#e9e9ed;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+                  <div style="display:flex;align-items:center;gap:10px;padding:12px 22px 0;font-size:0.75rem;color:#8a8d92;font-variant-numeric:tabular-nums">
+                    <span>{{ playerCur }}</span>
+                    <input type="range" min="0" max="{{ playerMax }}" step="0.1" value="{{ playerT }}" onChange="{{ seekTo }}" style="flex:1;min-width:0;height:4px;appearance:none;-webkit-appearance:none;border-radius:2px;background:linear-gradient(to right,#b8452a {{ playerPct }},#e2dfda {{ playerPct }});accent-color:#b8452a;cursor:pointer">
+                    <span>{{ playerDur }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px;padding:10px 22px 22px;line-height:1">
+                    <div style="display:flex;align-items:baseline;gap:8px">
+                      <span style="font-size:0.75rem;color:#8a8d92;font-variant-numeric:tabular-nums">{{ playerWhen }}</span>
+                      <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:700;color:#17181a">{{ playerKeyword }}</span>
+                    </div>
+                    <span style="font-size:0.8125rem;line-height:1.6;margin-bottom:-4px;color:#5c5f63;text-wrap:pretty">{{ playerText }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="알림함 · 다크" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button onClick="{{ closeInbox }}" aria-label="뒤로" style="width:44px;height:44px;border:none;background:none;color:#c2bbb3;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-arrow-left"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">알림</span>
+              <sc-if value="{{ hasAny }}" hint-placeholder-val="{{ yes }}">
+                <button onClick="{{ clearAll }}" style="height:40px;box-sizing:border-box;padding:0 16px;border-radius:100px;border:none;background:#2b2724;color:#f2efec;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">전체 삭제</button>
+              </sc-if>
+            </header>
+
+            <div style="flex:none;margin:2px 16px 0;position:relative;display:flex;padding:3px;border-radius:100px;background:#211e1c;gap:3px">
+              <span aria-hidden="true" style="position:absolute;top:3px;bottom:3px;left:3px;width:{{ segW }};border-radius:100px;background:#3a332e;transition:transform 0.22s cubic-bezier(0.2,0,0,1);transform:{{ segX }}"></span>
+              <sc-for list="{{ segDark }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.pick }}" style="position:relative;flex:1;height:36px;box-sizing:border-box;border-radius:100px;border:none;background:none;color:{{ c.fg }};font-size:0.8125rem;font-weight:{{ c.fw }};font-family:inherit;cursor:pointer">{{ c.label }}</button>
+              </sc-for>
+            </div>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px 24px;display:flex;flex-direction:column;gap:18px">
+              <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ no }}">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:56px 16px 26px;text-align:center">
+                  <span style="font-size:1.0625rem;font-weight:700;color:#f2efec">{{ emptyTitle }}</span>
+                  <span style="font-size:0.8125rem;color:#9a948d;line-height:1.6;max-width:30ch">이상행동이 감지되거나 일정 알람이 울리면 여기에 쌓입니다.</span>
+                  <button style="margin-top:6px;height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">알림 설정 열기</button>
+                </div>
+              </sc-if>
+              <sc-for list="{{ groupsDark }}" as="g" hint-placeholder-count="2">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <span style="font-size:0.9375rem;font-weight:700;color:#c2bbb3">{{ g.title }}</span>
+                  <div style="border-radius:18px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column">
+                    <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:center;gap:8px;min-height:56px;box-sizing:border-box;padding:5px 6px 5px 16px;border-bottom:{{ n.divider }}">
+                        <button onClick="{{ n.open }}" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;border:none;background:none;padding:0;font-family:inherit;text-align:left;cursor:pointer">
+                          <span style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:{{ n.kindColor }}"><sc-if value="{{ n.unread }}" hint-placeholder-val="{{ no }}"><span aria-label="읽지 않음" style="flex:none;width:8px;height:8px;border-radius:4px;background:#f0785a"></span></sc-if><sc-if value="{{ showKind }}" hint-placeholder-val="{{ yes }}"><span style="font-weight:{{ n.kindFw }}">{{ n.kindLabel }}</span></sc-if><span style="color:#9a948d;font-variant-numeric:tabular-nums">{{ n.time }}</span></span>
+                          <span style="font-size:0.9375rem;line-height:1.5;color:{{ n.textColor }};text-wrap:pretty">{{ n.text }}</span>
+                        </button>
+                        <button onClick="{{ n.remove }}" aria-label="삭제" style="flex:none;width:44px;height:44px;border:none;background:none;color:#9a948d;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:16px;right:16px;bottom:24px;z-index:40;display:flex;justify-content:center;pointer-events:none;animation:fadein 0.16s ease-out"><span style="padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;color:#f2efec">{{ toastText }}</span></div>
+            </sc-if>
+
+            <sc-if value="{{ playerOpen }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadein 0.16s ease-out">
+                <div onClick="{{ closePlayer }}" style="position:absolute;inset:0;background:rgba(0,0,0,0.6)"></div>
+                <div style="position:relative;width:100%;background:#1c1a18;border-radius:28px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.5)">
+                  <button onClick="{{ togglePlay }}" aria-label="{{ playLabel }}" style="position:relative;display:block;width:100%;aspect-ratio:16/9;border:none;padding:0;background:#000;cursor:pointer">
+                    <span style="position:absolute;inset:0;background:linear-gradient(160deg,#2a2622 0%,#161412 100%)"></span>
+                    <sc-if value="{{ playerPaused }}" hint-placeholder-val="{{ yes }}">
+                      <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:28px;background:rgba(0,0,0,0.55);border:1.5px solid #f0785a;color:#f0785a;display:flex;align-items:center;justify-content:center;animation:fadein 0.16s ease-out"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:24px;height:24px;margin-left:3px;fill:currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"></path></svg></span>
+                    </sc-if>
+                    <span style="position:absolute;right:10px;bottom:10px;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,0.5);color:#e9e9ed;font-size:0.75rem;font-variant-numeric:tabular-nums">{{ playerDur }}</span>
+                  </button>
+                  <button onClick="{{ closePlayer }}" aria-label="닫기" style="position:absolute;top:6px;right:6px;width:44px;height:44px;border:none;border-radius:22px;background:rgba(0,0,0,0.45);color:#e9e9ed;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+                  <div style="display:flex;align-items:center;gap:10px;padding:12px 22px 0;font-size:0.75rem;color:#9a948d;font-variant-numeric:tabular-nums">
+                    <span>{{ playerCur }}</span>
+                    <input type="range" min="0" max="{{ playerMax }}" step="0.1" value="{{ playerT }}" onChange="{{ seekTo }}" style="flex:1;min-width:0;height:4px;appearance:none;-webkit-appearance:none;border-radius:2px;background:linear-gradient(to right,#f0785a {{ playerPct }},#3a332e {{ playerPct }});accent-color:#f0785a;cursor:pointer">
+                    <span>{{ playerDur }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px;padding:10px 22px 22px;line-height:1">
+                    <div style="display:flex;align-items:baseline;gap:8px">
+                      <span style="font-size:0.75rem;color:#9a948d;font-variant-numeric:tabular-nums">{{ playerWhen }}</span>
+                      <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:700;color:#f2efec">{{ playerKeyword }}</span>
+                    </div>
+                    <span style="font-size:0.8125rem;line-height:1.6;margin-bottom:-4px;color:#c2bbb3;text-wrap:pretty">{{ playerText }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">날짜별로 묶음 리스트(04) 하나씩 — 묶음 제목은 일정 탭의 날짜 제목과 같은 양식입니다. 읽지 않은 알림은 메타 줄 앞에 강조색 점(8)이 붙고 종류 라벨이 강조색·700, 본문이 잉크색입니다. 읽으면 점이 사라지고 라벨·본문이 보조색으로 내려갑니다. 점은 어느 필터에서도 같은 자리에 있어 종류 라벨이 숨어도 읽음 여부가 보입니다. 왼쪽 색 바는 쓰지 않습니다(03). 읽음 규칙 — 알림함을 열어 목록을 본 것이 읽음입니다. 점은 열려 있는 동안 유지되고, 「뒤로」로 닫을 때 모두 읽음으로 커밋됩니다(이 시트에서는 닫은 뒤 새 알림 한 건이 도착한 상태로 다시 열려 규칙을 보여 줍니다). 본문을 누르는 것은 읽음 처리가 아니라 이동입니다 — 이벤트는 그 클립의 플레이어가 알림함 위에 카드 모달로 열리고, 일정은 해당 일정의 수정 화면으로 갑니다(단독 시트라 토스트로 대체). 오른쭉 X는 그 알림만 지웁니다. 「전체 삭제」는 원본과 같이 확인 없이 즉시 비우며, 비면 헤더에서 사라지고 빈 상태(04)가 나타납니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">02 · 알림 설정 — NotifSettingsOverlay</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="알림 설정 · 라이트" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="뒤로" style="width:44px;height:44px;border:none;background:none;color:#5c5f63;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-arrow-left"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">알림 설정</span>
+            </header>
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:2px 16px 24px;display:flex;flex-direction:column;gap:14px">
+              <sc-if value="{{ permDenied }}" hint-placeholder-val="{{ no }}">
+                <div style="display:flex;flex-direction:column;gap:10px;padding:13px 14px;border-radius:14px;background:#f8e4dd;font-size:0.875rem;line-height:1.55;color:#7a2118">
+                  <div style="display:flex;gap:10px"><i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#b8452a;margin-top:1px"></i><span>시스템 알림 권한이 꺼져 있습니다. 아래 스위치를 켜도 기기에 알림이 오지 않습니다.</span></div>
+                  <button style="align-self:flex-start;height:40px;box-sizing:border-box;padding:0 16px;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">시스템 설정 열기</button>
+                </div>
+              </sc-if>
+              <div style="border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);overflow:hidden;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:6px 16px;border-bottom:1px solid rgba(23,24,26,0.07)">
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:0.9375rem;color:#17181a">일정</span>
+                    <span style="font-size:0.75rem;color:#8a8d92">일정 등록 시 설정한 시각에</span>
+                    <span style="display:flex;gap:5px;margin-top:4px;font-size:0.75rem;line-height:1.6;color:#8a8d92"><i class="ph ph-warning-circle" style="flex:none;font-size:0.8125rem;color:#b8452a;margin-top:2px"></i><span>일정을 끄면 예약해 둔 알림이 모두 사라집니다. 다시 켜면 앞으로 남은 일정부터 알려 줍니다.</span></span>
+                  </span>
+                  <button onClick="{{ toggleSched }}" role="switch" aria-checked="{{ schedOn }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ schedBgL }};transition:background 0.18s">
+                    <span style="position:absolute;top:2px;left:{{ schedLeft }};width:28px;height:28px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.22);transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+                  </button>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:6px 16px">
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:0.9375rem;color:#17181a">이벤트</span>
+                    <span style="font-size:0.75rem;color:#8a8d92">키워드와 매치되는 클립이 저장될 때</span>
+                  </span>
+                  <button onClick="{{ toggleAbn }}" role="switch" aria-checked="{{ abnOn }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ abnBgL }};transition:background 0.18s">
+                    <span style="position:absolute;top:2px;left:{{ abnLeft }};width:28px;height:28px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.22);transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="알림 설정 · 다크" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="뒤로" style="width:44px;height:44px;border:none;background:none;color:#c2bbb3;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-arrow-left"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">알림 설정</span>
+            </header>
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:2px 16px 24px;display:flex;flex-direction:column;gap:14px">
+              <sc-if value="{{ permDenied }}" hint-placeholder-val="{{ no }}">
+                <div style="display:flex;flex-direction:column;gap:10px;padding:13px 14px;border-radius:14px;background:#3a211c;font-size:0.875rem;line-height:1.55;color:#ffc7b8">
+                  <div style="display:flex;gap:10px"><i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#f0785a;margin-top:1px"></i><span>시스템 알림 권한이 꺼져 있습니다. 아래 스위치를 켜도 기기에 알림이 오지 않습니다.</span></div>
+                  <button style="align-self:flex-start;height:40px;box-sizing:border-box;padding:0 16px;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">시스템 설정 열기</button>
+                </div>
+              </sc-if>
+              <div style="border-radius:18px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:6px 16px;border-bottom:1px solid rgba(255,255,255,0.07)">
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:0.9375rem;color:#f2efec">일정</span>
+                    <span style="font-size:0.75rem;color:#9a948d">일정 등록 시 설정한 시각에</span>
+                    <span style="display:flex;gap:5px;margin-top:4px;font-size:0.75rem;line-height:1.6;color:#9a948d"><i class="ph ph-warning-circle" style="flex:none;font-size:0.8125rem;color:#f0785a;margin-top:2px"></i><span>일정을 끄면 예약해 둔 알림이 모두 사라집니다. 다시 켜면 앞으로 남은 일정부터 알려 줍니다.</span></span>
+                  </span>
+                  <button onClick="{{ toggleSched }}" role="switch" aria-checked="{{ schedOn }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ schedBgD }};transition:background 0.18s">
+                    <span style="position:absolute;top:2px;left:{{ schedLeft }};width:28px;height:28px;border-radius:14px;background:{{ schedKnobD }};transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+                  </button>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;min-height:56px;box-sizing:border-box;padding:6px 16px">
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:0.9375rem;color:#f2efec">이벤트</span>
+                    <span style="font-size:0.75rem;color:#9a948d">키워드와 매치되는 클립이 저장될 때</span>
+                  </span>
+                  <button onClick="{{ toggleAbn }}" role="switch" aria-checked="{{ abnOn }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ abnBgD }};transition:background 0.18s">
+                    <span style="position:absolute;top:2px;left:{{ abnLeft }};width:28px;height:28px;border-radius:14px;background:{{ abnKnobD }};transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">묶음 리스트(04) 한 카드에 스위치(02) 두 행. 「일정」 행의 부제 아래에는 원본 NotifSettingsOverlay.vue와 같이 경고 아이콘이 붙은 각주가 스위치 상태와 무관하게 항상 표시됩니다. 알림함의 세그먼트는 여기서 꺼진 종류를 그대로 두되, 꺼진 종류의 새 알림은 오지 않는다는 것이 원본 동작입니다. 시스템 권한 거부 안내는 원본에서 도달할 수 없는 분기라 기본 숨김이며, 확인은 Tweaks의 「권한 거부 상태」로 합니다.</span>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;permDenied&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;알림 설정&quot;},&quot;startEmpty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;알림함&quot;}}">
+const KIND = { abn: '이벤트', sched: '일정' };
+const now = new Date();
+const dayAt = (off, hh, mm) => { const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - off, hh, mm); return d; };
+const iso = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const fmtDate = (k) => k.slice(0, 4) + '. ' + k.slice(5, 7) + '. ' + k.slice(8, 10) + '.';
+const fmt12 = (d) => {
+  const h = d.getHours(), m = d.getMinutes();
+  const mer = h >= 12 ? '오후' : '오전';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return mer + ' ' + String(h12).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+};
+// 읽음 규칙 — 알림함을 열어 본 것이 읽음. 읽지 않음은 항상 최신 쪽에 연속으로만 있다(마지막으로 연 뒤 도착한 것).
+// 문구 틀 — 이벤트: 「{name} 감지됨」({name}은 영어 이벤트 키워드: barking · licking · scratching), 일정: 「{name} N분 전입니다.」({name}은 일정 제목)
+const SEED = [
+  { id: 11, kind: 'abn', at: dayAt(0, 14, 32), text: 'licking 감지됨', read: false },
+  { id: 10, kind: 'sched', at: dayAt(0, 9, 0), text: '병원 30분 전입니다.', read: false },
+  { id: 9, kind: 'abn', at: dayAt(1, 21, 14), text: 'scratching 감지됨', read: false },
+  { id: 8, kind: 'sched', at: dayAt(1, 8, 30), text: '미용 30분 전입니다.', read: true },
+  { id: 12, kind: 'abn', at: dayAt(1, 7, 46), text: 'licking 감지됨', read: true },
+  { id: 7, kind: 'sched', at: dayAt(2, 8, 0), text: '목욕 30분 전입니다.', read: true },
+  { id: 6, kind: 'abn', at: dayAt(2, 3, 47), text: 'barking 감지됨', read: true },
+  { id: 5, kind: 'sched', at: dayAt(2, 18, 30), text: '산책 30분 전입니다.', read: true },
+  { id: 4, kind: 'abn', at: dayAt(2, 15, 12), text: 'licking 감지됨', read: true },
+  { id: 3, kind: 'abn', at: dayAt(2, 12, 5), text: 'scratching 감지됨', read: true },
+  { id: 2, kind: 'sched', at: dayAt(2, 11, 30), text: '병원 1시간 전입니다.', read: true },
+  { id: 1, kind: 'abn', at: dayAt(2, 6, 21), text: 'barking 감지됨', read: true },
+];
+// 닫은 뒤 다시 열릴 때 도착해 있는 새 알림 — 규칙을 시연하기 위한 한 건
+const ARRIVAL = { id: 13, kind: 'abn', text: 'barking 감지됨', read: false };
+const CLIP_LEN = 8;
+// 클립 설명 문장 — 05-I의 선택 항목. 분석 탭(V3-5)과 같은 문장 형식을 쓴다.
+const CLIP_TEXTS = {
+  licking: 'The dog is licking its front paw repeatedly while sitting on the pad.',
+  scratching: 'The dog scratches behind its ear with a hind leg, then lies back down.',
+  barking: 'The dog stands near the entrance and barks toward the outside several times.',
+};
+const fmtSec = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+
+class Component extends DCLogic {
+  state = { filter: 'all', items: SEED, sched: true, abn: true, player: null, playing: false, t: 0, toast: '' };
+
+  // 뒤로 = 알림함 닫기 — 보인 항목을 모두 읽음으로 커밋한다. 시연을 위해 새 알림 한 건이 도착한 채로 다시 연다.
+  closeInbox() {
+    this.setState((p) => {
+      const items = p.items.map((x) => ({ ...x, read: true }));
+      if (!items.some((x) => x.id === ARRIVAL.id)) items.unshift({ ...ARRIVAL, at: new Date() });
+      return { items, player: null, playing: false, t: 0 };
+    });
+  }
+  toast(msg) {
+    clearTimeout(this.toastT);
+    this.setState({ toast: msg });
+    this.toastT = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+  // 이벤트 알림 → 클립 플레이어(카드 모달). 정지 상태로 열고, 화면 탭으로 재생/일시정지. 8초 모의 재생.
+  startTick() {
+    this.stopTick();
+    this.tick = setInterval(() => {
+      const t = this.state.t + 0.1;
+      if (t >= CLIP_LEN) { this.stopTick(); this.setState({ t: 0, playing: false }); }
+      else this.setState({ t });
+    }, 100);
+  }
+  stopTick() { if (this.tick) { clearInterval(this.tick); this.tick = null; } }
+  componentWillUnmount() { this.stopTick(); clearTimeout(this.toastT); }
+  openItem(n) {
+    if (n.kind === 'abn') { this.stopTick(); this.setState({ player: n, t: 0, playing: false }); }
+    else this.toast('「' + n.text.replace(/ \d+(분|시간) 전입니다\.$/, '') + '」 일정 수정으로 이동');
+  }
+  closePlayer() { this.stopTick(); this.setState({ player: null, playing: false, t: 0 }); }
+  togglePlay() {
+    if (this.state.playing) { this.stopTick(); this.setState({ playing: false }); }
+    else { this.setState({ playing: true }); this.startTick(); }
+  }
+
+  renderVals() {
+    const s = this.state;
+    const startEmpty = this.props.startEmpty ?? false;
+    const items = startEmpty ? [] : s.items;
+    const shown = items.filter((n) => s.filter === 'all' || n.kind === s.filter);
+    const filters = [['all', '전체'], ['sched', '일정'], ['abn', '이벤트']];
+    const fi = filters.findIndex(([k]) => k === s.filter);
+    const todayKey = iso(now), yKey = iso(dayAt(1, 0, 0));
+
+    const groups = (dark) => {
+      const map = new Map();
+      shown.forEach((n) => { const k = iso(n.at); if (!map.has(k)) map.set(k, []); map.get(k).push(n); });
+      return [...map.entries()].map(([k, list]) => ({
+        title: k === todayKey ? '오늘' : k === yKey ? '어제' : fmtDate(k),
+        items: list.map((n, i) => ({
+          kindLabel: KIND[n.kind], time: fmt12(n.at), text: n.text, unread: !n.read,
+          kindFw: n.read ? '400' : '700',
+          kindColor: n.read ? (dark ? '#9a948d' : '#8a8d92') : (dark ? '#f0785a' : '#b8452a'),
+          textColor: n.read ? (dark ? '#9a948d' : '#8a8d92') : (dark ? '#f2efec' : '#17181a'),
+          divider: i < list.length - 1 ? (dark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(23,24,26,0.07)') : 'none',
+          open: () => this.openItem(n),
+          remove: () => this.setState((p) => ({ items: p.items.filter((x) => x.id !== n.id) })),
+        })),
+      }));
+    };
+    const seg = (dark) => filters.map(([k, label]) => ({
+      label, fw: s.filter === k ? '600' : '500',
+      fg: s.filter === k ? (dark ? '#f2efec' : '#17181a') : (dark ? '#9a948d' : '#7d8085'),
+      pick: () => this.setState({ filter: k }),
+    }));
+
+    return {
+      yes: true, no: false,
+      segLight: seg(false), segDark: seg(true),
+      segW: 'calc((100% - 12px) / 3)',
+      segX: 'translateX(calc(' + fi + ' * (100% + 3px)))',
+      hasAny: items.length > 0,
+      // 종류 라벨은 「전체」에서만 — 한 종류로 좁힌 상태에서는 중복 정보다
+      showKind: s.filter === 'all',
+      isEmpty: shown.length === 0,
+      emptyTitle: items.length === 0 ? '알림이 없습니다' : (s.filter === 'abn' ? '이벤트 알림이 없습니다' : '일정 알림이 없습니다'),
+      groupsLight: groups(false), groupsDark: groups(true),
+      clearAll: () => this.setState({ items: [] }),
+      closeInbox: () => this.closeInbox(),
+      toastOn: !!s.toast, toastText: s.toast,
+      playerOpen: !!s.player, playerPaused: !s.playing,
+      playLabel: s.playing ? '일시정지' : '재생',
+      closePlayer: () => this.closePlayer(), togglePlay: () => this.togglePlay(),
+      seekTo: (e) => this.setState({ t: Number(e.target.value) }),
+      playerT: s.t, playerMax: CLIP_LEN, playerPct: Math.round((s.t / CLIP_LEN) * 100) + '%',
+      playerCur: fmtSec(s.t), playerDur: fmtSec(CLIP_LEN),
+      playerKeyword: s.player ? s.player.text.replace(/ 감지됨$/, '') : '',
+      playerWhen: s.player ? fmt12(s.player.at) : '',
+      playerText: s.player ? (CLIP_TEXTS[s.player.text.replace(/ 감지됨$/, '')] || '') : '',
+
+      permDenied: this.props.permDenied ?? false,
+      schedOn: s.sched, abnOn: s.abn,
+      toggleSched: () => this.setState((p) => ({ sched: !p.sched })),
+      toggleAbn: () => this.setState((p) => ({ abn: !p.abn })),
+      schedLeft: s.sched ? '22px' : '2px', abnLeft: s.abn ? '22px' : '2px',
+      schedBgL: s.sched ? '#17181a' : '#d8d5d0', abnBgL: s.abn ? '#17181a' : '#d8d5d0',
+      schedBgD: s.sched ? '#f2efec' : '#3a3531', abnBgD: s.abn ? '#f2efec' : '#3a3531',
+      schedKnobD: s.sched ? '#121110' : '#8a8378', abnKnobD: s.abn ? '#121110' : '#8a8378',
+    };
+  }
+}
+</script>
+</body>
+</html>

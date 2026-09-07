@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #181513; }
+  a { color: #ffb38a; text-decoration: none; }
+  a:hover { color: #ffc8a7; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#181513;color:#fff9f3;font-family:'IBM Plex Sans KR',system-ui,sans-serif;padding:64px 0 120px;font-size:15px;line-height:1.6">
+
+<div style="max-width:1080px;margin:0 auto;padding:0 48px;display:flex;flex-direction:column;gap:64px">
+
+<header style="display:flex;flex-direction:column;gap:20px;padding-bottom:40px;border-bottom:1px solid rgba(255,249,243,0.1)">
+  <div style="display:flex;align-items:center;gap:14px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#90867c">
+    <span>skim2048 / mewly</span>
+    <span style="width:4px;height:4px;border-radius:50%;background:#554d46"></span>
+    <span>skim2048 / babycat</span>
+    <span style="width:4px;height:4px;border-radius:50%;background:#554d46"></span>
+    <span>master</span>
+  </div>
+  <h1 style="margin:0;font-size:44px;line-height:1.15;font-weight:600;letter-spacing:-0.02em;text-wrap:balance">구조 지도 — 화면·API·토큰</h1>
+  <p style="margin:0;max-width:64ch;color:#c6bdb3;font-size:17px;line-height:1.65;text-wrap:pretty">반려견 건강 관리 AI 펫하우스. Vue 3 + Capacitor 프론트엔드(mewly)와 Jetson 위에서 도는 4컨테이너 VLM 백엔드(babycat)를 한 장으로 대조한다. 아래 지도가 앞으로의 동기화 기준점이 된다.</p>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;align-items:baseline;gap:16px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#ffb38a">01</span>
+    <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.01em">두 리포지토리의 경계</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div style="background:#262019;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:8px;height:8px;border-radius:50%;background:#ffb38a"></span>
+        <span style="font-weight:600;font-size:17px">mewly — 프론트엔드</span>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65">Vue 3.5 + vue-router 4 + Vite 6, Capacitor 7로 안드로이드 패키징. hls.js 외 UI 라이브러리 없음 — 컴포넌트·CSS 전부 자작.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:#403933;padding:4px 9px;border-radius:5px;color:#c6bdb3">24 components</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:#403933;padding:4px 9px;border-radius:5px;color:#c6bdb3">24 composables</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:#403933;padding:4px 9px;border-radius:5px;color:#c6bdb3">2 views</span>
+      </div>
+      <p style="margin:0;padding-top:14px;border-top:1px solid rgba(255,249,243,0.1);color:#90867c;font-size:13px;line-height:1.6"><strong style="color:#ffb38a;font-weight:600">의미 결정권을 전부 쥔다.</strong> 라벨 어휘·프리셋·기준선·리듬 카드 판정 — 백엔드는 이 중 어느 것의 의미도 모른다.</p>
+    </div>
+    <div style="background:#262019;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:8px;height:8px;border-radius:50%;background:#5fbf8a"></span>
+        <span style="font-weight:600;font-size:17px">babycat — 백엔드</span>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65">Python + FastAPI + GStreamer, Docker Compose 4컨테이너. NVIDIA Jetson Orin, VILA1.5-3b 추론. UI 없음 — HTTP API만 노출.</p>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:13px">
+        <div style="display:flex;gap:10px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;color:#ffb38a;min-width:76px">router</span><span style="color:#c6bdb3">인증·토큰·중계·SSE 병합. 유일한 외부 진입점</span></div>
+        <div style="display:flex;gap:10px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;color:#ffb38a;min-width:76px">streamer</span><span style="color:#c6bdb3">카메라 프로필·ONVIF PTZ·HLS/WebRTC 재배포</span></div>
+        <div style="display:flex;gap:10px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;color:#ffb38a;min-width:76px">analyzer</span><span style="color:#c6bdb3">VLM 추론·키워드 매치·이벤트 통지</span></div>
+        <div style="display:flex;gap:10px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;color:#ffb38a;min-width:76px">recorder</span><span style="color:#c6bdb3">클립 조립·이벤트/추론 이력·집계·하드웨어 상태</span></div>
+      </div>
+      <p style="margin:0;padding-top:14px;border-top:1px solid rgba(255,249,243,0.1);color:#90867c;font-size:13px;line-height:1.6"><code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">8000/tcp</code> HTTPS 게이트웨이(사설 CA) 단일 진입, <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">8189/udp</code> WebRTC 미디어만 우회.</p>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;align-items:baseline;gap:16px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#ffb38a">02</span>
+    <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.01em">화면 계층</h2>
+  </div>
+  <p style="margin:0;max-width:70ch;color:#90867c;font-size:14px;line-height:1.65">라우트는 <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">/login</code>과 <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">/</code> 둘뿐이다. 그 안의 모든 화면 전환은 MainView의 내부 상태 5개(<code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">activeTab · overlay · schedEdit · sheet · modal</code>)가 만든다. 안드로이드 뒤로가기는 이 순서를 역으로 걷어낸다.</p>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+
+    <div style="background:#262019;border-radius:12px;padding:24px 28px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#7c3e20;background:#ffb38a;padding:3px 8px;border-radius:4px;font-weight:600">BASE</span>
+        <span style="font-weight:600;font-size:16px">하단 탭 4개 — KeepAlive로 살려둔다</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <div style="background:#181513;border-radius:9px;padding:18px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px;color:#ffb38a">홈</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e">HomeTab.vue · 44KB</div>
+          <div style="font-size:13px;color:#c6bdb3;line-height:1.55">영상 16:9 · 기기 4버튼 · VLM 카드(아코디언) · 요약 대시보드</div>
+        </div>
+        <div style="background:#181513;border-radius:9px;padding:18px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px;color:#ffb38a">일정</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e">CalendarTab.vue · 8.7KB</div>
+          <div style="font-size:13px;color:#c6bdb3;line-height:1.55">42셀 달력 + 점. 날짜 탭으로 분석 탭 교차 진입</div>
+        </div>
+        <div style="background:#181513;border-radius:9px;padding:18px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px;color:#ffb38a">분석</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e">AnalysisTab.vue · 34KB</div>
+          <div style="font-size:13px;color:#c6bdb3;line-height:1.55">날짜 이동 · 상태/이벤트 세그먼트 · 24시간 히트맵 · 그날의 클립</div>
+        </div>
+        <div style="background:#181513;border-radius:9px;padding:18px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px;color:#ffb38a">설정</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e">SettingsTab.vue · 5.6KB</div>
+          <div style="font-size:13px;color:#c6bdb3;line-height:1.55">프로필 카드 + 두 그룹. 대부분 모달을 여는 행</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="background:#262019;border-radius:12px;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#ffb38a;border:1px solid #b0592f;padding:3px 8px;border-radius:4px;font-weight:600">OVERLAY</span>
+          <span style="font-size:14px;color:#90867c">풀스크린 · 오른쪽에서 밀려 들어옴</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:14px">
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,249,243,0.06)"><span>알림</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">NotificationsOverlay</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,249,243,0.06)"><span>프로필</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">ProfileOverlay</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,249,243,0.06)"><span>알림 설정</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">NotifSettingsOverlay</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span>일정 편집</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">ScheduleEditor</span></div>
+        </div>
+      </div>
+      <div style="background:#262019;border-radius:12px;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#ffb38a;border:1px solid #b0592f;padding:3px 8px;border-radius:4px;font-weight:600">SHEET</span>
+          <span style="font-size:14px;color:#90867c">바텀 시트 · 아래에서 올라옴</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:14px">
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,249,243,0.06)"><span>마이크</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">MicSheet</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,249,243,0.06)"><span>온도</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">TempSheet</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,249,243,0.06)"><span>조명</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">LightSheet</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span>PTZ</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6f665e">PtzSheet · 25KB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="background:#262019;border-radius:12px;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#ffb38a;border:1px solid #b0592f;padding:3px 8px;border-radius:4px;font-weight:600">MODAL</span>
+          <span style="font-size:14px;color:#90867c">중앙 · 스케일 팝</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px">
+          <span style="font-size:13px;background:#403933;padding:6px 11px;border-radius:6px">카메라</span>
+          <span style="font-size:13px;background:#403933;padding:6px 11px;border-radius:6px">프롬프트</span>
+          <span style="font-size:13px;background:#403933;padding:6px 11px;border-radius:6px">분석 설정</span>
+          <span style="font-size:13px;background:#403933;padding:6px 11px;border-radius:6px">리소스</span>
+          <span style="font-size:13px;background:#403933;padding:6px 11px;border-radius:6px">서버</span>
+          <span style="font-size:13px;background:#4a2513;color:#ffc8a7;padding:6px 11px;border-radius:6px">비밀번호 · 최초 로그인 시 닫기 불가</span>
+          <span style="font-size:13px;background:#403933;padding:6px 11px;border-radius:6px">세션 만료 · App.vue 전역</span>
+        </div>
+      </div>
+      <div style="background:#262019;border-radius:12px;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#ffb38a;border:1px solid #b0592f;padding:3px 8px;border-radius:4px;font-weight:600">OTHER</span>
+          <span style="font-size:14px;color:#90867c">그 밖의 층</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;color:#c6bdb3;line-height:1.55">
+          <div><strong style="color:#fff9f3;font-weight:600">회전 전체화면</strong> — 100vh×100vw 캔버스 + 우측 로그 패널 + 항상 표시되는 PTZ 패드. HomeTab이 자체 등록</div>
+          <div><strong style="color:#fff9f3;font-weight:600">클립 플레이어</strong> — ClipPlayerModal, 분석 탭에서 드릴다운</div>
+          <div><strong style="color:#fff9f3;font-weight:600">토스트</strong> — 하단 24px 고정, z-index 240으로 모달 위</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;align-items:baseline;gap:16px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#ffb38a">03</span>
+    <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.01em">화면 ↔ API 매핑</h2>
+  </div>
+
+  <div style="background:#262019;border-radius:12px;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.15fr 1fr 1.5fr 0.75fr;gap:0;background:#403933;font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:#c6bdb3;font-weight:600">
+      <div style="padding:13px 20px">화면 / 컴포넌트</div>
+      <div style="padding:13px 20px">컴포저블</div>
+      <div style="padding:13px 20px">엔드포인트</div>
+      <div style="padding:13px 20px">담당 컨테이너</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.15fr 1fr 1.5fr 0.75fr;font-size:13px;line-height:1.55">
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">로그인 <span style="color:#6f665e">LoginView</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useAuth</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">POST /api/login</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">router</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">세션 유지 <span style="color:#6f665e">App.vue</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useAuth</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">POST /api/refresh<br>POST /api/logout</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">router</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">홈 — 라이브 영상 <span style="color:#6f665e">HomeTab</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useStreamProtocol<br>useStreamStats</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">GET /live/hls/index.m3u8<br>POST /live/whep<br>GET /stream <span style="color:#6f665e">(MJPEG)</span><br>POST /streaming/start · /stop</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">streamer</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">홈 — VLM 카드 · 로그</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useSSE · useAnalysis<br>useVlmStatus · useInferLog</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">GET /state <span style="color:#6f665e">(SSE 스냅숏)</span><br>POST /analysis/start · /stop<br>POST /vlm/switch</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">analyzer<br><span style="font-size:11px">/state는 router 병합</span></div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">홈 — 요약 대시보드</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useProfile<br>useEventSummary</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">GET /client/storage/pet_profile<br>GET /events</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">router · recorder</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">분석 탭 <span style="color:#6f665e">AnalysisTab</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useInferenceSummary<br>useEventSummary · useClips</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">GET /summary <span style="color:#6f665e">bucket=hour</span><br>GET /events<br>GET /clips · /clips/{name}<br>DELETE /clips · /events/{id}</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">recorder</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">PTZ 시트 <span style="color:#6f665e">PtzSheet</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">usePtz</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">POST /ptz</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">streamer</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">카메라 모달 <span style="color:#6f665e">CameraPanel</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useCamera</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">GET /camera · POST /camera</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">streamer</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">프롬프트 · 분석 설정</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">analysisConfig</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">POST /prompt<br>POST /presets <span style="color:#6f665e">라벨 어휘 주입</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">analyzer</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">리소스 모달 <span style="color:#6f665e">ResourcesSheet</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useSSE</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">GET /state <span style="color:#6f665e">monitor_sources</span></div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">recorder → router</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">프로필 오버레이</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useProfile</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">GET · PUT /client/storage/pet_profile</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">router</div>
+
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06)">비밀번호 모달</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useAuth</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#ffb38a">POST /api/change-password</div>
+      <div style="padding:15px 20px;border-bottom:1px solid rgba(255,249,243,0.06);color:#90867c">router</div>
+
+      <div style="padding:15px 20px;background:rgba(255,139,139,0.04)">일정 · 알림 · 알림 설정<br>마이크 · 온도 · 조명</div>
+      <div style="padding:15px 20px;background:rgba(255,139,139,0.04);font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3">useSchedules · useNotifications<br>useNotifSettings · useDevices</div>
+      <div style="padding:15px 20px;background:rgba(255,139,139,0.04);font-size:12px;color:#ff8b8b">서버 없음 — localStorage <code style="font-family:'IBM Plex Mono',monospace">mewly.*</code></div>
+      <div style="padding:15px 20px;background:rgba(255,139,139,0.04);color:#90867c">—</div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;gap:14px;align-items:flex-start;background:#262019;border-radius:10px;padding:18px 22px;border-left:2px solid #90867c">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#c6bdb3">백엔드가 제공하지만 프론트가 쓰지 않는 것</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#90867c;line-height:1.7">GET /inferences <span style="font-family:'IBM Plex Sans KR',sans-serif">— /summary로 대체됨. 원문 열람 UI 없음</span><br>DELETE /clips/all · GET /health</span>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;align-items:baseline;gap:16px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#ffb38a">04</span>
+    <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.01em">디자인 토큰</h2>
+  </div>
+  <p style="margin:0;max-width:70ch;color:#90867c;font-size:14px;line-height:1.65">웜 크림 + 피치. 다크가 기본이고 <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">[data-theme="light"]</code>가 램프를 뒤집는다 — 라이트에서 accent는 대비 확보를 위해 <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">#cf6636</code>으로 어두워진다.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div style="background:#262019;border-radius:12px;padding:26px;display:flex;flex-direction:column;gap:18px">
+      <span style="font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:#90867c;font-weight:600">Core — dark</span>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:7px;background:#181513;border:1px solid rgba(255,249,243,0.14)"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3;flex:1">--color-bg</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#90867c">#181513</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:7px;background:#262019"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3;flex:1">--color-surface</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#90867c">#262019</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:7px;background:#fff9f3"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3;flex:1">--color-text</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#90867c">#fff9f3</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:7px;background:#ffb38a"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3;flex:1">--color-accent</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#90867c">#ffb38a</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:7px;background:#ff8b8b"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3;flex:1">--color-danger</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#90867c">#ff8b8b</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;padding-top:16px;border-top:1px solid rgba(255,249,243,0.1)">
+        <span style="font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:#90867c;font-weight:600">Ramps 100 → 900</span>
+        <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:28px">
+          <span style="flex:1;background:#f7f2ec"></span><span style="flex:1;background:#dcd4cb"></span><span style="flex:1;background:#c6bdb3"></span><span style="flex:1;background:#b0a59a"></span><span style="flex:1;background:#90867c"></span><span style="flex:1;background:#6f665e"></span><span style="flex:1;background:#554d46"></span><span style="flex:1;background:#403933"></span><span style="flex:1;background:#2c2723"></span>
+        </div>
+        <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;height:28px">
+          <span style="flex:1;background:#ffeee1"></span><span style="flex:1;background:#ffddc6"></span><span style="flex:1;background:#ffc8a7"></span><span style="flex:1;background:#ffb38a"></span><span style="flex:1;background:#ff9564"></span><span style="flex:1;background:#e07440"></span><span style="flex:1;background:#b0592f"></span><span style="flex:1;background:#7c3e20"></span><span style="flex:1;background:#4a2513"></span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;padding-top:16px;border-top:1px solid rgba(255,249,243,0.1)">
+        <span style="font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:#90867c;font-weight:600">Status — 고정색</span>
+        <div style="display:flex;gap:10px">
+          <span style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:9px;border-radius:6px;background:#12281c;color:#5fbf8a;border:1px solid #1e4630">#5fbf8a</span>
+          <span style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:9px;border-radius:6px;background:#2c1518;color:#e05b6a;border:1px solid #4a2228">#e05b6a</span>
+          <span style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:9px;border-radius:6px;background:#2a2210;color:#d9a44a">#d9a44a</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#262019;border-radius:12px;padding:26px;display:flex;flex-direction:column;gap:18px">
+      <span style="font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:#90867c;font-weight:600">Type — 5단만 사용</span>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div style="display:flex;align-items:baseline;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e;min-width:64px">18px</span><span style="font-size:18px;font-weight:700">heading — 프레임·화면 제목</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e;min-width:64px">16px</span><span style="font-size:16px;font-weight:700">title — 1차 강조·날짜·이름</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e;min-width:64px">14px</span><span style="font-size:14px">body — 본문·리스트·버튼·입력값</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e;min-width:64px">13px</span><span style="font-size:13px;color:#c6bdb3">label — 필드 라벨·부제·칩·로그</span></div>
+        <div style="display:flex;align-items:baseline;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6f665e;min-width:64px">12px</span><span style="font-size:12px;color:#90867c">caption — 눈금·요일·타임스탬프</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid rgba(255,249,243,0.1)">
+        <span style="font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:#90867c;font-weight:600">Families — 폐쇄망 내장</span>
+        <div style="font-size:13px;color:#c6bdb3;line-height:1.7"><strong style="color:#fff9f3;font-weight:600">NanumSquare</strong> 300·400·700·800 <span style="color:#6f665e">— 500·600 없음</span><br><strong style="color:#fff9f3;font-weight:600">Inter</strong> latin 서브셋<br><strong style="color:#fff9f3;font-weight:600">Patrick Hand</strong> — 브랜드 워드마크 전용</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid rgba(255,249,243,0.1)">
+        <span style="font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:#90867c;font-weight:600">Space · Radius — density 0.7×</span>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c6bdb3;line-height:1.7">2.8 · 5.6 · 8.4 · 11.2 · 16.8 · 22.4px<br>radius 4 · 8 · 14px<br>탭 바 64px · 상단 바 58px · 터치 44px</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;align-items:baseline;gap:16px">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#ffb38a">05</span>
+    <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.01em">진단</h2>
+  </div>
+  <p style="margin:0;max-width:70ch;color:#90867c;font-size:14px;line-height:1.65">코드에서 실제로 확인한 것만 적었다. 위에서부터 영향이 큰 순서.</p>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+
+    <div style="background:#262019;border-radius:12px;padding:26px 28px;border-left:3px solid #ff8b8b;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#ff8b8b;font-weight:600">결함</span>
+        <span style="font-size:17px;font-weight:600">타입 스케일 토큰 두 개가 폰트 스택에 덮여 무효화됨</span>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65">
+        <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">global.css</code>의 <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">:root</code>는 타입 스케일에서 <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">--font-body: 14px</code> · <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">--font-heading: 18px</code>를 정의하지만, 같은 블록 아래쪽 Typography 절에서 같은 이름을 폰트 패밀리로 <strong style="color:#fff9f3">재정의</strong>한다. CSS는 나중 선언이 이기므로 두 변수의 최종 값은 <code style="font-family:'IBM Plex Mono',monospace;color:#ffb38a">'NanumSquare', 'Inter', system-ui, sans-serif</code>다.
+      </p>
+      <div style="background:#181513;border-radius:8px;padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.75;color:#90867c">
+        <div>--font-body: 14px;<span style="color:#554d46">      /* 타입 스케일 */</span></div>
+        <div>…</div>
+        <div style="color:#ff8b8b">--font-body: 'NanumSquare', 'Inter', system-ui, sans-serif;  /* 최종 승자 */</div>
+        <div style="margin-top:10px;color:#c6bdb3">font-size: var(--font-body)  →  <span style="color:#ff8b8b">invalid, 선언 버려짐</span></div>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65">
+        결과적으로 <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">font-size: var(--font-body)</code>와 <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">var(--font-heading)</code>를 쓴 모든 선언이 파싱 단계에서 버려지고 상속값(브라우저 기본 16px)이 그대로 내려온다. <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">.app-frame</code>·<code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">.topbar-title</code>·<code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">.btn</code>·<code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">.form-field</code>·<code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">.chip-btn</code>·<code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">.toast-text</code> 등 본문 어법 전체가 해당된다 — 의도한 14px 대신 16px, 화면 제목은 18px 대신 굵기만 다른 16px. <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">--font-caption/label/title</code>은 충돌이 없어 정상이므로, <strong style="color:#fff9f3">5단 스케일 중 3단만 살아 있고 위계가 부분적으로 무너진 상태</strong>다.
+      </p>
+      <p style="margin:0;font-size:13px;color:#90867c;line-height:1.6">고치는 법: 폰트 패밀리 쪽 이름을 <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">--font-family-body</code> · <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">--font-family-heading</code>으로 분리. <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">--font-ui</code>·<code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">--font-heading-weight</code> 참조처도 함께 정리해야 한다.</p>
+    </div>
+
+    <div style="background:#262019;border-radius:12px;padding:26px 28px;border-left:3px solid #d9a44a;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#d9a44a;font-weight:600">구조</span>
+        <span style="font-size:17px;font-weight:600">기능 절반이 서버 없이 localStorage 위에 서 있다</span>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65">일정·알림·알림 설정·기기 제어(마이크/온도/조명) 5종은 <strong style="color:#fff9f3">형태만</strong> 구현된 목업이다. babycat이 지원하지 않아 컴포저블 내부를 localStorage로 구동하고 인터페이스만 도출해 둔 상태 — 의도된 설계이고 프로필은 이미 <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">/client/storage/pet_profile</code>로 서버 이전됐다. 다만 사용자 눈에는 진짜 기능과 구분되지 않는다: 기기 제어 실패 토스트는 목업이라 아예 발화하지 않고, 일정 알람은 앱이 꺼져 있으면 울리지 않는다. <strong style="color:#fff9f3">디자인상 "아직 연결 안 됨"을 드러낼지 숨길지가 미결</strong>이다.</p>
+    </div>
+
+    <div style="background:#262019;border-radius:12px;padding:26px 28px;border-left:3px solid #d9a44a;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#d9a44a;font-weight:600">구조</span>
+        <span style="font-size:17px;font-weight:600">거대 컴포넌트 3종</span>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65"><code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">HomeTab</code> 44KB · <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">AnalysisTab</code> 34KB · <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">PtzSheet</code> 25KB — 세 파일이 소스의 큰 몫을 차지한다. HomeTab 하나가 영상 플레이어·프로토콜 전환·기기 버튼·VLM 아코디언·추론 로그·요약 대시보드·회전 전체화면을 전부 안는다. 디자인을 손볼 때 영향 범위를 읽기 어려운 지점이고, 화면 단위로 리디자인하려면 여기부터 갈라야 한다.</p>
+    </div>
+
+    <div style="background:#262019;border-radius:12px;padding:26px 28px;border-left:3px solid #90867c;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#90867c;font-weight:600">명명</span>
+        <span style="font-size:17px;font-weight:600">/state와 /events가 이름으로 서로를 가린다</span>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65">프론트의 <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">APP_ENDPOINTS.events</code>는 실제로 <code style="font-family:'IBM Plex Mono',monospace;color:#ffb38a">/state</code>(라이브 SSE)를 가리키고, 저장된 이벤트 이력은 <code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">API_ENDPOINTS.eventHistory</code> → <code style="font-family:'IBM Plex Mono',monospace;color:#ffb38a">/events</code>다. 코드 주석이 이 함정을 명시해 두었을 만큼 반복해서 걸리는 지점 — 이름을 <code style="font-family:'IBM Plex Mono',monospace;color:#c6bdb3">liveState</code>로 바꾸면 주석 없이도 읽힌다.</p>
+    </div>
+
+    <div style="background:#262019;border-radius:12px;padding:26px 28px;border-left:3px solid #90867c;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#90867c;font-weight:600">기회</span>
+        <span style="font-size:17px;font-weight:600">추론 원문이 90일치 쌓이는데 열람 경로가 없다</span>
+      </div>
+      <p style="margin:0;color:#c6bdb3;font-size:14px;line-height:1.65">recorder는 매치 여부와 무관하게 VLM 서술 원문(<code style="font-family:'IBM Plex Mono',monospace;color:#fff9f3">vlm_text</code>)을 전량 보존하고 <code style="font-family:'IBM Plex Mono',monospace;color:#ffb38a">GET /inferences</code>로 질의를 열어 두었다. 프론트는 집계된 <code style="font-family:'IBM Plex Mono',monospace;color:#ffb38a">/summary</code>만 소비하므로 <strong style="color:#fff9f3">"그때 실제로 뭘 봤는지"를 보호자가 읽을 방법이 없다</strong>. 리듬 카드가 "평소보다 오래 누워 있었어요"라고 말할 때 그 근거 문장을 펼쳐 보이는 것은 곧바로 만들 수 있는 신뢰 장치다.</p>
+    </div>
+
+  </div>
+</section>
+
+<footer style="padding-top:40px;border-top:1px solid rgba(255,249,243,0.1);display:flex;justify-content:space-between;align-items:baseline;gap:24px;font-size:12px;color:#6f665e">
+  <span>mewly · babycat — master 기준 · 2026-09-01</span>
+  <span>다음: 재현할 화면을 고르면 그 화면부터 실물로 만든다</span>
+</footer>
+
+</div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="./public/icons/phosphor/regular/style.css">
+<link rel="stylesheet" href="./public/icons/phosphor/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  body { margin: 0; background: #08090a; }
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  a { color: #f0785a; text-decoration: none; }
+  a:hover { color: #ff9276; }
+  button { transition: opacity 0.18s ease; }
+  button:active:not(:disabled) { opacity: 0.65; transition: opacity 0s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @keyframes sheetin { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  input[type=range]:not(.r)::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 8px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  input[type=range]:not(.r)::-moz-range-thumb { width: 16px; height: 16px; border: none; border-radius: 8px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  input[type='range'].r { -webkit-appearance:none; appearance:none; height:8px; width:100%; background-color:transparent; background-size:100% 8px; background-position:center; background-repeat:no-repeat; border-radius:999px; cursor:pointer; }
+  input[type='range'].r::-webkit-slider-runnable-track { height:8px; border-radius:999px; background:transparent; }
+  input[type='range'].r::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; margin-top:-7px; border-radius:50%; background:#b8452a; box-shadow:0 0 0 4px rgba(184,69,42,0.18); }
+  input[type='range'].rd::-webkit-slider-thumb { background:#f0785a; box-shadow:0 0 0 4px rgba(240,120,90,0.2); }
+</style>
+</helmet>
+
+<section style="min-height:100vh;background:#08090a;display:flex;flex-direction:column;gap:40px;padding:52px 40px 90px;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif;align-items:center">
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+    <span style="font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:#6b7178">Mewly · 컴포넌트 카탈로그 v3 — 확정</span>
+    <span style="max-width:66ch;font-size:0.8125rem;color:#8a9099;line-height:1.7;text-wrap:pretty">A안(캡슐 버튼 · 채움 필드 · 톤 배경 피드백 · 묶음 리스트 · 큰 제목 시트)으로 확정한 정본입니다. 왼쪽 라이트, 오른쪽 다크. 전 화면 리디자인은 이 부품만 조립합니다 — 여기 없는 값은 쓰지 않습니다. 이 카탈로그는 제품과 무관한 템플릿입니다 — 예시 문구는 모두 자리표시자이며 특정 화면의 어휘를 들이지 않습니다.</span>
+  </div>
+
+  <!-- 용어 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">용어</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">화면에 쓰는 낱말 — 원본 i18n과 다르게 확정한 것</span>
+      <span style="font-size:0.75rem;color:#6b7178">여기 적힌 낱말은 원본 messages.js의 값보다 우선한다</span>
+    </div>
+    <div style="border-radius:18px;padding:20px;background:#121315;display:flex;flex-direction:column;gap:10px;font-size:0.8125rem;line-height:1.7;color:#9aa1a9">
+      <span>텍스트 레이블은 원본 <span style="font-family:ui-monospace,monospace;font-size:0.75rem;color:#e7eaee">src/i18n/messages.js</span>의 한국어 값을 그대로 쓴다. 아래에 적힌 낱말만 예외이며, 예외는 사용자가 확정한 날짜와 함께 이 표에 문장으로 남긴다.</span>
+      <div style="display:grid;grid-template-columns:auto auto 1fr;column-gap:18px;row-gap:8px;align-items:baseline;padding-top:4px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">원본 키</span>
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">원본 값 → 확정 낱말</span>
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">쓰는 자리</span>
+        <span style="font-family:ui-monospace,monospace;font-size:0.75rem;color:#e7eaee">sched.done</span>
+        <span>「마침」 → <span style="color:#e7eaee">「완료」</span></span>
+        <span>일정 탭의 끝난 항목 상태 표기, 편집 화면의 스위치 라벨, 밀어서 꺼내는 동작 라벨, 토스트 문장. 2026-09-07 확정.</span>
+        <span style="font-family:ui-monospace,monospace;font-size:0.75rem;color:#e7eaee">ana.acto.sub</span>
+        <span>「농도 = 활동(비누움)」 → <span style="color:#e7eaee">「농도 = 활동(눕지 않음)」</span></span>
+        <span>분석 탭 「주간 활동」 카드 제목 오른쪽의 부제. 「비누움」은 쓰지 않으며, 다른 자리에서 같은 뜻이 필요하면 「눕지 않음」으로 쓴다. 2026-09-07 확정.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 00 컬러셋 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">00</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">컬러셋 — 표면·잉크·강조·의미·데이터</span>
+      <span style="font-size:0.75rem;color:#6b7178">채움색은 배경이 아니라 얹히는 표면을 기준으로 고른다</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#8a8d92">LIGHT · 표면 계층</span>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#f6f5f3;box-shadow:inset 0 0 0 1px rgba(23,24,26,0.12)"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#17181a">배경</span><span style="font-size:0.75rem;color:#8a8d92">화면 바닥</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#7d8085">#f6f5f3</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.10)"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#17181a">카드 · 시트</span><span style="font-size:0.75rem;color:#8a8d92">배경 위에 얹히는 면</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#7d8085">#ffffff</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#e9e6e1"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#17181a">채움</span><span style="font-size:0.75rem;color:#8a8d92">필드 · 세그먼트 · 칩</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#7d8085">#e9e6e1</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#efece8"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#17181a">아이콘 원</span><span style="font-size:0.75rem;color:#8a8d92">리스트 행 앞머리</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#7d8085">#efece8</span>
+          </div>
+        </div>
+
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#8a8d92">잉크</span>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#17181a"></span><span style="font-size:0.6875rem;color:#7d8085">본문 #17181a</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#7d8085"></span><span style="font-size:0.6875rem;color:#7d8085">라벨 #7d8085</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#8a8d92"></span><span style="font-size:0.6875rem;color:#7d8085">보조 #8a8d92</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#c9c5bf"></span><span style="font-size:0.6875rem;color:#7d8085">비활성 #c9c5bf</span></div>
+        </div>
+
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#8a8d92">강조</span>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#b8452a"></span><span style="font-size:0.6875rem;color:#7d8085">기본 #b8452a</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#a3271f"></span><span style="font-size:0.6875rem;color:#7d8085">진한 #a3271f</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:rgba(184,69,42,0.10)"></span><span style="font-size:0.6875rem;color:#7d8085">톤 0.10</span></div>
+        </div>
+
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#8a8d92">의미 — 배경 · 글자</span>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#eceef1;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#33383f">참고</span><span style="font-size:0.6875rem;color:#7d8085">#eceef1 · #33383f</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#f8e4dd;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#7a2118">주의</span><span style="font-size:0.6875rem;color:#7d8085">#f8e4dd · #7a2118</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#dff0e4;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#1e4a30">완료</span><span style="font-size:0.6875rem;color:#7d8085">#dff0e4 · #1e4a30</span></div>
+        </div>
+      </div>
+
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#9a948d">DARK · 표면 계층</span>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#121110;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12)"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#f2efec">배경</span><span style="font-size:0.75rem;color:#9a948d">화면 바닥</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#8f8880">#121110</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#1c1a18"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#f2efec">카드 · 시트</span><span style="font-size:0.75rem;color:#9a948d">배경 위에 얹히는 면</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#8f8880">#1c1a18</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#211e1c"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#f2efec">채움 · 배경 위</span><span style="font-size:0.75rem;color:#9a948d">카드 밖 필드 · 세그먼트</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#8f8880">#211e1c</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#2b2724"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#f2efec">채움 · 시트 위</span><span style="font-size:0.75rem;color:#9a948d">시트·모달 안의 필드</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#8f8880">#2b2724</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="flex:none;width:44px;height:44px;border-radius:12px;background:#3a332e"></span>
+            <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:0.875rem;color:#f2efec">채움 · 그 위</span><span style="font-size:0.75rem;color:#9a948d">채움 안에 놓이는 버튼</span></span>
+            <span style="font-size:0.75rem;font-family:ui-monospace,monospace;color:#8f8880">#3a332e</span>
+          </div>
+        </div>
+
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#9a948d">잉크</span>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#f2efec"></span><span style="font-size:0.6875rem;color:#8f8880">본문 #f2efec</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#c2bbb3"></span><span style="font-size:0.6875rem;color:#8f8880">부제 #c2bbb3</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#8f8880"></span><span style="font-size:0.6875rem;color:#8f8880">라벨 #8f8880</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#4a443f"></span><span style="font-size:0.6875rem;color:#8f8880">비활성 #4a443f</span></div>
+        </div>
+
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#9a948d">강조</span>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#f0785a"></span><span style="font-size:0.6875rem;color:#8f8880">기본 #f0785a</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#ffc7b8"></span><span style="font-size:0.6875rem;color:#8f8880">밝은 #ffc7b8</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:rgba(240,120,90,0.18)"></span><span style="font-size:0.6875rem;color:#8f8880">톤 0.18</span></div>
+        </div>
+
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#9a948d">의미 — 배경 · 글자</span>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#272b30;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#c2c7cd">참고</span><span style="font-size:0.6875rem;color:#8f8880">#272b30 · #c2c7cd</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#3a211c;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#ffc7b8">주의</span><span style="font-size:0.6875rem;color:#8f8880">#3a211c · #ffc7b8</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:36px;border-radius:10px;background:#1e3327;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#8fd0a5">완료</span><span style="font-size:0.6875rem;color:#8f8880">#1e3327 · #8fd0a5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#8a8d92">데이터 · 범주 램프 — 1단→3단 순으로 밝아진다</span>
+        <div style="display:flex;gap:6px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#a03b23"></span><span style="font-size:0.6875rem;color:#7d8085">1단</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#d97a5c"></span><span style="font-size:0.6875rem;color:#7d8085">2단</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#f0b7a5"></span><span style="font-size:0.6875rem;color:#7d8085">3단</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#9c968d"></span><span style="font-size:0.6875rem;color:#7d8085">중립 강</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#e2dfda"></span><span style="font-size:0.6875rem;color:#7d8085">중립 약</span></div>
+        </div>
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#8a8d92">데이터 · 히트맵 5단 — 0단만 중립</span>
+        <div style="display:flex;gap:6px">
+          <span style="flex:1;height:34px;border-radius:8px;background:#efece8"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#f7dcd2"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#eeb49d"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#d97a5c"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#a03b23"></span>
+        </div>
+      </div>
+
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#9a948d">데이터 · 범주 램프 — 다크는 중간 톤으로 압축한다</span>
+        <div style="display:flex;gap:6px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#7b3a24"></span><span style="font-size:0.6875rem;color:#8f8880">1단</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#a15c40"></span><span style="font-size:0.6875rem;color:#8f8880">2단</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#c08a72"></span><span style="font-size:0.6875rem;color:#8f8880">3단</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#443e39"></span><span style="font-size:0.6875rem;color:#8f8880">중립 강</span></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="height:34px;border-radius:8px;background:#2b2724"></span><span style="font-size:0.6875rem;color:#8f8880">중립 약</span></div>
+        </div>
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#9a948d">데이터 · 히트맵 5단 — 0단만 중립</span>
+        <div style="display:flex;gap:6px">
+          <span style="flex:1;height:34px;border-radius:8px;background:#211e1c"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#3d2a23"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#65321f"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#94523a"></span>
+          <span style="flex:1;height:34px;border-radius:8px;background:#c08a72"></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-radius:18px;padding:20px;background:#101113;display:flex;flex-direction:column;gap:8px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span style="color:#e7eaee;font-weight:600">규칙</span>
+      <span>채움색은 배경이 아니라 <span style="color:#e7eaee">얹히는 표면</span>을 기준으로 고른다. 다크에서 시트 표면(#1c1a18) 위에 카드 기준 채움(#211e1c)을 쓰면 경계가 사라진다.</span>
+      <span>강조색은 채움 버튼에 쓰지 않는다. 주 버튼은 잉크(라이트 #17181a · 다크 #f2efec), 강조색은 텍스트 버튼·선택 상태·데이터에만 쓴다.</span>
+      <span>선택 상태는 톤 배경 + 강조색 글자. 라이트 0.10, 다크 0.18을 쓴다.</span>
+      <span>새 색을 만들지 않는다. 여기 없는 값이 필요하면 규칙을 먼저 고친다.</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">00-B</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">스크롤바 — 노출 금지</span>
+      <span style="font-size:0.75rem;color:#6b7178">전역 규칙 · 예외 없음</span>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:10px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span>스크롤바는 어떤 화면에서도 보이지 않는다. 잠시 나타났다 사라지는 것도 노출로 본다 — 시트 개폐나 레이아웃 변화로 순간 스크롤바가 생기면 결함이다.</span>
+      <span>특정 클래스가 아니라 <span style="color:#e7eaee">전역 선택자</span>에 건다. 스크롤 컨테이너를 새로 만들 때마다 규칙을 다시 붙이는 방식은 반드시 빠뜨린다.</span>
+      <div style="margin-top:2px;padding:14px 16px;border-radius:12px;background:#08090a;font-family:ui-monospace,monospace;font-size:0.75rem;line-height:1.9;color:#c9cdd3;white-space:pre">* { scrollbar-width: none; -ms-overflow-style: none; }
+*::-webkit-scrollbar { width: 0; height: 0; display: none; }</div>
+      <span>오버레이 래퍼에는 <span style="font-family:ui-monospace,monospace;font-size:0.75rem;color:#e7eaee">overflow:hidden</span>을 함께 둔다. 시트가 올라오는 동안 바깥 컨테이너가 늘어나는 것을 막는다.</span>
+    </div>
+  </div>
+
+  <!-- 01 버튼 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">01</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">버튼 — 캡슐</span>
+      <span style="font-size:0.75rem;color:#6b7178">주·보조 44 · 작은 버튼 40 · 칩·세그먼트 36 · 액센트는 채움에 쓰지 않음</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:8px">
+          <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer">주 동작</button>
+          <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:1px solid rgba(23,24,26,0.16);background:transparent;color:#17181a;font-size:0.9375rem;font-family:inherit;cursor:pointer">보조</button>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button disabled="{{ yes }}" style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.9375rem;font-weight:600;font-family:inherit;opacity:0.35;cursor:default">비활성</button>
+          <button onClick="{{ runBusy }}" style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;opacity:{{ busyOpacity }}">
+            <sc-if value="{{ busy }}" hint-placeholder-val="{{ false }}"><span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;animation:spin 0.7s linear infinite"></span></sc-if>{{ busyLabel }}
+          </button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button style="height:40px;box-sizing:border-box;padding:0 16px;border-radius:100px;border:none;background:rgba(178,42,42,0.1);color:#a3271f;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">삭제</button>
+          <button style="height:40px;box-sizing:border-box;padding:0 8px;border:none;background:none;color:#b8452a;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">텍스트 버튼</button>
+        </div>
+      </div>
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:8px">
+          <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer">주 동작</button>
+          <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:#f2efec;font-size:0.9375rem;font-family:inherit;cursor:pointer">보조</button>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.9375rem;font-weight:600;font-family:inherit;opacity:0.3;cursor:default">비활성</button>
+          <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(18,17,16,0.25);border-top-color:#121110;animation:spin 0.7s linear infinite"></span>저장 중</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button style="height:40px;box-sizing:border-box;padding:0 16px;border-radius:100px;border:none;background:rgba(255,139,139,0.14);color:#ff8b8b;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">삭제</button>
+          <button style="height:40px;box-sizing:border-box;padding:0 8px;border:none;background:none;color:#f0785a;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">텍스트 버튼</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 입력 · 선택 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">02</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">입력 · 선택 — 채움</span>
+      <span style="font-size:0.75rem;color:#6b7178">테두리 없음 · 라벨은 필드 안 0.6875rem · 칩과 세그먼트 높이는 36 고정</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;flex-direction:column;gap:14px">
+        <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+          <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.host.top }};font-size:{{ f.host.size }};color:{{ f.host.colorL }}">필드 라벨</span>
+          <input value="{{ host }}" onChange="{{ setHost }}" onFocus="{{ f.host.focus }}" onBlur="{{ f.host.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+        </label>
+        <label style="position:relative;display:block;border-radius:14px;background:#e9e6e1;cursor:text">
+          <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.note.top }};font-size:{{ f.note.size }};color:{{ f.note.colorL }}">여러 줄 칸</span>
+          <textarea value="{{ note }}" onChange="{{ setNote }}" onFocus="{{ f.note.focus }}" onBlur="{{ f.note.blur }}" style="display:block;box-sizing:border-box;width:100%;min-height:84px;border:none;border-radius:14px;background:transparent;color:#17181a;padding:23px 14px 13px;font-size:0.9375rem;line-height:1.6;font-family:inherit;resize:none;outline:none;caret-color:#b8452a"></textarea>
+        </label>
+        <div style="position:relative;display:flex;padding:3px;border-radius:100px;background:#e9e6e1;gap:3px">
+          <span aria-hidden="true" style="position:absolute;top:3px;bottom:3px;left:3px;width:{{ segW }};border-radius:100px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.10);transition:transform 0.22s cubic-bezier(0.2,0,0,1);transform:{{ segX }}"></span>
+          <sc-for list="{{ segLight }}" as="c" hint-placeholder-count="3">
+            <button onClick="{{ c.pick }}" style="position:relative;flex:1;height:36px;box-sizing:border-box;border-radius:100px;border:none;background:none;color:{{ c.segFg }};font-size:0.8125rem;font-weight:{{ c.fw }};font-family:inherit;cursor:pointer">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ chipsLight }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.pick }}" style="height:36px;box-sizing:border-box;padding:0 14px;border-radius:100px;border:none;background:{{ c.flatBg }};color:{{ c.flatFg }};font-size:0.875rem;font-weight:{{ c.fw }};font-family:inherit;cursor:pointer">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;min-height:44px;padding:0 2px;font-size:0.875rem;color:#33383f">
+          <span style="flex:none;width:20px;height:20px;border-radius:6px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:1px solid #17181a;background:#17181a;color:#fff">
+            <svg viewBox="0 0 12 12" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="2.5,6.5 5,9 9.5,3.5"></polyline></svg>
+          </span>
+          체크박스 · 활성 — 채움 + SVG 폴리라인. 아이콘 폰트의 check 글리프는 사각 테두리를 함께 그려 상자가 이중으로 보이므로 쓰지 않는다.
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 2px">
+          <span style="font-size:0.9375rem;color:#17181a">스위치 라벨</span>
+          <button onClick="{{ toggleSwitch }}" role="switch" aria-checked="{{ switchOn }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ swLightBg }};transition:background 0.18s">
+            <span style="position:absolute;top:2px;left:{{ swLeft }};width:28px;height:28px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.22);transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#8a8d92"><span>슬라이더 라벨</span><span style="font-variant-numeric:tabular-nums">{{ level }}%</span></div>
+          <input type="range" class="r" min="0" max="100" step="20" value="{{ level }}" onChange="{{ setLevel }}" style="background-image:{{ levelFillLight }}">
+        </div>
+      </div>
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;flex-direction:column;gap:14px">
+        <label style="position:relative;display:block;height:56px;border-radius:14px;background:#211e1c;cursor:text">
+          <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.host.top }};font-size:{{ f.host.size }};color:{{ f.host.colorD }}">필드 라벨</span>
+          <input value="{{ host }}" onChange="{{ setHost }}" onFocus="{{ f.host.focus }}" onBlur="{{ f.host.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+        </label>
+        <label style="position:relative;display:block;border-radius:14px;background:#211e1c;cursor:text">
+          <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.note.top }};font-size:{{ f.note.size }};color:{{ f.note.colorD }}">여러 줄 칸</span>
+          <textarea value="{{ note }}" onChange="{{ setNote }}" onFocus="{{ f.note.focus }}" onBlur="{{ f.note.blur }}" style="display:block;box-sizing:border-box;width:100%;min-height:84px;border:none;border-radius:14px;background:transparent;color:#f2efec;padding:23px 14px 13px;font-size:0.9375rem;line-height:1.6;font-family:inherit;resize:none;outline:none;caret-color:#f0785a"></textarea>
+        </label>
+        <div style="position:relative;display:flex;padding:3px;border-radius:100px;background:#211e1c;gap:3px">
+          <span aria-hidden="true" style="position:absolute;top:3px;bottom:3px;left:3px;width:{{ segW }};border-radius:100px;background:#3a332e;transition:transform 0.22s cubic-bezier(0.2,0,0,1);transform:{{ segX }}"></span>
+          <sc-for list="{{ segDark }}" as="c" hint-placeholder-count="3">
+            <button onClick="{{ c.pick }}" style="position:relative;flex:1;height:36px;box-sizing:border-box;border-radius:100px;border:none;background:none;color:{{ c.segFg }};font-size:0.8125rem;font-weight:{{ c.fw }};font-family:inherit;cursor:pointer">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ chipsDark }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.pick }}" style="height:36px;box-sizing:border-box;padding:0 14px;border-radius:100px;border:none;background:{{ c.flatBg }};color:{{ c.flatFg }};font-size:0.875rem;font-weight:{{ c.fw }};font-family:inherit;cursor:pointer">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;min-height:44px;padding:0 2px;font-size:0.875rem;color:#c2bbb3">
+          <span style="flex:none;width:20px;height:20px;border-radius:6px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.26);background:transparent;color:#121110"></span>
+          체크박스 · 비활성 — 테두리만 두고 안은 비운다. 상자 크기 20, 반경 6은 활성과 같다.
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 2px">
+          <span style="font-size:0.9375rem;color:#f2efec">스위치 라벨</span>
+          <button onClick="{{ toggleSwitch }}" role="switch" aria-checked="{{ switchOn }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ swDarkBg }};transition:background 0.18s">
+            <span style="position:absolute;top:2px;left:{{ swLeft }};width:28px;height:28px;border-radius:14px;background:{{ swKnobDark }};transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#9a948d"><span>슬라이더 라벨</span><span style="font-variant-numeric:tabular-nums">{{ level }}%</span></div>
+          <input type="range" class="r rd" min="0" max="100" step="20" value="{{ level }}" onChange="{{ setLevel }}" style="background-image:{{ levelFillDark }}">
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:8px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span style="color:#e7eaee;font-weight:600">여러 줄 칸 — 라벨도 칸 안에 둔다</span>
+      <span>여러 줄이어도 라벨을 칸 밖에 두지 않는다. 라벨 크기와 색은 한 줄 칸과 같고, 올라간 위치도 <span style="color:#e7eaee">top 9px</span>으로 같다.</span>
+      <span>내려간 라벨은 <span style="color:#e7eaee">top 23px</span> — 한 줄 칸의 18px(칸 중앙)과 다르다. 여러 줄 칸은 글자가 첫 줄부터 시작하므로 그 첫 줄 자리에 맞춘다.</span>
+      <span>입력 영역 패딩은 <span style="color:#e7eaee">23px 14px 13px</span>. 위쪽 23은 라벨이 올라갈 자리다. 줄높이는 <span style="color:#e7eaee">1.6</span>.</span>
+      <span>높이는 고정하지 않고 <span style="color:#e7eaee">최소 높이</span>로 준다 — 줄높이 24px 기준으로 2줄 84px, 4줄 132px. 크기 조절 손잡이는 두지 않는다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">슬라이더 — 연속값 · 단계값</span>
+      <span>트랙 높이 <span style="color:#e7eaee">8</span> · 캡슐. 지난 구간은 강조색(라이트 #b8452a · 다크 #f0785a), 남은 구간은 채움 톤(라이트 <span style="color:#e7eaee">#ddd9d3</span> · 다크 <span style="color:#e7eaee">#3a3531</span>). 손잡이 <span style="color:#e7eaee">22</span> 강조색 원, 후광 4(라이트 0.18 · 다크 0.20).</span>
+      <span>라벨 줄은 슬라이더 위 <span style="color:#e7eaee">0.75rem</span> — 왼쪽 라벨, 오른쪽 값(tabular), 슬라이더와의 간격 4. 값이 이미 큰 수치로 위에 있으면 라벨 줄을 두지 않는다 — 같은 값을 두 번 적지 않는다.</span>
+      <span>눈금은 <span style="color:#e7eaee">단계값(step)에서만</span> 둔다 — 슬라이더 아래 5, 좌우 여백 11(손잡이 반지름), 1×5 잉크 18%(라이트 rgba(23,24,26,0.18) · 다크 rgba(255,255,255,0.18)). 눈금 숫자를 적으면 눈금 아래 4 · 0.75rem 보조색. 양끝만 적을 때(최소·최대)는 눈금 아래 0.75rem 보조색 한 줄을 좌우로 벌린다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">큰 수치 · 상태 텍스트 · 전원과 모드</span>
+      <span>조작 대상 값 하나를 크게 보일 때는 <span style="color:#e7eaee">1.25rem · 700</span>(제목 크기)을 쓴다. 단위는 0.75rem 보조색으로 기준선 정렬, 간격 4. 그 위 캡션은 0.75rem 보조색. 타입 스케일 밖의 크기를 신설하지 않는다.</span>
+      <span>상태(켜짐 · 가동 중 · 전송 중)는 <span style="color:#e7eaee">칩이 아니라 텍스트</span>로 적는다 — 0.8125rem · 400. 활성은 강조색, 비활성은 보조색. 진행형 상태 앞에는 03 상태 점(7 · 2초 맥동)을 둔다. 누를 수 없는 것을 캡슐에 담지 않는다.</span>
+      <span>켜고 끄는 값은 <span style="color:#e7eaee">02 스위치</span>, 둘 중 하나를 고르는 모드는 <span style="color:#e7eaee">02 세그먼트</span>다. 강조색으로 채운 원형 버튼(오브)이나 글로우는 쓰지 않는다 — 강조색은 채움 버튼에 쓰지 않는다는 01 규칙 그대로다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">프리셋 슬롯 — 번호 넷 · PTZ 위치에만 쓴다</span>
+      <span>프리셋 슬롯은 <span style="color:#e7eaee">슬라이더 한 번으로 닿지 않는 값</span>(PTZ의 팬·틸트·줌 조합)에만 둔다. 밝기(여섯 단계)나 온도(한 축) 같은 값에는 두지 않는다 — 슬라이더가 이미 한 번에 닿는 값을 저장해 두면 조작 부품이 값보다 많아진다. 반복되는 것이 「몇 시에 어떤 값」이면 프리셋이 아니라 아래 예약 구조를 쓴다.</span>
+      <span>슬롯은 <span style="color:#e7eaee">1~4 네 칸</span>, 간격 8, 높이 <span style="color:#e7eaee">44</span>, 반경 14, 채움(라이트 #e9e6e1 · 다크 #2b2724). 위 줄 번호 0.875rem · 500, 아래 줄 저장값 0.6875rem 보조색, 사이 2. 현재 값과 일치하는 슬롯만 톤 채움 + 강조색 글자 + 700.</span>
+      <span>머리줄 — 왼쪽 「프리셋」 0.75rem 보조색, 오른쪽 텍스트 버튼(40) 「현재 ○○ 저장」. 저장 모드에서는 버튼이 「취소」로 바뀌고 슬롯 번호 앞에 북마크 글리프(0.8125rem)가 붙는다. 저장 모드에서 슬롯을 누르면 현재 값이 그 슬롯에 들어가고 모드가 풀린다.</span>
+      <span>슬롯 아래 안내 한 줄 0.75rem 오른쪽 정렬 — 평시 「슬롯을 누르면 저장된 값으로 이동합니다」, 저장 모드 「저장할 슬롯을 누르세요」, 저장 직후 「현재 값을 슬롯에 저장했습니다」. 안내 문장은 토스트로 띄우지 않는다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">예약 — 시간대에 값을 적용하는 규칙</span>
+            <span>나이트 모드 · 냉난방 예약처럼 <span style="color:#e7eaee">시간대 안에서 값을 적용하는 규칙</span>은 한 구조를 쓴다 — 04 묶음 카드 한 장이다. <span style="color:#e7eaee">머릿줄(56)</span>에 앞머리 원 34 · 이름 · 보조 한 줄(시간대만, tabular — 스위치와 꺾쇠가 있는 머릿줄의 제목 열은 180 남짓이므로 적용값을 더하면 두 줄로 꺾인다. 적용값은 펼침 안에서 본다) · 꺾쇠 · <span style="color:#e7eaee">사용 스위치(52×32)</span>가 있다. 스위치가 머릿줄에 있으므로 「사용」 행을 따로 두지 않고, 오른쪽 부가값(켜짐·꺼짐 글자)도 두지 않는다 — 상태는 스위치가 말한다. 스위치 밖의 머릿줄을 누르면 카드 안이 펼쳐진다.</span>
+      <span>펼침 영역은 <span style="color:#e7eaee">두 줄</span>이다. 첫 줄(52)은 시간대 — 가운데 정렬로 「시작 칩 → 종료 칩」(칩 36 · 화살표 글리프 1rem 보조색 · 간격 10). 칩을 누르면 그 아래에 두 열 휠(정각만)이 열리고 한 번에 하나만 열린다. 둘째 줄(52)은 적용값 — 왼쪽 세그먼트(모드, 폭 150) · 오른쪽 <span style="color:#e7eaee">스테퍼</span>(− · 값 0.9375rem tabular · +, 원형 40 채움, 값 최소 폭 54). 적용값이 없는 규칙(나이트 모드)은 첫 줄만 둔다. 카드 안에 슬라이더나 세로 폼 행 목록을 쌓지 않는다 — 다섯 줄짜리 폼은 시트 안에서 너무 길고, 위에서 이미 슬라이더인 값을 카드 안에서 다시 슬라이더로 두면 같은 조작이 두 번 보인다.</span>
+      <span>설명문(「이 시간대에는 조명을 끕니다.」)은 펼침 영역의 <span style="color:#e7eaee">마지막 줄</span>에 0.75rem 보조색 한 줄만 둔다(좌우 16 · 아래 12). 머릿줄과 접힌 상태에는 넣지 않는다.</span>
+      <span>휠이 <span style="color:#e7eaee">스크롤 시트의 바닥 아래로</span> 열리면 시트를 그만큼 굴려(휠 아래 여백 12) 휠 전체가 보이게 한다. 열린 휠이 잘려 보이는 것은 결함이다.</span>
+      <span>시각이나 적용값을 고르면 <span style="color:#e7eaee">사용이 함께 켜진다</span>. 꺼져 있을 때 펼침 영역의 두 줄은 지우지 않고 흐림 0.55로 남긴다. 예약은 수동 조작을 막지 않는다 — 시간대 안에서 손으로 바꾼 값은 그대로 적용되고, 예약 구간은 하나만 둔다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">누르고 있는 동안 동작하는 버튼</span>
+      <span>말하기처럼 <span style="color:#e7eaee">누른 동안만</span> 동작하는 버튼은 원형 <span style="color:#e7eaee">96</span> · 잉크 채움 · 글리프 2rem(그림으로 다룬다). 누른 동안 톤 배경(라이트 0.10 · 다크 0.18) + 강조색 글리프, 놓으면 즉시 원래로. 상태 텍스트는 버튼 아래 12에 둔다. 막대 애니메이션 같은 파형 그림은 두지 않는다.</span>
+    </div>
+  </div>
+
+  <!-- 03 상태 피드백 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">03</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">상태 피드백 — 톤 배경</span>
+      <span style="font-size:0.75rem;color:#6b7178">참고=회색 · 주의=적색 · 완료=초록 · 색 바 없음</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#eceef1;font-size:0.875rem;line-height:1.55;color:#33383f"><i class="ph ph-info" style="flex:none;font-size:1.0625rem;color:#565d66;margin-top:1px"></i><span>참고 — 이 값을 바꾸면 다시 로그인해야 합니다.</span></div>
+        <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#f8e4dd;font-size:0.875rem;line-height:1.55;color:#7a2118"><i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#b8452a;margin-top:1px"></i><span>주의 — 서버에 연결할 수 없습니다. 주소와 네트워크를 확인하세요.</span></div>
+        <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#dff0e4;font-size:0.875rem;line-height:1.55;color:#1e4a30"><i class="ph-fill ph-check-circle" style="flex:none;font-size:1.0625rem;color:#2f7d52;margin-top:1px"></i><span>완료 — 변경 사항을 저장했습니다.</span></div>
+        <div style="align-self:stretch;display:flex;align-items:center;gap:10px;margin-top:4px;padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;color:#f4f3f1"><span>저장했습니다</span></div>
+        <span style="font-size:0.75rem;color:#8a8d92;line-height:1.6">토스트 = 지나가도 되는 확인 · 인라인 = 그 자리에서 고쳐야 하는 것 · 버튼 = 진행 중</span>
+      </div>
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#22252a;font-size:0.875rem;line-height:1.55;color:#ccd2da"><i class="ph ph-info" style="flex:none;font-size:1.0625rem;color:#9aa3ad;margin-top:1px"></i><span>참고 — 이 값을 바꾸면 다시 로그인해야 합니다.</span></div>
+        <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#3a211c;font-size:0.875rem;line-height:1.55;color:#ffc7b8"><i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#f0785a;margin-top:1px"></i><span>주의 — 서버에 연결할 수 없습니다. 주소와 네트워크를 확인하세요.</span></div>
+        <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#1d2f24;font-size:0.875rem;line-height:1.55;color:#b6dcc4"><i class="ph-fill ph-check-circle" style="flex:none;font-size:1.0625rem;color:#6fc190;margin-top:1px"></i><span>완료 — 변경 사항을 저장했습니다.</span></div>
+        <div style="align-self:stretch;display:flex;align-items:center;gap:10px;margin-top:4px;padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;color:#f2efec"><span>저장했습니다 — 토스트 2.4s 후 자동 소멸</span></div>
+        <span style="font-size:0.75rem;color:#9a948d;line-height:1.6">토스트는 아이콘 없이 텍스트만. 종류 구분이 필요한 메시지는 인라인으로 씁니다.</span>
+        <div style="display:flex;align-items:center;gap:9px;padding:2px;font-size:0.8125rem;color:#9a948d"><span style="width:7px;height:7px;border-radius:4px;background:#f0785a;animation:pulse 2s ease-in-out infinite"></span>작업 진행 중 — 상태 점은 2초 주기로만 맥동</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 목록 · 빈 상태 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">04</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">목록 · 빈 상태 — 묶음 리스트</span>
+      <span style="font-size:0.75rem;color:#6b7178">한 카드 안 구분선 행 56(폼 행은 같은 어법에 52 — 05-G) · 빈 상태에는 반드시 다음 동작 하나</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;flex-direction:column;gap:12px">
+        <div style="border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(23,24,26,0.06)">
+          <button style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;border-bottom:1px solid rgba(23,24,26,0.07);background:none;color:#17181a;cursor:pointer;font-family:inherit;text-align:left">
+            <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#5c5f63;font-size:1.0625rem"><i class="ph ph-user"></i></span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">행 제목 · 부제</span>
+            <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#b3b6ba"></i>
+          </button>
+          <button style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;border-bottom:1px solid rgba(23,24,26,0.07);background:none;color:#17181a;cursor:pointer;font-family:inherit;text-align:left">
+            <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#5c5f63;font-size:1.0625rem"><i class="ph ph-link"></i></span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">행 제목</span>
+            <span style="font-size:0.8125rem;color:#8a8d92">부가값</span>
+            <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#b3b6ba"></i>
+          </button>
+          <button style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;background:none;color:#17181a;cursor:pointer;font-family:inherit;text-align:left">
+            <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#5c5f63;font-size:1.0625rem"><i class="ph ph-gear"></i></span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">행 제목</span>
+            <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#b3b6ba"></i>
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 16px;text-align:center">
+          <span style="font-size:1.0625rem;font-weight:700;color:#17181a">항목이 없습니다</span>
+          <span style="font-size:0.8125rem;color:#8a8d92;line-height:1.6;max-width:30ch">새 항목이 생기면 여기에 쌓입니다.</span>
+          <button style="margin-top:6px;height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">다음 동작</button>
+        </div>
+      </div>
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;flex-direction:column;gap:12px">
+        <div style="border-radius:16px;background:#1c1a18;overflow:hidden">
+          <button style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;border-bottom:1px solid rgba(255,255,255,0.07);background:none;color:#f2efec;cursor:pointer;font-family:inherit;text-align:left">
+            <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#272320;display:flex;align-items:center;justify-content:center;color:#c2bbb3;font-size:1.0625rem"><i class="ph ph-user"></i></span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">행 제목 · 부제</span>
+            <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#6f6862"></i>
+          </button>
+          <button style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;border-bottom:1px solid rgba(255,255,255,0.07);background:none;color:#f2efec;cursor:pointer;font-family:inherit;text-align:left">
+            <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#272320;display:flex;align-items:center;justify-content:center;color:#c2bbb3;font-size:1.0625rem"><i class="ph ph-link"></i></span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">행 제목</span>
+            <span style="font-size:0.8125rem;color:#9a948d">부가값</span>
+            <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#6f6862"></i>
+          </button>
+          <button style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;background:none;color:#f2efec;cursor:pointer;font-family:inherit;text-align:left">
+            <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#272320;display:flex;align-items:center;justify-content:center;color:#c2bbb3;font-size:1.0625rem"><i class="ph ph-gear"></i></span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">행 제목</span>
+            <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#6f6862"></i>
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 16px;text-align:center">
+          <span style="font-size:1.0625rem;font-weight:700;color:#f2efec">데이터를 불러오지 못했습니다</span>
+          <span style="font-size:0.8125rem;color:#9a948d;line-height:1.6;max-width:30ch">서버 응답이 없습니다. 잠시 후 다시 시도하세요.</span>
+          <button style="margin-top:6px;height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">다시 시도</button>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:20px;background:#121315;display:flex;flex-direction:column;gap:10px;font-size:0.8125rem;line-height:1.7;color:#9aa1a9">
+      <span style="color:#e7eaee;font-weight:600">빈 상태의 두 등급 (2026-09-07 확정)</span>
+      <span><span style="color:#e7eaee">화면 전체가 빌 때</span>만 위의 세 줄 빈 상태를 쓴다 — 제목 1.0625rem · 700, 설명 0.8125rem 보조색, 다음 동작 버튼 하나. 카메라 프로필 미등록, 알림함 비어 있음, 조건에 맞는 클립 없음이 여기 해당한다.</span>
+      <span><span style="color:#e7eaee">카드나 패널 한 칸이 빌 때</span>는 본문 크기(0.8125rem) 보조색 <span style="color:#e7eaee">한 줄</span>만 적고 버튼을 두지 않는다. 사용자가 취할 다음 동작은 그 화면의 다른 부품(날짜 이동, 기기 줄, 설정 행)이 이미 맡고 있기 때문이다. 홈 탭 VLM 카드의 「추론 보고가 아직 없습니다.」, 회전 전체화면 로그 패널의 「로그가 없습니다.」, 분석 탭 이벤트 세그먼트의 「이 날은 감지된 이벤트가 없습니다」, 「오늘의 활동」 카드 배지 자리의 「이 날의 추론 데이터가 없습니다」가 여기 해당한다. 문장은 원본 i18n 값을 그대로 쓴다.</span>
+      <span>영상 자리처럼 <span style="color:#e7eaee">자리는 크지만 다음 동작이 없는 상태</span>(홈 탭 「카메라가 꺼져 있습니다 / 설정 → 카메라 설정에서 켜세요」)는 제목 1.0625rem · 700과 설명 0.8125rem 두 줄로 적고 버튼은 두지 않는다. 같은 자리의 미등록 상태는 다음 동작이 있으므로 세 줄이다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">행의 각주 줄 (2026-09-07 확정)</span>
+      <span>행의 글자 묶음은 제목(0.9375rem) · 부제(0.75rem 보조색)에 <span style="color:#e7eaee">각주 줄</span>을 하나 더 둘 수 있다. 각주는 부제 아래 간격 4, 아이콘과 문장이 가로로 놓이며 사이 간격 5. 아이콘은 0.8125rem 강조색(라이트 #b8452a · 다크 #f0785a)으로 문장 첫 줄에 맞춰 위 2 내려 앉히고, 문장은 0.75rem 보조색 · 줄 간격 1.6이다. 각주는 조작 상태와 무관하게 <span style="color:#e7eaee">항상 보인다</span> — 켜고 끈 뒤에만 나타나는 안내는 각주가 아니라 03 참고 톤 상자다. 알림 설정의 「일정」 행이 여기 해당한다.</span>
+    </div>
+  </div>
+
+  <!-- 05 시트 · 모달 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">시트 · 모달 — 큰 제목</span>
+      <span style="font-size:0.75rem;color:#6b7178">반경 28 · 핸들 40×5 · X 없음(스와이프로 닫기) · 주 버튼 하나 폭 가득</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="position:relative;height:400px;border-radius:18px;overflow:hidden;background:#e9e7e3;display:flex;align-items:flex-end">
+        <div style="position:absolute;inset:0;background:rgba(23,24,26,0.42)"></div>
+        <div style="position:relative;width:100%;background:#f6f5f3;border-radius:28px 28px 0 0;display:flex;flex-direction:column;animation:sheetin 0.22s cubic-bezier(0.2,0,0,1)">
+          <div style="height:24px;display:flex;align-items:center;justify-content:center"><span style="width:40px;height:5px;border-radius:3px;background:rgba(23,24,26,0.16)"></span></div>
+          <div style="padding:8px 22px 24px;display:flex;flex-direction:column;gap:14px">
+            <span style="font-size:1.25rem;font-weight:700;color:#17181a;letter-spacing:-0.01em">시트 제목</span>
+            <span style="font-size:0.8125rem;color:#7d8085;line-height:1.6">본문 좌우 22 · 하단 24. 취소 버튼은 두지 않고, 되돌릴 수 없는 동작에만 확인을 붙입니다.</span>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#8a8d92"><span>슬라이더 라벨</span><span style="font-variant-numeric:tabular-nums">{{ level }}%</span></div>
+              <input type="range" class="r" min="0" max="100" step="20" value="{{ level }}" onChange="{{ setLevel }}" style="background-image:{{ levelFillLight }}">
+            </div>
+            <button style="height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer">적용</button>
+          </div>
+        </div>
+      </div>
+      <div style="position:relative;height:400px;border-radius:18px;overflow:hidden;background:#0b0a09;display:flex;align-items:center;justify-content:center;padding:20px">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6)"></div>
+        <div style="position:relative;width:100%;background:#1c1a18;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,0.5)">
+          <span style="font-size:1.25rem;font-weight:700;color:#f2efec;letter-spacing:-0.01em">모달 제목</span>
+          <span style="font-size:0.8125rem;color:#9a948d;line-height:1.6">모달도 같은 반경 28 · 패딩 22. 시트와 모달의 차이는 <span style="color:#f2efec">등장 방향</span>뿐입니다 — 아래에서 올라오면 시트, 가운데 페이드면 모달. 모달은 닫기 수단이 필요하므로 취소를 둡니다.</span>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer">저장</button>
+            <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:#f2efec;font-size:1rem;font-family:inherit;cursor:pointer">취소</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 규격표 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05-B</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">드롭다운 — 필드에 붙는 목록</span>
+      <span style="font-size:0.75rem;color:#6b7178">필드 아래 6 · 같은 폭 · 행 44 · 꺾쇠는 열리면 180° 회전 · 열림 페이드 0.2s + 세로 펴짐 0.24s</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px 20px 168px;background:#f6f5f3">
+        <div style="position:relative;max-width:200px">
+          <button onClick="{{ ddToggleL }}" aria-haspopup="listbox" aria-expanded="{{ ddOpenL }}" style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;height:56px;box-sizing:border-box;padding:0 34px 0 14px;border:none;border-radius:14px;background:#e9e6e1;font-family:inherit;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none">
+            <span style="font-size:0.6875rem;color:#7d8085">필드 라벨</span>
+            <span style="color:#17181a;font-size:0.9375rem;font-variant-numeric:tabular-nums">{{ ddValL }}</span>
+            <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#8a8d92;display:block;transition:transform 0.24s ease;transform:{{ ddRotL }}"></i>
+          </button>
+          <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;padding:6px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(23,24,26,0.18);display:flex;flex-direction:column;transform-origin:top center;pointer-events:{{ ddEvL }};opacity:{{ ddOpL }};transform:{{ ddScL }};transition:opacity 0.2s ease,transform 0.24s cubic-bezier(0.2,0,0,1)">
+            <sc-for list="{{ ddItemsL }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 12px;border:none;border-radius:10px;background:{{ o.bg }};color:{{ o.fg }};font-size:0.875rem;font-weight:{{ o.fw }};font-family:inherit;cursor:pointer;text-align:left;font-variant-numeric:tabular-nums">{{ o.label }}<sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 12 12" style="flex:none;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="2.5,6.5 5,9 9.5,3.5"></polyline></svg></sc-if></button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="border-radius:18px;padding:20px 20px 168px;background:#121110">
+        <div style="position:relative;max-width:200px">
+          <button onClick="{{ ddToggleD }}" aria-haspopup="listbox" aria-expanded="{{ ddOpenD }}" style="position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:3px;width:100%;height:56px;box-sizing:border-box;padding:0 34px 0 14px;border:none;border-radius:14px;background:#211e1c;font-family:inherit;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none">
+            <span style="font-size:0.6875rem;color:#8f8880">필드 라벨</span>
+            <span style="color:#f2efec;font-size:0.9375rem;font-variant-numeric:tabular-nums">{{ ddValD }}</span>
+            <i class="ph ph-caret-down" style="position:absolute;right:14px;top:50%;margin-top:-0.34375rem;font-size:0.6875rem;line-height:1;color:#9a948d;display:block;transition:transform 0.24s ease;transform:{{ ddRotD }}"></i>
+          </button>
+          <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;padding:6px;border-radius:14px;background:#2b2724;box-shadow:0 10px 30px rgba(0,0,0,0.5);display:flex;flex-direction:column;transform-origin:top center;pointer-events:{{ ddEvD }};opacity:{{ ddOpD }};transform:{{ ddScD }};transition:opacity 0.2s ease,transform 0.24s cubic-bezier(0.2,0,0,1)">
+            <sc-for list="{{ ddItemsD }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 12px;border:none;border-radius:10px;background:{{ o.bg }};color:{{ o.fg }};font-size:0.875rem;font-weight:{{ o.fw }};font-family:inherit;cursor:pointer;text-align:left;font-variant-numeric:tabular-nums">{{ o.label }}<sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 12 12" style="flex:none;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="2.5,6.5 5,9 9.5,3.5"></polyline></svg></sc-if></button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:8px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span>값을 고르는 필드는 시스템 드롭다운(<span style="font-family:ui-monospace,monospace;font-size:0.75rem;color:#e7eaee">select</span>)을 쓰지 않는다. 필드에 붙는 목록으로 연다.</span>
+      <span>목록이 <span style="color:#e7eaee">아래로</span> 열리므로 꺾쇠는 아래를 향하고, 열리면 180° 돈다. 위로 올라오는 시트를 여는 컨트롤에는 아래 꺾쇠를 쓰지 않는다.</span>
+      <span>열 때 선택된 행이 목록 가운데 오도록 스크롤을 맞춘다. 최대 높이 212, 바깥을 누르면 닫힌다.</span>
+      <span>선택지가 12개를 넘고 격자로 보여야 하면(연·월 등) 드롭다운 대신 시트를 쓴다.</span>
+      <span>필드의 꺾쇠(0.6875rem)는 <span style="color:#e7eaee">필드 전체 높이 기준 수직 중앙</span>, 오른쪽 14에 둔다 — 값 줄 안에 넣지 않는다. 값은 열려 있어도 400이다.</span>
+      <span>열림·닫힘 전환 — 목록은 <span style="color:#e7eaee">페이드 0.2s + 위에서 세로 펴짐 0.24s</span>(scaleY 0.92→1), 꺾쇠는 180° 회전 0.24s. 고르면 바로 닫힌다.</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05-C</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">달력 인디케이터 — day.today · day.selected · day.event</span>
+      <span style="font-size:0.75rem;color:#6b7178">채움은 선택, 색은 오늘 · 셀 44 · 원 24 · 점 6</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;gap:10px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;color:#17181a">14</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#7d8085;text-align:center">기본</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700;color:#b8452a">15</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#7d8085;text-align:center">day.today</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700;background:#17181a;color:#fff">16</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#7d8085;text-align:center">day.selected</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700;background:#b8452a;color:#fff">17</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#7d8085;text-align:center">today + selected</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="position:absolute;top:5px;left:50%;margin-left:8px;width:6px;height:6px;border-radius:3px;background:#8a8d92"></span>
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;color:#17181a">18</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#7d8085;text-align:center">day.event</span>
+        </div>
+      </div>
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;gap:10px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;color:#f2efec">14</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#8f8880;text-align:center">기본</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700;color:#f0785a">15</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#8f8880;text-align:center">day.today</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700;background:#f2efec;color:#121110">16</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#8f8880;text-align:center">day.selected</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-weight:700;background:#f0785a;color:#121110">17</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#8f8880;text-align:center">today + selected</span>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span style="position:relative;height:44px;display:flex;align-items:center;justify-content:center;width:44px">
+            <span style="position:absolute;top:5px;left:50%;margin-left:8px;width:6px;height:6px;border-radius:3px;background:#9a948d"></span>
+            <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;color:#f2efec">18</span>
+          </span>
+          <span style="font-size:0.6875rem;color:#8f8880;text-align:center">day.event</span>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:8px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span><span style="color:#e7eaee">day.today</span> 오늘 — 강조색 글자 + 굵게. 마커는 두지 않는다.</span>
+      <span><span style="color:#e7eaee">day.selected</span> 선택 — 잉크 채움 원 + 반전 글자. 선택은 사용자가 만드는 상태이므로 가장 강한 신호를 준다.</span>
+      <span><span style="color:#e7eaee">today + selected</span> 오늘을 선택하면 강조색 채움. 두 축(채움=선택, 색=오늘)이 그대로 겹친다.</span>
+      <span><span style="color:#e7eaee">day.event</span> 항목 있음 — 원 바깥 우상단 6px 중립 점. 위 세 상태와 무관하게 함께 나타난다. 이름은 모양이 아니라 역할을 가리키므로 점을 다른 모양으로 바꿔도 그대로 쓴다.</span>
+      <span>같은 축을 연·월 시트에도 쓴다 — 이번 달은 강조색 글자, 보고 있는 달은 톤 채움. 형태는 언제나 하나뿐이다.</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05-D</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">달력 — 날짜 선택 정본</span>
+      <span style="font-size:0.75rem;color:#6b7178">42셀 · 셀 44 · 인접 월은 흐리게 · 인디케이터는 05-C 규칙</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px">
+          <span style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;font-size:1.0625rem;font-weight:700;color:#17181a;font-variant-numeric:tabular-nums">2026년 9월<i class="ph ph-caret-right" style="font-size:0.8125rem"></i></span>
+          <span style="display:flex">
+            <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#5c5f63;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+            <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#5c5f63;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+          </span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);font-size:0.75rem;color:#8a8d92;text-align:center">
+          <sc-for list="{{ calWeekdays }}" as="w" hint-placeholder-count="7"><span>{{ w.label }}</span></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr)">
+          <sc-for list="{{ calLight }}" as="c" hint-placeholder-count="42">
+            <span style="height:44px;display:flex;align-items:center;justify-content:center;position:relative">
+              <span style="position:absolute;z-index:1;top:5px;left:50%;margin-left:8px;width:6px;height:6px;border-radius:3px;background:{{ c.dotBg }}"></span>
+              <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+            </span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border-radius:18px;padding:20px;background:#121110;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px">
+          <span style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;font-size:1.0625rem;font-weight:700;color:#f2efec;font-variant-numeric:tabular-nums">2026년 9월<i class="ph ph-caret-right" style="font-size:0.8125rem"></i></span>
+          <span style="display:flex">
+            <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#c2bbb3;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+            <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#c2bbb3;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+          </span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);font-size:0.75rem;color:#9a948d;text-align:center">
+          <sc-for list="{{ calWeekdays }}" as="w" hint-placeholder-count="7"><span>{{ w.label }}</span></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr)">
+          <sc-for list="{{ calDark }}" as="c" hint-placeholder-count="42">
+            <span style="height:44px;display:flex;align-items:center;justify-content:center;position:relative">
+              <span style="position:absolute;z-index:1;top:5px;left:50%;margin-left:8px;width:6px;height:6px;border-radius:3px;background:{{ c.dotBg }}"></span>
+              <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+            </span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:8px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span>날짜를 고르는 자리에는 시스템 날짜 선택기를 쓰지 않는다. 이 달력을 쓴다 — 월 달력 화면, 생년월일 같은 날짜 필드, 그 밖의 날짜 입력이 모두 같은 부품이다.</span>
+      <span>필드 안에서 날짜를 고를 때는 05-B 드롭다운처럼 필드 아래에 띄운다. 화면 전체를 덮는 별도 모드로 빠지지 않는다.</span>
+      <span>요일 라벨은 중립 한 가지 색만 쓴다 — 주말을 색으로 구분하지 않는다.</span>
+      <span>연·월을 건너뛰려면 헤더의 연·월 라벨을 누른다 — 달력 자리에 두 열 휠이 들어온다. 아래 05-H.</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05-G</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">폼 행 · 시각 휠 — 한 행에 한 요소</span>
+      <span style="font-size:0.75rem;color:#6b7178">라벨 좌 · 캡슐 값 칩 우 · 휠은 그 행 아래에서 펼친다 · 분은 1분 단위</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3">
+        <div style="border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(23,24,26,0.07)">
+            <span style="font-size:0.9375rem;color:#17181a">스위치 행</span>
+            <span style="flex:none;width:52px;height:32px;border-radius:16px;background:#d6d1ca;position:relative"><span style="position:absolute;top:2px;left:2px;width:28px;height:28px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.22)"></span></span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(23,24,26,0.07)">
+            <span style="font-size:0.9375rem;color:#17181a">시작</span>
+            <span style="display:flex;gap:8px">
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#e9e6e1;font-size:0.9375rem;color:#17181a;font-variant-numeric:tabular-nums">2026. 09. 02.</span>
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#e9e6e1;font-size:0.9375rem;color:#17181a;font-variant-numeric:tabular-nums">오후 06:00</span>
+            </span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px">
+            <span style="font-size:0.9375rem;color:#17181a">종료</span>
+            <span style="display:flex;gap:8px">
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#e9e6e1;font-size:0.9375rem;color:#17181a;font-variant-numeric:tabular-nums">2026. 09. 02.</span>
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:rgba(184,69,42,0.10);font-size:0.9375rem;color:#a3271f;font-variant-numeric:tabular-nums">오후 07:00</span>
+            </span>
+          </div>
+          <div style="position:relative;height:180px;margin:0 12px;border-top:1px solid rgba(23,24,26,0.07);display:grid;grid-template-columns:repeat(3,72px);column-gap:16px;justify-content:center">
+            <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#efece8"></span>
+            <sc-for list="{{ wheelMeridiem }}" as="col" hint-placeholder-count="1">
+              <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                <div style="height:72px"></div>
+                <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                  <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};color:{{ it.colorL }};font-weight:{{ it.fw }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                </sc-for>
+                <div style="height:72px"></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-radius:18px;padding:20px;background:#121110">
+        <div style="border-radius:18px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.07)">
+            <span style="font-size:0.9375rem;color:#f2efec">스위치 행</span>
+            <span style="flex:none;width:52px;height:32px;border-radius:16px;background:#3a332e;position:relative"><span style="position:absolute;top:2px;left:2px;width:28px;height:28px;border-radius:14px;background:#9a948d"></span></span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.07)">
+            <span style="font-size:0.9375rem;color:#f2efec">시작</span>
+            <span style="display:flex;gap:8px">
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#2b2724;font-size:0.9375rem;color:#f2efec;font-variant-numeric:tabular-nums">2026. 09. 02.</span>
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#2b2724;font-size:0.9375rem;color:#f2efec;font-variant-numeric:tabular-nums">오후 06:00</span>
+            </span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px">
+            <span style="font-size:0.9375rem;color:#f2efec">종료</span>
+            <span style="display:flex;gap:8px">
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#2b2724;font-size:0.9375rem;color:#f2efec;font-variant-numeric:tabular-nums">2026. 09. 02.</span>
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:rgba(240,120,90,0.2);font-size:0.9375rem;color:#f0785a;font-variant-numeric:tabular-nums">오후 07:00</span>
+            </span>
+          </div>
+          <div style="position:relative;height:180px;margin:0 12px;border-top:1px solid rgba(255,255,255,0.07);display:grid;grid-template-columns:repeat(3,72px);column-gap:16px;justify-content:center">
+            <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#2b2724"></span>
+            <sc-for list="{{ wheelMeridiem }}" as="col" hint-placeholder-count="1">
+              <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                <div style="height:72px"></div>
+                <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                  <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};color:{{ it.colorD }};font-weight:{{ it.fw }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                </sc-for>
+                <div style="height:72px"></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:8px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span><span style="color:#e7eaee">한 행에 한 요소</span>를 둔다 — 라벨은 왼쪽, 값은 오른쪽 칩. 두 필드를 한 행에 나란히 놓지 않는다. 좁은 화면에서 값이 잘리고 무엇이 무엇의 짝인지 흐려진다.</span>
+      <span>행은 한 카드 안에 구분선으로 잇는다 — 카드·구분선·마지막 행 처리는 <span style="color:#e7eaee">04 묶음 리스트와 같은 어법</span>이고 <span style="color:#e7eaee">행 높이만 다르다</span>. 값 칩은 높이 36 · 캡슐(반경 100)이고, 행은 <span style="color:#e7eaee">52</span>다 — 칩 36에 위아래 여백 8과 구분선 1을 더한 값이며, 04의 56과 같이 <span style="color:#e7eaee">행 높이를 명시하고 세로 패딩은 상한 이하로 둔다</span>(52에서는 7). 04의 56은 두 줄과 앞머리 원 34를 담는 값이므로 이 행에 쓰지 않는다.</span>
+      <span>날짜와 시각은 <span style="color:#e7eaee">칩 두 개로 나눈다</span>. 각각 따로 누를 수 있어야 하고, 누른 칩만 강조색 톤으로 편집 중임을 알린다.</span>
+      <span>시각은 칩 아래에 <span style="color:#e7eaee">휠을 펼쳐서</span> 고른다 — 오전·오후 / 시 / 분 세 열. 새 층을 쌓지 않고 폼 안에서 열린다.</span>
+      <span>정각만 유효한 시각(한 시간 단위로 묶는 값의 경계 등)은 <span style="color:#e7eaee">분 열을 두지 않는다</span> — 두 열(오전·오후 / 시)만 두고 칩 표기는 그대로 「오전/오후 hh:mm」다. 고를 수 없는 값을 열에 남겨 비활성으로 채우지 않는다. 열 사이는 세 열과 같은 <span style="color:#e7eaee">16</span>이다.</span>
+      <span>분은 <span style="color:#e7eaee">1분 단위</span>(00~59, 60칸)다. 휠은 굴러가므로 칸 수가 많아도 부담이 없고, 실제 시각을 그대로 담는다.</span>
+      <span>선택된 줄은 가운데 <span style="color:#e7eaee">캡슐 띠</span>로 표시하고 위아래로 갈수록 흐려진다. 선택 값은 크기만 키우고 굵기는 그대로다(05-H). 값 칩과 같은 캡슐이라 「지금 고르는 값」이 같은 모양으로 이어진다.</span>
+      <span>스위치 행이 시각 입력을 끄면 시각 칩만 사라지고 날짜 칩은 남는다. 행 자체는 없애지 않는다.</span>
+      <span>칩의 값 표기 — 날짜는 <span style="color:#e7eaee">YYYY. MM. DD.</span>(월·일 두 자리, 점 뒤 한 칸), 시각은 <span style="color:#e7eaee">오전/오후 hh:mm</span>(시·분 두 자리). 자릿수가 고정되어야 칩 폭이 값에 따라 흔들리지 않는다. 시 휠의 줄도 두 자리이며 순서는 <span style="color:#e7eaee">01 → 12</span>다(12를 맨 앞에 두지 않는다).</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05-H</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">행 안에서 펼치기 — 날짜 · 연월 · 시각 한 구조</span>
+      <span style="font-size:0.75rem;color:#6b7178">칩을 누르면 그 행 아래가 열린다 · 연·월 라벨을 눌러 달력 ↔ 휠</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3">
+        <div style="border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(23,24,26,0.07)">
+            <span style="font-size:0.9375rem;color:#17181a">시작</span>
+            <span style="display:flex;gap:8px">
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:rgba(184,69,42,0.10);font-size:0.9375rem;color:#a3271f;font-variant-numeric:tabular-nums">2026. 09. 02.</span>
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#e9e6e1;font-size:0.9375rem;color:#17181a;font-variant-numeric:tabular-nums">오후 06:00</span>
+            </span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding:8px 12px 12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px">
+              <button onClick="{{ ymToggleL }}" style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:1.0625rem;font-weight:700;color:#b8452a;font-variant-numeric:tabular-nums">2026년 9월<i class="ph ph-caret-right" style="font-size:0.8125rem;display:inline-block;transition:transform 0.24s ease;transform:{{ ymRotL }}"></i></button>
+              <sc-if value="{{ ymClosedL }}" hint-placeholder-val="{{ true }}">
+                <span style="display:flex;animation:fadein 0.24s ease">
+                  <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#b8452a;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+                  <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#b8452a;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+                </span>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;overflow:hidden;interpolate-size:allow-keywords;transition:height 0.28s ease">
+            <sc-if value="{{ ymClosedL }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);font-size:0.75rem;color:#8a8d92;text-align:center;animation:fadein 0.24s ease">
+                <sc-for list="{{ calWeekdays }}" as="w" hint-placeholder-count="7"><span>{{ w.label }}</span></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease">
+                <sc-for list="{{ calRowLight }}" as="c" hint-placeholder-count="42">
+                  <span style="height:44px;display:flex;align-items:center;justify-content:center">
+                    <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+                  </span>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ ymOpenL }}" hint-placeholder-val="{{ false }}">
+              <div style="position:relative;height:180px;display:grid;grid-template-columns:repeat(2,72px);column-gap:12px;justify-content:center;animation:fadein 0.24s ease">
+                <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#efece8"></span>
+                <sc-for list="{{ wheelYm }}" as="col" hint-placeholder-count="2">
+                  <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                    <div style="height:72px"></div>
+                    <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                      <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};color:{{ it.colorL }};font-weight:{{ it.fw }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                    </sc-for>
+                    <div style="height:72px"></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            </div>
+          </div>
+        </div>
+        <span style="display:block;margin-top:10px;font-size:0.75rem;color:#8a8d92">날짜 칩을 누른 상태 — 달력이 그 행 아래에 붙는다. 연·월 라벨을 누르면 달력 자리에 두 열 휠이 들어온다</span>
+      </div>
+
+      <div style="border-radius:18px;padding:20px;background:#121110">
+        <div style="border-radius:18px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.07)">
+            <span style="font-size:0.9375rem;color:#f2efec">시작</span>
+            <span style="display:flex;gap:8px">
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:rgba(240,120,90,0.2);font-size:0.9375rem;color:#f0785a;font-variant-numeric:tabular-nums">2026. 09. 02.</span>
+              <span style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border-radius:100px;background:#2b2724;font-size:0.9375rem;color:#f2efec;font-variant-numeric:tabular-nums">오후 06:00</span>
+            </span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding:8px 12px 12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;min-height:44px">
+              <button onClick="{{ ymToggleD }}" style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:1.0625rem;font-weight:700;color:#f0785a;font-variant-numeric:tabular-nums">2026년 9월<i class="ph ph-caret-right" style="font-size:0.8125rem;display:inline-block;transition:transform 0.24s ease;transform:{{ ymRotD }}"></i></button>
+              <sc-if value="{{ ymClosedD }}" hint-placeholder-val="{{ true }}">
+                <span style="display:flex;animation:fadein 0.24s ease">
+                  <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#f0785a;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+                  <button style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#f0785a;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+                </span>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;overflow:hidden;interpolate-size:allow-keywords;transition:height 0.28s ease">
+            <sc-if value="{{ ymClosedD }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);font-size:0.75rem;color:#9a948d;text-align:center;animation:fadein 0.24s ease">
+                <sc-for list="{{ calWeekdays }}" as="w" hint-placeholder-count="7"><span>{{ w.label }}</span></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease">
+                <sc-for list="{{ calRowDark }}" as="c" hint-placeholder-count="42">
+                  <span style="height:44px;display:flex;align-items:center;justify-content:center">
+                    <span style="width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+                  </span>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ ymOpenD }}" hint-placeholder-val="{{ false }}">
+              <div style="position:relative;height:180px;display:grid;grid-template-columns:repeat(2,72px);column-gap:12px;justify-content:center;animation:fadein 0.24s ease">
+                <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#2b2724"></span>
+                <sc-for list="{{ wheelYm }}" as="col" hint-placeholder-count="2">
+                  <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                    <div style="height:72px"></div>
+                    <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                      <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};color:{{ it.colorD }};font-weight:{{ it.fw }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                    </sc-for>
+                    <div style="height:72px"></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            </div>
+          </div>
+        </div>
+        <span style="display:block;margin-top:10px;font-size:0.75rem;color:#9a948d">날짜 칩을 누른 상태 — 달력이 그 행 아래에 붙는다. 연·월 라벨을 누르면 달력 자리에 두 열 휠이 들어온다</span>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:10px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span>날짜 · 연월 · 시각은 <span style="color:#e7eaee">한 구조</span>를 쓴다 — 값 칩을 누르면 그 행 아래가 열리고, 다시 누르면 접힌다. 시트도 화면 이동도 없다. 열린 칩만 <span style="color:#e7eaee">강조 톤(배경·글자색)</span>으로 「지금 이 값을 고치고 있다」를 알린다. 굵기는 바꾸지 않는다 — 값은 열려 있어도 400이다(07 「굵게는 제목과 선택된 상태에만」의 예외: 열림은 선택이 아니다).</span>
+      <span>펼침 영역은 카드 안에 머문다. 위는 구분선으로 잇고, 좌우 여백은 12, 아래는 12를 둔다. 카드 밖으로 떠 있는 팝오버로 만들지 않는다 — 어느 행의 값인지 잃는다.</span>
+      <span>달력 헤더의 연·월 라벨이 <span style="color:#e7eaee">접기·펼치기 스위치</span>다. 접혀 있으면 꺾쇠는 오른쪽(▸), 펼치면 아래(▾)를 본다. 라벨은 강조색 1.0625rem · 700, 좌우 이동 버튼은 44×44 · 글리프 1rem. 펼치면 <span style="color:#e7eaee">달력이 있던 자리에</span> 휠이 들어오고, 이동 버튼은 숨는다.</span>
+      <span>연·월 휠은 <span style="color:#e7eaee">두 열</span>(연도 · 월), 시각 휠은 세 열(오전·오후 · 시 · 분)이다. 열 수만 다르고 나머지 사양은 같다 — 줄 높이 36, 다섯 줄이 보이는 높이 180, 가운데 캡슐 띠, 선택 1.0625rem · 700, 나머지 0.9375rem · 400.</span>
+      <span>휠은 <span style="color:#e7eaee">굴러간다</span> — 열마다 값 전부를 담은 스크롤 영역이고, 위아래에 여백 72(= 두 줄)를 두어 첫 값과 끝 값도 가운데에 올 수 있다. 줄마다 가운데 스냅을 걸어 멈추면 반드시 한 줄이 띠에 맞는다. 멈춘 줄이 값이 된다. 줄을 눌러 고르는 길도 함께 남긴다. 띠에 맞은 줄은 <span style="color:#e7eaee">크기만 1.0625rem</span>으로 키운다(나머지 0.9375rem) — 굵기는 400 그대로다. 띠와 크기가 이미 「지금 값」을 가리키므로 굵게 쓰지 않는다.</span>
+      <span>흐림은 줄마다 주지 않고 <span style="color:#e7eaee">영역 위아래에 마스크</span>로 준다(62 · 118 기준 위아래 페이드) — 굴리는 동안 줄 단위로 값이 튀지 않는다. 고를 수 없는 값은 마스크와 별개로 흐리게 두고 누를 수 없게 한다.</span>
+      <span>목록 범위는 자리마다 다르다 — 시는 01~12 순서(12는 11 아래, 맨 위에 두지 않는다), 분은 1분 단위 60칸. 연도 범위는 값의 성격에 따른다 — 앞뒤로 열린 예약 값은 올해 앞뒤 10년, 과거만 허용하는 값(생년월일 등)은 하한부터 오늘까지, 기록 조회는 기록 시작 연도부터 올해까지. 오늘 이후를 허용하지 않는 자리는 흐리게 두고 스냅도 되돌린다.</span>
+      <span>휠은 <span style="color:#e7eaee">고르는 층</span>이다(05-F) — 밖을 누르면 접히고 값은 그대로다. 접히는 순간 선택은 칩에 반영한다. 별도의 확인 버튼을 두지 않는다.</span>
+      <span>같은 행에 칩이 둘이면 <span style="color:#e7eaee">한 번에 하나만</span> 열린다. 시각을 누르면 열려 있던 날짜가 접힌다.</span>
+      <span>전환 시간 — 연·월 라벨 꺾쇠 회전과 달력·휠·이동 버튼의 페이드 인은 <span style="color:#e7eaee">0.24s ease</span>, 펼침 영역의 높이 변화는 <span style="color:#e7eaee">0.28s ease</span>. 아이콘을 교체하지 않고 회전으로 상태를 보인다.</span>
+      <span>목록 선택의 두 갈래 — <span style="color:#e7eaee">폼 필드</span>(56 높이 채움 필드, 라벨이 안에 있는 것)는 05-B 드롭다운으로 필드 아래에 띄운다. <span style="color:#e7eaee">카드 안 「라벨 + 값 칩」 행</span>(선택지 목록·시각·날짜)은 05-H로 그 행 아래에서 펼친다. 한 화면에 둘이 섞여도 된다 — 부품의 모양이 방식을 정한다.</span>
+      <span>선택지가 정해진 <span style="color:#e7eaee">목록에서 고르는 값</span>도 같은 구조다 — 행을 누르면 그 아래에 <span style="color:#e7eaee">한 열 휠</span>(열 너비 160)이 펼쳐진다. 카드 밖으로 뜨는 드롭다운을 쓰지 않는다. 줄 높이·띠·마스크·전환은 다른 휠과 같다.</span>
+      <span>연·월 라벨은 높이 44 · 좌우 패딩 <span style="color:#e7eaee">10</span>, 꺾쇠 글리프 0.8125rem · 글자와의 간격 6. 펼친 동안에만 강조색을 쓴다. 자리는 05-D와 같다 — <span style="color:#e7eaee">라벨은 왼쪽, 이전·다음 버튼은 오른쪽에 붙여 묶는다</span>(라벨 ▸ ······ ‹ ›). 접힌 상태에서도 라벨 옆 꺾쇠(▸)를 보여 누를 수 있음을 알린다. 펼치면 이동 버튼이 사라지고 라벨은 왼쪽 자리에 남는다.</span>
+      <span>두 열 휠은 열 너비 <span style="color:#e7eaee">72</span> · 열 사이 <span style="color:#e7eaee">12</span>로 가운데 정렬한다. 연도(「2026년」)가 기준이고 월 열도 같은 너비를 쓴다 — 두 열이 다르면 띠와 어긋난다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">표면은 조작 가능성을 말한다</span>
+      <span>한 화면에 <span style="color:#e7eaee">조작하는 값과 읽기만 하는 정보가 함께 있으면 표면으로 가른다</span> — 조작하는 것만 카드(라이트 흰 표면 + 그림자 · 다크 시트 위 채움)를 갖고, 읽기 전용 정보는 표면 없이 소제목과 구분선으로만 묶는다. 읽을 수만 있는 것을 설정 행과 같은 카드에 담으면 고칠 수 있는 것으로 읽힌다.</span>
+      <span>묶음 경계의 구분선은 <span style="color:#e7eaee">좌우 여백을 상쇄해 양끝까지 닿게</span> 한다(모달 본문 여백 22를 음수 여백으로 되돌린다). 카드 안 행 사이의 구분선과 달리, 묶음을 가르는 선은 화면을 가로지른다.</span>
+      <span>고르는 즉시 적용되는 값만 있는 화면에는 <span style="color:#e7eaee">저장 버튼을 두지 않는다</span> — 그 화면은 「입력하는 층」이 아니라 <span style="color:#e7eaee">고르는 층</span>이고, 밖을 눌러 닫을 수 있다. 저장 버튼을 남기면 이미 적용된 값을 한 번 더 확정하는 것처럼 보인다.</span>
+      <span>구간(범위)을 정하는 값에는 <span style="color:#e7eaee">결과를 보여 주는 띠</span>를 함께 둔다 — 24칸 띠 높이 <span style="color:#e7eaee">24</span> · 칸 사이 2 · 반경 3, 아래에 0·6·12·18·24 자리표. 값을 바꾸면 칠해진 구간이 그 자리에서 움직여, 설명문을 읽기 전에 무엇을 정하는지 보인다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">끝난 항목은 아래 묶음으로 내린다</span>
+      <span>목록에 <span style="color:#e7eaee">끝난 항목과 남은 항목이 섞이면 묶음을 둘로 나눈다</span> — 남은 것이 위, 끝난 것이 아래다. 각 묶음은 04 묶음 리스트 카드 하나이고, 두 카드는 <span style="color:#e7eaee">간격 8</span>로만 갈린다.</span>
+      <span>이때 <span style="color:#e7eaee">소제목을 두지 않는다</span>. 묶음의 이름은 각 행이 스스로 밝히는 상태 표기(부가값 자리의 「끝난 상태」 낱말)와 <span style="color:#e7eaee">흐림 0.55</span>가 대신한다. 그 표기를 없애면 소제목이 필요해지므로 함께 판단한다.</span>
+      <span>끝난 항목이 없으면 카드는 하나다 — 빈 묶음의 카드나 소제목을 남기지 않는다.</span>
+      <span>끝난 상태를 부르는 낱말은 <span style="color:#e7eaee">「완료」</span>다(2026-09-07 확정, 첫머리 「용어」 표 참조). 행의 상태 표기, 편집 화면의 스위치 라벨, 밀어서 꺼내는 동작 라벨, 토스트 문장에 같은 낱말을 쓴다. 끝낸 것을 되돌리는 동작은 「되돌리기」다.</span>
+      <span>끝냄을 <span style="color:#e7eaee">켜고 끄는 조작</span>은 원본 mewly에 없는 기능이며 사양으로 확정한다(2026-09-07). 조작 자리는 둘이다 — 행을 왼쪽으로 밀어 꺼내는 「완료」 동작(끝난 행에서는 같은 자리가 「되돌리기」), 편집 화면의 「완료」 스위치. 어느 쪽으로 바꿔도 목록의 상태 표기·흐림·아래 묶음 이동이 함께 따라온다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">밀어서 동작</span>
+      <span>목록 행의 동작은 <span style="color:#e7eaee">행을 밀어서</span> 꺼낸다. 행을 누르는 길과 오른쪽 꺾쇠는 두지 않는다 — 이동도 동작 하나로 다룬다. 두 방향을 쓴다: <span style="color:#e7eaee">왼쪽으로 밀면 오른쪽에서</span> 통상 동작이, <span style="color:#e7eaee">오른쪽으로 밀면 왼쪽에서</span> 지우는 동작이 들어온다.</span>
+      <span>동작 버튼은 <span style="color:#e7eaee">폭 72 · 높이는 행과 같다</span>. 글리프 1.0625rem 위, 라벨 0.6875rem·600 아래, 사이 간격 4. 한 방향에 두 개까지 두고(열림 폭 144), 지우는 방향은 하나만 둔다(72).</span>
+      <span>패널은 행 내용 <span style="color:#e7eaee">위로 덮어 들어온다</span>(z-index 2). 행 내용은 손가락을 그대로 따라가고, 경계를 넘은 글자는 잘린다. 닫힌 동안 패널은 행 밖에 서고 행 래퍼의 <span style="font-family:ui-monospace,monospace;font-size:0.75rem;color:#e7eaee">overflow:hidden</span>이 가린다.</span>
+      <span>끄는 중에는 전이를 걸지 않아 손가락에 붙고, 놓으면 <span style="color:#e7eaee">그 방향 열림 폭의 절반</span>을 넘겼는지로 열림·닫힘이 갈린다. 스냅은 <span style="color:#e7eaee">0.22s cubic-bezier(0.2,0,0,1)</span> — 세그먼트 알약과 같은 곡선이다. 한 번에 한 행, 한 방향만 열린다.</span>
+      <span>색은 위계로 읽힌다 — <span style="color:#e7eaee">지우는 동작은 강조색 채움</span>(가장 셈), 그다음 동작은 잉크 채움, 보조 동작은 중립 채움이다. 되돌릴 수 있는 상태 동작은 켜고 끄는 두 얼굴을 같은 자리에 둔다.</span>
+      <span>지우기는 <span style="color:#e7eaee">확인을 묻지 않고 즉시</span> 지우며 결과를 토스트로 알린다. 되돌릴 수 없는 지우기라면 이 규칙을 쓰지 않고 확인 단계를 둔다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">되풀이 값은 날짜를 만들지 않는다</span>
+      <span>「안 함·매일·매주…」처럼 <span style="color:#e7eaee">되풀이 주기를 고르는 값</span>은 알림 예약 규칙이며, 달력에 회차를 만들지 않는다. 따라서 날짜 값과 서로를 제약하지 않는다 — 주기에 따라 날짜 행을 숨기거나 바꾸지 않는다.</span>
+      <span>날짜가 고정인 편집 화면(고른 하루를 편집하는 경우)은 <span style="color:#e7eaee">날짜 선택기를 두지 않는다</span>. 그 날짜는 카드 위에 읽기 전용 한 줄(0.8125rem 보조색)로만 적고, 「시작·종료」 행은 시각만 다룬다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">연도 열의 범위
+      <span>연도 열은 <span style="color:#e7eaee">올해 −50년 ~ 올해 +50년</span>을 담는다(기본 전제). 상수를 박지 않고 언제나 오늘에서 계산한다.</span>
+      <span>미래를 고를 수 없는 용도(기록 조회·생년월)는 <span style="color:#e7eaee">상한을 오늘로 내린다</span> — 올해 −50년 ~ 올해. 연도 열에서 오늘 이후 연도는 빼고, 상한이 걸린 <span style="color:#e7eaee">월은 열에 남기되 비활성</span>으로 둔다(05-H).</span>
+      <span>날짜 격자는 행 간격을 두지 않는다(<span style="color:#e7eaee">row-gap 0</span>) — 셀 44가 이미 행 높이다. 간격을 더하면 달력만 헐거워진다.</span>
+      <span>휠의 선택 띠는 <span style="color:#e7eaee">휠 영역의 전체 폭</span>으로 깔다 — 카드 안 펼침 영역의 좌우 여백 12 안쪽을 그대로 따른다(05-G·05-H 같음). 열은 그 안에서 가운데 정렬한다. 상자 전역에 걸면 캡슐이 아니라 한 줄 통짜 배경으로 읽힌다.</span>
+    </div>
+  </div>
+
+  <!-- 05-I 미디어 플레이어 -->
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05-I</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">미디어 플레이어 — 영상 카드 모달</span>
+      <span style="font-size:0.75rem;color:#6b7178">정지 상태로 열림 · 화면 탭 = 재생/일시정지 · 마커 링 56 · 시크 바 4</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:20px;background:#f6f5f3">
+        <div style="position:relative;border-radius:28px;background:#f6f5f3;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.18)">
+          <button onClick="{{ mpToggleL }}" aria-label="{{ mpLabelL }}" style="position:relative;display:block;width:100%;aspect-ratio:16/9;border:none;padding:0;background:#000;cursor:pointer">
+            <span style="position:absolute;inset:0;background:linear-gradient(160deg,#2a2622 0%,#161412 100%)"></span>
+            <sc-if value="{{ mpPausedL }}" hint-placeholder-val="{{ true }}">
+              <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:28px;background:rgba(0,0,0,0.55);border:1.5px solid #f0785a;color:#f0785a;display:flex;align-items:center;justify-content:center;animation:fadein 0.16s ease-out"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:24px;height:24px;margin-left:3px;fill:currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"></path></svg></span>
+            </sc-if>
+            <span style="position:absolute;right:10px;bottom:10px;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,0.5);color:#e9e9ed;font-size:0.75rem;font-variant-numeric:tabular-nums">{{ mpDur }}</span>
+          </button>
+          <button aria-label="닫기" style="position:absolute;top:6px;right:6px;width:44px;height:44px;border:none;border-radius:22px;background:rgba(0,0,0,0.45);color:#e9e9ed;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 22px 0;font-size:0.75rem;color:#8a8d92;font-variant-numeric:tabular-nums">
+            <span>{{ mpCurL }}</span>
+            <input type="range" min="0" max="{{ mpMax }}" step="0.1" value="{{ mpTL }}" onChange="{{ mpSeekL }}" style="flex:1;min-width:0;height:4px;appearance:none;-webkit-appearance:none;border-radius:2px;background:linear-gradient(to right,#b8452a {{ mpPctL }},#e2dfda {{ mpPctL }});accent-color:#b8452a;cursor:pointer">
+            <span>{{ mpDur }}</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;padding:10px 22px 22px;line-height:1">
+            <span style="font-size:0.75rem;color:#8a8d92;font-variant-numeric:tabular-nums">오전 07:46</span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:700;color:#17181a">영상 제목</span>
+          </div>
+        </div>
+      </div>
+      <div style="border-radius:18px;padding:20px;background:#121110">
+        <div style="position:relative;border-radius:28px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.5)">
+          <button onClick="{{ mpToggleD }}" aria-label="{{ mpLabelD }}" style="position:relative;display:block;width:100%;aspect-ratio:16/9;border:none;padding:0;background:#000;cursor:pointer">
+            <span style="position:absolute;inset:0;background:linear-gradient(160deg,#2a2622 0%,#161412 100%)"></span>
+            <sc-if value="{{ mpPausedD }}" hint-placeholder-val="{{ true }}">
+              <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:28px;background:rgba(0,0,0,0.55);border:1.5px solid #f0785a;color:#f0785a;display:flex;align-items:center;justify-content:center;animation:fadein 0.16s ease-out"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:24px;height:24px;margin-left:3px;fill:currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"></path></svg></span>
+            </sc-if>
+            <span style="position:absolute;right:10px;bottom:10px;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,0.5);color:#e9e9ed;font-size:0.75rem;font-variant-numeric:tabular-nums">{{ mpDur }}</span>
+          </button>
+          <button aria-label="닫기" style="position:absolute;top:6px;right:6px;width:44px;height:44px;border:none;border-radius:22px;background:rgba(0,0,0,0.45);color:#e9e9ed;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 22px 0;font-size:0.75rem;color:#9a948d;font-variant-numeric:tabular-nums">
+            <span>{{ mpCurD }}</span>
+            <input type="range" min="0" max="{{ mpMax }}" step="0.1" value="{{ mpTD }}" onChange="{{ mpSeekD }}" style="flex:1;min-width:0;height:4px;appearance:none;-webkit-appearance:none;border-radius:2px;background:linear-gradient(to right,#f0785a {{ mpPctD }},#3a332e {{ mpPctD }});accent-color:#f0785a;cursor:pointer">
+            <span>{{ mpDur }}</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;padding:10px 22px 22px;line-height:1">
+            <span style="font-size:0.75rem;color:#9a948d;font-variant-numeric:tabular-nums">오전 07:46</span>
+            <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:700;color:#f2efec">영상 제목</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:10px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span>미디어 플레이어는 <span style="color:#e7eaee">카드 모달</span>이다(05 — 반경 28, 스크림, 페이드 160ms). 화면 가운데에 뜨고, 스크림이나 오른쪽 위 X(44)를 누르면 닫힌다. 고르는 층(05-F)이 아니므로 밖을 눌러 닫혀도 잃는 값은 없다. 어느 화면에서 열려도 같은 부품이다.</span>
+      <span>열면 <span style="color:#e7eaee">정지 상태</span>로 시작한다 — 자동 재생하지 않는다. 화면 어디를 탭해도 재생/일시정지가 바뀐다. 끝까지 가면 처음으로 되감고 정지한다.</span>
+      <span>마커 — 링 <span style="color:#e7eaee">56</span> · 검정 55% · 강조색 테두리 1.5 · 글리프 24. 글리프는 <span style="color:#e7eaee">인라인 도형</span>으로 그린다(아이콘 폰트에 기대지 않는다). 정지 중에만 재생 마커를 보인다 — 재생 중에는 <span style="color:#e7eaee">마커를 두지 않는다</span>(일시정지 마커를 잠깐 보이는 연출도 쓰지 않는다).</span>
+      <span>시크 바 — 높이 <span style="color:#e7eaee">4</span> · 손잡이 16(흰색, 그림자) · 지난 구간은 강조색, 남은 구간은 채움 톤. 양 끝에 현재/전체 시간 <span style="color:#e7eaee">mm:ss</span> 0.75rem. 영상 안 오른쪽 아래에도 전체 길이 칩(검정 50%, 반경 6)을 둔다.</span>
+      <span>영상 아래 정보 한 줄 — <span style="color:#e7eaee">시각이 먼저, 제목이 뒤</span>. 시각은 05-G 칩 표기(오전/오후 hh:mm) 0.75rem 보조색, 제목은 0.9375rem · 700. 그 아래 설명 문장이 있으면 0.8125rem · 1.6. 패딩은 모달과 같은 22 — 다만 글자 상자의 여유를 상쇄해야 좌우 22와 같게 보인다. 정보 블록에 <span style="color:#e7eaee">line-height 1</span>을 두어 시각·제목 줄의 위·아래 여유를 없애고, 설명 문장은 1.6을 유지한 채 <span style="color:#e7eaee">margin-bottom −4</span>로 마지막 줄의 아래 여유만 상쇄한다.</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">05-F</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">층 닫기 — 밖을 누르는 행위</span>
+      <span style="font-size:0.75rem;color:#6b7178">고르는 층은 취소와 같다 · 입력하는 층은 닫히지 않는다</span>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:10px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span><span style="color:#e7eaee">고르는 층</span> — 드롭다운, 피커 시트, 연·월 격자. 밖을 누르는 것은 취소 버튼을 누르는 것과 같다. 아무것도 고르지 않았으므로 값은 그대로 남고, 별도의 취소 버튼을 두지 않는다.</span>
+      <span><span style="color:#e7eaee">입력하는 층</span> — 저장 버튼이 있는 편집 화면과 모달. 밖을 눌러도 닫히지 않는다. 입력 중인 내용이 조용히 사라지는 것을 막기 위해 닫기는 X나 뒤로가기로만 한다.</span>
+      <span><span style="color:#e7eaee">강제 층</span> — 지나갈 수 없는 모달(최초 설정 강제 등). 밖을 눌러도 닫히지 않고 취소도 없다. 닫는 유일한 길은 완료다.</span>
+      <span>어느 경우든 밖을 누르는 영역은 층 전체를 덮는다. 스크림이 보이지 않는 드롭다운도 투명한 레이어로 화면 전체를 덮어 같은 동작을 준다 — 일부만 반응하면 눌러도 닫히지 않는 자리가 생긴다.</span>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">06</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">모션 · 터치 타깃</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:12px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+        <span style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:#6b7178">모션</span>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>시트 등장 · 퇴장</span><span style="color:#e7eaee;font-family:ui-monospace,monospace;font-size:0.75rem">220ms · cubic-bezier(.2,0,0,1)</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>모달 페이드</span><span style="color:#e7eaee;font-family:ui-monospace,monospace;font-size:0.75rem">160ms · ease-out</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>누름 피드백</span><span style="color:#e7eaee;font-family:ui-monospace,monospace;font-size:0.75rem">즉시 → 180ms 복귀</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>토글 노브</span><span style="color:#e7eaee;font-family:ui-monospace,monospace;font-size:0.75rem">180ms · cubic-bezier(.2,0,0,1)</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>토스트 노출</span><span style="color:#e7eaee;font-family:ui-monospace,monospace;font-size:0.75rem">2.4s 후 자동 소멸</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>세그먼트 선택 알약 이동</span><span style="color:#e7eaee;font-family:ui-monospace,monospace;font-size:0.75rem">0.22s · (0.2,0,0,1)</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>상태 점 맥동</span><span style="color:#e7eaee;font-family:ui-monospace,monospace;font-size:0.75rem">2s · 무한</span></div>
+        <span style="margin-top:4px;color:#6b7178">그 밖의 장식 애니메이션은 두지 않습니다.</span>
+      </div>
+      <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:12px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+        <span style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:#6b7178">터치 타깃 — 최소 44</span>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>목록 행의 삭제 ×</span><span style="color:#e7eaee">44</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>모달 닫기 ×</span><span style="color:#e7eaee">44</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>카드 안 작은 버튼</span><span style="color:#e7eaee">44</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>달력 날짜 셀</span><span style="color:#e7eaee">44</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>시트 안 보조 버튼</span><span style="color:#e7eaee">44</span></div>
+        <span style="margin-top:4px;color:#6b7178">아이콘만 작게 두고 히트 영역을 44로 넓힙니다.</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:1000px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;color:#f0785a">07</span>
+      <span style="font-size:1rem;font-weight:600;color:#e7eaee">타입 스케일 · 값 텍스트 사양</span>
+      <span style="font-size:0.75rem;color:#6b7178">이 네 단계 밖의 크기는 쓰지 않습니다 · 기준 390px 폭</span>
+    </div>
+    <div style="border-radius:18px;background:#f6f5f3;overflow:hidden">
+      <div style="display:flex;align-items:baseline;gap:20px;padding:18px 22px;border-bottom:1px solid rgba(23,24,26,0.07)">
+        <span style="flex:none;width:118px;font-size:0.75rem;font-family:ui-monospace,monospace;color:#8a8d92">1.25rem · 700</span>
+        <span style="flex:1;font-size:1.25rem;font-weight:700;color:#17181a;letter-spacing:-0.01em">화면 · 시트 제목</span>
+        <span style="flex:none;font-size:0.75rem;color:#8a8d92">시트/모달 제목, 화면 대제목</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:20px;padding:18px 22px;border-bottom:1px solid rgba(23,24,26,0.07)">
+        <span style="flex:none;width:118px;font-size:0.75rem;font-family:ui-monospace,monospace;color:#8a8d92">1.0625rem · 700</span>
+        <span style="flex:1;font-size:1.0625rem;font-weight:700;color:#17181a">섹션 · 빈 상태 제목</span>
+        <span style="flex:none;font-size:0.75rem;color:#8a8d92">카드 제목, 빈 상태</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:20px;padding:18px 22px;border-bottom:1px solid rgba(23,24,26,0.07)">
+        <span style="flex:none;width:118px;font-size:0.75rem;font-family:ui-monospace,monospace;color:#8a8d92">0.9375rem · 400/500</span>
+        <span style="flex:1;font-size:0.9375rem;color:#17181a">본문 — 목록 행, 입력값, 버튼</span>
+        <span style="flex:none;font-size:0.75rem;color:#8a8d92">읽고 조작하는 기본 크기</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:20px;padding:18px 22px;border-bottom:1px solid rgba(23,24,26,0.07)">
+        <span style="flex:none;width:118px;font-size:0.75rem;font-family:ui-monospace,monospace;color:#8a8d92">0.875rem · 400</span>
+        <span style="flex:1;font-size:0.875rem;color:#17181a">상태 메시지 — 인라인 피드백 전용</span>
+        <span style="flex:none;font-size:0.75rem;color:#8a8d92">03의 인라인 3종만</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:20px;padding:18px 22px;border-bottom:1px solid rgba(23,24,26,0.07)">
+        <span style="flex:none;width:118px;font-size:0.75rem;font-family:ui-monospace,monospace;color:#8a8d92">0.8125rem · 400</span>
+        <span style="flex:1;font-size:0.8125rem;color:#5c5f63;line-height:1.6">설명문 — 시트 본문, 보조 설명, 부가 정보, 토스트</span>
+        <span style="flex:none;font-size:0.75rem;color:#8a8d92">읽어도 되고 넘겨도 되는 글</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:20px;padding:18px 22px">
+        <span style="flex:none;width:118px;font-size:0.75rem;font-family:ui-monospace,monospace;color:#8a8d92">0.75rem · 400</span>
+        <span style="flex:1;font-size:0.75rem;color:#8a8d92">라벨 · 캡션 — 필드 라벨, 수치 단위, 시각</span>
+        <span style="flex:none;font-size:0.75rem;color:#8a8d92">최소 크기 · 이보다 작게 쓰지 않음</span>
+      </div>
+    </div>
+    <div style="border-radius:18px;padding:22px;background:#101113;border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:8px;font-size:0.8125rem;line-height:1.7;color:#8a9099">
+      <span style="color:#e7eaee;font-weight:600">값 텍스트 사양 — 같은 역할이면 같은 굵기</span>
+      <span>필드 라벨은 <span style="color:#e7eaee">0.6875rem · 400</span>, 값은 <span style="color:#e7eaee">0.9375rem · 400</span>. 입력 필드든 눌러서 고르는 행이든 값의 굵기는 같다 — 조작 방식이 달라도 역할이 같으면 사양도 같다.</span>
+      <span>굵게(700)는 <span style="color:#e7eaee">제목과 선택된 상태</span>에만 쓴다. 값을 굵게 쓰면 화면 안에서 무엇이 제목인지 흐려진다.</span>
+      <span>목록 행의 오른쪽 부가값(현재 설정값, 상태 등)은 <span style="color:#e7eaee">0.8125rem · 400 · 보조색</span>. 행 제목과 같은 크기로 쓰지 않는다.</span>
+      <span>화면을 넘기기 전에 같은 역할끼리 대조한다 — 라벨·값·아이콘의 색, 굵기, 크기, 간격.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">고정 높이</span>
+      <span>버튼 <span style="color:#e7eaee">주·보조 44 · 작은 40 · 칩·세그먼트 36</span>. 목록 행 56, 폼 행 52(칩 36 + 위아래 8 · 패딩 7), 드롭다운 목록 행 44, 채움 필드 56, 하단 내비 64, 아이콘 버튼 44×44, 토글 52×32.</span>
+      <span>패딩으로 높이를 만들지 않는다 — 값을 명시하고 <span style="font-family:ui-monospace,monospace;font-size:0.75rem;color:#e7eaee">box-sizing:border-box</span>를 함께 쓴다. content-box에서는 패딩과 보더가 더해져 사양보다 커진다.</span>
+      <span>행 56은 <span style="color:#e7eaee">구분선 1px과 세로 패딩을 포함한 값</span>이다. 세로 패딩은 <span style="color:#e7eaee">(56 − 보더 − 내용 최고 높이) ÷ 2</span> 이하로 둔다 — 앞머리 원 34나 두 줄 텍스트가 든 행은 6, 44 버튼(삭제 등)이 든 행은 5다. 행의 높이를 정하는 것은 텍스트가 아니라 <span style="color:#e7eaee">그 행에서 가장 높은 부품</span>이다.</span>
+      <span>한 행 안에 두 줄(제목 + 보조)을 쌓을 때 줄 사이는 <span style="color:#e7eaee">2</span>다 — 목록 행·설정 행·프로필 행 모두 같다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">탭 화면의 고정 영역</span>
+      <span>탭 화면에서 고정되는 것은 <span style="color:#e7eaee">헤더(56)와 하단 내비(64)</span>만이다. 날짜·기간·뷰 전환 같은 <span style="color:#e7eaee">내용의 조건을 정하는 조작은 내용과 함께 흐른다</span> — 고정 영역이 커지면 내용이 눌리고, 조작 아래로 펼쳐지는 달력·휠도 고정 영역을 키우게 된다.</span>
+      <span>예외는 하나다 — <span style="color:#e7eaee">조작 자체가 그 화면의 주 내용인 경우</span>는 고정할 수 있다. 달력 격자가 그 달의 분포를 함께 보여 주고 그 아래 목록이 고른 하루의 상세인 화면이 그렇다. 이때 고정되는 것은 <span style="color:#e7eaee">연·월 줄과 격자</span>이며, 목록은 스크롤한다. 조건에 맞지 않으면 이 예외를 쓰지 않는다.</span>
+      <span>날짜 조작 줄은 <span style="color:#e7eaee">날짜 칩(왼쪽) + 이전·다음 버튼(오른쪽 묶음)</span>의 05-D 배치를 따르고, 칩을 누르면 그 줄 아래로 달력이 펼쳐진다(05-G). 날짜를 고르거나 이전·다음으로 이동하면 펼침은 접힌다 — 고른 결과를 바로 봐야 하는 탐색 화면이기 때문이다.</span>
+      <span style="color:#e7eaee;font-weight:600;margin-top:6px">아이콘 글리프 · 헤더</span>
+      <span>아이콘 글리프는 세 값만 쓴다 — 방향 꺾쇠 <span style="color:#e7eaee">1rem</span>, 그 밖의 아이콘 버튼(닫기·영상 오버레이·목록 앞머리 원) <span style="color:#e7eaee">1.0625rem</span>, 화면 헤더와 하단 내비 <span style="color:#e7eaee">1.25rem</span>. 버튼 자리는 어느 쪽이든 44×44다.</span>
+      <span>하단 내비는 높이 64 · 아이콘 1.25rem · 라벨 0.6875rem, 아이콘과 라벨 사이 3. 선택 항목만 <span style="color:#e7eaee">강조색 · 700 · 채운 아이콘</span>, 나머지는 보조색 · 400 · 선 아이콘이다.</span>
+      <span>전체화면 편집 헤더는 높이 <span style="color:#e7eaee">56</span>, 제목 <span style="color:#e7eaee">1.0625rem · 700</span>, 왼쪽 닫기 44×44, 오른쪽 저장 40. 달력·목록 화면 헤더도 같은 높이를 쓴다.</span>
+      <span>달력 요일 라벨은 <span style="color:#e7eaee">0.75rem</span>, 날짜 숫자는 <span style="color:#e7eaee">0.875rem</span>, 원 24, 셀 44. 연·월은 칩 격자가 아니라 <span style="color:#e7eaee">두 열 휠</span>로 고른다(05-H) — 줄 36 · 다섯 줄 180 · 선택 1.0625rem · 700.</span>
+      <span>워드마크와 빈 아바타 안 장식 아이콘은 타입 스케일 밖이다 — 글자가 아니라 그림으로 다룬다. 그 밖의 모든 텍스트는 여섯 단계 안에서 고른다.</span>
+    </div>
+    <span style="font-size:0.75rem;color:#6b7178;line-height:1.7">뱃지는 숫자 없이 12px 점만 씁니다 — 정확한 건수는 목록에서 확인합니다. 필드 안 라벨만 0.6875rem 예외 — 입력값과 한 칸에 겹쳐 놓기 위한 값입니다. 크기는 모두 rem이라 시스템 글자 크기 설정을 따라갑니다.</span>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1120,&quot;height&quot;:1500}}">
+const SEG_OPTIONS = ['전체', '선택지 A', '선택지 B'];
+
+class Component extends DCLogic {
+  state = { busy: false, host: '', note: '', focusKey: null, chip: '전체', seg: '전체', switchOn: true, level: 60 };
+
+  MP_LEN = 8;
+  mpTick(k) {
+    this.mpStop(k);
+    this['mpTimer' + k] = setInterval(() => {
+      const t = (this.state['mpT' + k] || 0) + 0.1;
+      if (t >= this.MP_LEN) { this.mpStop(k); this.setState({ ['mpT' + k]: 0, ['mpPlay' + k]: false }); }
+      else this.setState({ ['mpT' + k]: t });
+    }, 100);
+  }
+  mpStop(k) { const id = this['mpTimer' + k]; if (id) { clearInterval(id); this['mpTimer' + k] = null; } }
+  componentWillUnmount() { this.mpStop('L'); this.mpStop('D'); }
+  mediaPlayer(k) {
+    const s = this.state;
+    const playing = !!s['mpPlay' + k];
+    const t = s['mpT' + k] || 0;
+    const fmt = (v) => String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(Math.floor(v % 60)).padStart(2, '0');
+    return {
+      ['mpPaused' + k]: !playing,
+      ['mpLabel' + k]: playing ? '일시정지' : '재생',
+      ['mpT' + k]: t, ['mpCur' + k]: fmt(t),
+      ['mpPct' + k]: Math.round((t / this.MP_LEN) * 100) + '%',
+      ['mpSeek' + k]: (e) => this.setState({ ['mpT' + k]: Number(e.target.value) }),
+      ['mpToggle' + k]: () => {
+        if (playing) { this.mpStop(k); this.setState({ ['mpPlay' + k]: false }); }
+        else { this.setState({ ['mpPlay' + k]: true }); this.mpTick(k); }
+      },
+    };
+  }
+
+  // 05-B 드롭다운 — 라이트·다크 따로 연다. 시작은 열린 상태(예시가 열림을 보여야 한다).
+  // 열림·닫힘은 페이드(0.2s) + 위에서 세로로 펴짐(scaleY 0.92→1, 0.24s), 꺾쇠는 180° 회전(0.24s). 고르면 닫힌다.
+  dropdown(k, dark) {
+    const s = this.state;
+    const open = s['dd' + k] === undefined ? true : s['dd' + k];
+    const val = s['ddVal' + k] || '09:00';
+    const items = ['08:30', '09:00', '09:30'].map((v) => {
+      const on = v === val;
+      return {
+        label: v, on, fw: on ? '700' : '400',
+        bg: on ? (dark ? 'rgba(240,120,90,0.2)' : 'rgba(184,69,42,0.10)') : 'transparent',
+        fg: on ? (dark ? '#f0785a' : '#a3271f') : (dark ? '#f2efec' : '#17181a'),
+        pick: () => this.setState({ ['ddVal' + k]: v, ['dd' + k]: false }),
+      };
+    });
+    return {
+      ['ddVal' + k]: val, ['ddItems' + k]: items, ['ddOpen' + k]: open,
+      ['ddToggle' + k]: () => this.setState({ ['dd' + k]: !open }),
+      ['ddRot' + k]: open ? 'rotate(180deg)' : 'rotate(0deg)',
+      ['ddOp' + k]: open ? 1 : 0, ['ddSc' + k]: open ? 'scaleY(1)' : 'scaleY(0.92)',
+      ['ddEv' + k]: open ? 'auto' : 'none',
+    };
+  }
+
+  // 플로팅 라벨 — 비어 있고 포커스도 없으면 라벨이 값 자리를 채우고, 그 외에는 축소되며 올라간다
+  // multi=true는 여러 줄 칸 — 내려간 라벨을 칸 중앙이 아니라 첫 줄 자리에 둔다
+  field(k, multi) {
+    const s = this.state;
+    const up = s.focusKey === k || String(s[k] || '').length > 0;
+    const on = s.focusKey === k;
+    return {
+      top: up ? '9px' : (multi ? '23px' : '18px'),
+      size: up ? '0.6875rem' : '0.9375rem',
+      colorL: on ? '#b8452a' : (up ? '#7d8085' : '#8a8d92'),
+      colorD: on ? '#f0785a' : (up ? '#8f8880' : '#9a948d'),
+      focus: () => this.setState({ focusKey: k }),
+      blur: () => this.setState((st) => (st.focusKey === k ? { focusKey: null } : null)),
+    };
+  }
+
+  // 2026년 9월 데모 — 1일이 화요일, 오늘 2일, 항목 있는 날 5·17·23일. pick으로 선택일을 바꾼다
+  calCells(dark, pick) {
+    const ink = dark ? '#f2efec' : '#17181a';
+    const accent = dark ? '#f0785a' : '#b8452a';
+    const onFill = dark ? '#121110' : '#fff';
+    const dots = [5, 17, 23];
+    const list = [];
+    for (let i = 30; i <= 31; i++) list.push({ n: i, dim: true });
+    const sel = pick || 17;
+    for (let n = 1; n <= 30; n++) list.push({ n, today: n === 2, picked: n === sel, dot: dots.includes(n) });
+    let trail = 1;
+    while (list.length < 42) list.push({ n: trail++, dim: true });
+    return list.map((c) => ({
+      n: String(c.n),
+      dotBg: c.dot ? (dark ? '#9a948d' : '#8a8d92') : 'transparent',
+      numBg: c.picked ? (c.today ? accent : ink) : 'transparent',
+      numColor: c.dim ? (dark ? '#4a443f' : '#c9c5bf') : (c.picked ? onFill : (c.today ? accent : ink)),
+      numWeight: c.today || c.picked ? '700' : '400',
+    }));
+  }
+
+  // 휠 한 열 — 실제로 굴러간다. 줄 36 · 위아래 여백 72로 첫·끝 값도 가운데 올 수 있다.
+  // 멈추면 가운데 줄이 값이 된다(스냅). 줄을 눌러 고르는 길도 남긴다.
+  wheelCol(key, labels, sel) {
+    const K = '_w' + key;
+    const cur = this.state[K] === undefined ? sel : this.state[K];
+    return {
+      items: labels.map((label, i) => ({
+        label,
+        fw: '400',
+        size: i === cur ? '1.0625rem' : '0.9375rem',
+        colorL: '#17181a', colorD: '#f2efec',
+        pick: () => this.setState({ [K]: i }),
+      })),
+      // 라이트·다크가 같은 열 데이터를 쓰므로 위치는 요소마다 따로 기억한다.
+      // 스크롤은 요소에 직접 걸어 굴림이 끊기지 않게 한다.
+      ref: (el) => {
+        if (!el) return;
+        el.__commit = () => {
+          const i = Math.max(0, Math.min(labels.length - 1, Math.round(el.scrollTop / 36)));
+          if (i !== el.__wi) { el.__wi = i; this.setState({ [K]: i }); }
+        };
+        if (!el.__bound) {
+          el.__bound = true;
+          el.addEventListener('scroll', () => {
+            clearTimeout(el.__t);
+            el.__t = setTimeout(() => el.__commit(), 130);
+          }, { passive: true });
+          el.addEventListener('scrollend', () => el.__commit());
+        }
+        // 줄이 다 그려지기 전엔 scrollTop이 잘린다 — 높이가 찰 때까지 미룬다
+        const place = () => {
+          if (el.scrollHeight < 144 + labels.length * 36) { requestAnimationFrame(place); return; }
+          el.__wi = cur; el.scrollTop = cur * 36;
+        };
+        if (el.__wi !== cur) place();
+      },
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const mk = (dark) => ['전체', '칩 A', '칩 B', '칩 C'].map((label) => {
+      const on = s.chip === label;
+      return {
+        label, fw: on ? '600' : '400',
+        flatBg: on ? (dark ? '#f2efec' : '#17181a') : (dark ? '#1c1a18' : '#e9e6e1'),
+        flatFg: on ? (dark ? '#121110' : '#fff') : (dark ? '#c2bbb3' : '#5c5f63'),
+        pick: () => this.setState({ chip: label }),
+      };
+    });
+    const seg = (dark) => SEG_OPTIONS.map((label) => {
+      const on = s.seg === label;
+      return {
+        label, fw: on ? '600' : '500',
+        segBg: on ? (dark ? '#3a3531' : '#fff') : 'transparent',
+        segFg: on ? (dark ? '#f2efec' : '#17181a') : (dark ? '#9a948d' : '#7d8085'),
+        segShadow: on ? (dark ? 'none' : '0 1px 2px rgba(23,24,26,0.14)') : 'none',
+        pick: () => this.setState({ seg: label }),
+      };
+    });
+
+    return {
+      yes: true,
+      busy: s.busy,
+      busyLabel: s.busy ? '저장 중' : '로딩 데모',
+      busyOpacity: s.busy ? '0.85' : '1',
+      runBusy: () => { this.setState({ busy: true }); setTimeout(() => this.setState({ busy: false }), 1600); },
+      host: s.host,
+      setHost: (e) => this.setState({ host: e.target.value }),
+      note: s.note,
+      setNote: (e) => this.setState({ note: e.target.value }),
+      f: { host: this.field('host'), note: this.field('note', true) },
+      calWeekdays: ['일', '월', '화', '수', '목', '금', '토'].map((label) => ({ label })),
+      calLight: this.calCells(false), calDark: this.calCells(true),
+      // 05-H는 열린 칩(2026. 09. 02.)과 선택일이 같아야 한다
+      calRowLight: this.calCells(false, 2), calRowDark: this.calCells(true, 2),
+      // 02 드롭다운 필드 — 라이트·다크 따로 열고 닫는다. 목록은 필드 아래(05-B), 열림·닫힘은 페이드 + 세로 펼침
+      ...this.dropdown('L', false), ...this.dropdown('D', true),
+      // 05-I 미디어 플레이어 — 8초 모의 재생, 라이트(L)·다크(D) 따로
+      mpMax: this.MP_LEN, mpDur: '00:08',
+      ...this.mediaPlayer('L'), ...this.mediaPlayer('D'),
+      // 05-H 연·월 라벨 스위치 — 라이트·다크 따로 접고 펼친다
+      ymOpenL: !!s.ymL, ymClosedL: !s.ymL, ymRotL: s.ymL ? 'rotate(90deg)' : 'rotate(0deg)',
+      ymToggleL: () => this.setState((st) => ({ ymL: !st.ymL })),
+      ymOpenD: !!s.ymD, ymClosedD: !s.ymD, ymRotD: s.ymD ? 'rotate(90deg)' : 'rotate(0deg)',
+      ymToggleD: () => this.setState((st) => ({ ymD: !st.ymD })),
+      // 시각 휠 데모 — 오후 7:00에서 시작, 시 01~12(12는 11 아래) · 분 1분 단위 60칸
+      wheelMeridiem: [
+        this.wheelCol('ap', ['오전', '오후'], 1),
+        this.wheelCol('h', ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'], 6),
+        this.wheelCol('mi', Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0')), 0),
+      ],
+      // 연·월 휠 — 열 수만 다르고 줄 높이·띠·조작은 시각 휠과 같다
+      // 연도 열은 올해 ±50년(101개). 상수를 박지 않고 오늘에서 계산한다
+      wheelYm: [
+        this.wheelCol('y', Array.from({ length: 101 }, (_, i) => (new Date().getFullYear() - 50 + i) + '년'), 50),
+        this.wheelCol('m', Array.from({ length: 12 }, (_, i) => (i + 1) + '월'), 8),
+      ],
+      chipsLight: mk(false), chipsDark: mk(true),
+      segLight: seg(false), segDark: seg(true),
+      // 선택 표시는 칩마다 배경을 켜는 대신 하나의 알약이 미끄러진다 (트랙 padding 3 · gap 3)
+      segW: 'calc((100% - 12px) / 3)',
+      segX: SEG_OPTIONS.indexOf(s.seg) === 0
+        ? 'translateX(0)'
+        : 'translateX(calc(' + SEG_OPTIONS.indexOf(s.seg) + ' * (100% + 3px)))',
+      switchOn: s.switchOn,
+      toggleSwitch: () => this.setState((p) => ({ switchOn: !p.switchOn })),
+      swLeft: s.switchOn ? '22px' : '2px',
+      swLightBg: s.switchOn ? '#17181a' : '#d8d5d0',
+      swDarkBg: s.switchOn ? '#f2efec' : '#3a3531',
+      swKnobDark: s.switchOn ? '#121110' : '#8a8378',
+      level: s.level,
+      setLevel: (e) => this.setState({ level: Number(e.target.value) }),
+      levelFillLight: 'linear-gradient(to right, #b8452a ' + s.level + '%, #ddd9d3 ' + s.level + '%)',
+      levelFillDark: 'linear-gradient(to right, #f0785a ' + s.level + '%, #3a3531 ' + s.level + '%)',
+    };
+  }
+}
+</script>
+</body>
+</html>

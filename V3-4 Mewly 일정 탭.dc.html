@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="./public/icons/phosphor/regular/style.css">
+<link rel="stylesheet" href="./public/icons/phosphor/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  body { margin: 0; background: #08090a; }
+  a { color: #f0785a; text-decoration: none; }
+  a:hover { color: #ff9276; }
+  @font-face { font-family: 'Patrick Hand'; font-weight: 400; font-display: swap; src: url('./public/fonts/patrickhand/patrickhand-latin.woff2') format('woff2'); }
+  button { transition: opacity 0.18s ease; }
+  button:active:not(:disabled) { opacity: 0.65; transition: opacity 0s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes sheetin { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  .sy { scrollbar-width: none; -ms-overflow-style: none; }
+  .sy::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  .sy > * { flex: 0 0 auto; }
+  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+</style>
+</helmet>
+
+<section style="min-height:100vh;background:#08090a;display:flex;flex-direction:column;align-items:center;gap:30px;padding:52px 32px 90px;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif">
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+    <span style="font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:#6b7178">Mewly · 일정 탭 · 일정 편집기 — v3 컴포넌트 적용</span>
+    <span style="max-width:66ch;font-size:0.8125rem;color:#8a9099;line-height:1.7;text-wrap:pretty">3단계 두 번째 묶음입니다. 달력 42셀·일정 점·다음 일정 강조가 실제 데이터로 움직이고, 편집기는 카테고리 검증·종일 전환·시간 역전 오류까지 동작합니다. 두 기기가 같은 상태를 공유합니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">01 · 일정 탭 — CalendarTab</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="일정 탭 · 라이트" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px">
+              <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em">일정</span>
+              <button style="width:44px;height:44px;border:none;background:none;color:#5c5f63;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-bell"></i></button>
+            </header>
+
+            <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button onClick="{{ toggleYm }}" style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;border:none;border-radius:12px;background:none;color:{{ ymLabelColorL }};font-family:inherit;cursor:pointer">
+                <span style="font-size:1.0625rem;font-weight:700;font-variant-numeric:tabular-nums">{{ monthLabel }}</span>
+                <i class="ph ph-caret-right" style="font-size:0.8125rem;display:inline-block;transition:transform 0.24s ease;transform:{{ ymCaretRot }}"></i>
+              </button>
+              <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+              <span style="display:flex;animation:fadein 0.24s ease">
+                <button onClick="{{ prevMonth }}" aria-label="이전 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#5c5f63;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+                <button onClick="{{ nextMonth }}" aria-label="다음 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#5c5f63;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+              </span>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ ymMode }}" hint-placeholder-val="{{ no }}">
+              <div style="flex:none;position:relative;margin:8px 16px 0;height:180px;display:grid;grid-template-columns:repeat(2,72px);column-gap:12px;justify-content:center;animation:fadein 0.24s ease">
+                <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#e9e6e1"></span>
+                <sc-for list="{{ ymWheelLight }}" as="col" hint-placeholder-count="2">
+                  <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                    <div style="height:72px"></div>
+                    <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                      <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                    </sc-for>
+                    <div style="height:72px"></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+            <div style="flex:none;margin:8px 16px 0;display:grid;grid-template-columns:repeat(7,1fr);font-size:0.75rem;color:#8a8d92;text-align:center;animation:fadein 0.24s ease">
+              <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7"><span style="color:{{ w.colorL }}">{{ w.label }}</span></sc-for>
+            </div>
+
+            <div style="flex:none;margin:4px 16px 0;display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease">
+              <sc-for list="{{ cellsLight }}" as="c" hint-placeholder-count="42">
+                <button onClick="{{ c.pick }}" disabled="{{ c.dim }}" style="height:44px;border:none;background:none;padding:0;cursor:{{ c.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;position:relative">
+                  <span style="position:absolute;z-index:1;top:5px;left:50%;margin-left:8px;width:6px;height:6px;border-radius:3px;background:{{ c.dotBg }}"></span>
+                  <span style="width:24px;height:24px;border-radius:12px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};border:{{ c.numBorder }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+                </button>
+              </sc-for>
+            </div>
+            </sc-if>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;margin:10px 16px 0;display:flex;flex-direction:column;gap:8px;padding-bottom:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;min-height:36px">
+                <span style="font-size:0.9375rem;font-weight:700;white-space:nowrap">{{ dayLabel }}</span>
+                <button style="min-height:36px;padding:0 6px;border:none;background:none;color:#b8452a;font-size:0.8125rem;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap">일정 등록</button>
+              </div>
+
+              <sc-if value="{{ hasRemain }}" hint-placeholder-val="{{ yes }}">
+                <div style="border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(23,24,26,0.06)">
+                  <sc-for list="{{ schedRemainL }}" as="e" hint-placeholder-count="3">
+                    <div style="position:relative;overflow:hidden;box-sizing:border-box;height:56px;border-bottom:{{ e.divider }}">
+                      <div style="position:absolute;top:0;left:0;bottom:0;z-index:2;display:flex;transform:{{ e.dx2 }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.del }}" style="width:72px;border:none;background:{{ e.delBg }};color:{{ e.delFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-trash" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">삭제</span></button>
+                      </div>
+                      <div style="position:absolute;top:0;right:0;bottom:0;z-index:2;display:flex;transform:{{ e.px }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.toggleDone }}" style="width:72px;border:none;background:{{ e.doneBg }};color:{{ e.doneFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="{{ e.doneIcon }}" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">{{ e.doneLabel }}</span></button>
+                        <button onClick="{{ e.edit }}" style="width:72px;border:none;background:{{ e.editBg }};color:{{ e.editFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-pencil-simple" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">수정</span></button>
+                      </div>
+                      <div onPointerDown="{{ e.down }}" onPointerMove="{{ e.move }}" onPointerUp="{{ e.up }}" onPointerCancel="{{ e.up }}" style="position:relative;display:flex;gap:11px;align-items:center;box-sizing:border-box;height:100%;padding:10px 16px;background:{{ e.rowBg }};touch-action:pan-y;cursor:grab;transform:{{ e.tx }};transition:{{ e.tr }}">
+                        <div style="flex:1;min-width:0;display:flex;gap:11px;align-items:center;opacity:{{ e.opacity }}">
+                          <span style="flex:none;width:48px;font-size:0.75rem;font-variant-numeric:tabular-nums;color:{{ e.timeColorL }};font-weight:{{ e.timeWeight }}">{{ e.timeLabel }}</span>
+                          <span style="flex:1;min-width:0;font-size:0.9375rem;color:#17181a">{{ e.title }}</span>
+                          <span style="flex:none;font-size:0.75rem;color:#8a8d92;white-space:nowrap">{{ e.meta }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ hasDone }}" hint-placeholder-val="{{ no }}">
+                <div style="border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(23,24,26,0.06)">
+                  <sc-for list="{{ schedDoneL }}" as="e" hint-placeholder-count="1">
+                    <div style="position:relative;overflow:hidden;box-sizing:border-box;height:56px;border-bottom:{{ e.divider }}">
+                      <div style="position:absolute;top:0;left:0;bottom:0;z-index:2;display:flex;transform:{{ e.dx2 }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.del }}" style="width:72px;border:none;background:{{ e.delBg }};color:{{ e.delFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-trash" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">삭제</span></button>
+                      </div>
+                      <div style="position:absolute;top:0;right:0;bottom:0;z-index:2;display:flex;transform:{{ e.px }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.toggleDone }}" style="width:72px;border:none;background:{{ e.doneBg }};color:{{ e.doneFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="{{ e.doneIcon }}" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">{{ e.doneLabel }}</span></button>
+                        <button onClick="{{ e.edit }}" style="width:72px;border:none;background:{{ e.editBg }};color:{{ e.editFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-pencil-simple" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">수정</span></button>
+                      </div>
+                      <div onPointerDown="{{ e.down }}" onPointerMove="{{ e.move }}" onPointerUp="{{ e.up }}" onPointerCancel="{{ e.up }}" style="position:relative;display:flex;gap:11px;align-items:center;box-sizing:border-box;height:100%;padding:10px 16px;background:{{ e.rowBg }};touch-action:pan-y;cursor:grab;transform:{{ e.tx }};transition:{{ e.tr }}">
+                        <div style="flex:1;min-width:0;display:flex;gap:11px;align-items:center;opacity:{{ e.opacity }}">
+                          <span style="flex:none;width:48px;font-size:0.75rem;font-variant-numeric:tabular-nums;color:{{ e.timeColorL }};font-weight:{{ e.timeWeight }}">{{ e.timeLabel }}</span>
+                          <span style="flex:1;min-width:0;font-size:0.9375rem;color:#17181a">{{ e.title }}</span>
+                          <span style="flex:none;font-size:0.75rem;color:#8a8d92;white-space:nowrap">{{ e.meta }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ dayEmpty }}" hint-placeholder-val="{{ no }}">
+                <span style="padding:10px 2px;font-size:0.875rem;color:#8a8d92">이 날에는 일정이 없습니다.</span>
+              </sc-if>
+
+            </div>
+
+            <sc-if value="{{ tabToast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:80px;z-index:8;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;color:#f4f3f1;animation:fadein 0.2s ease">{{ tabToast }}</div>
+            </sc-if>
+
+            <nav style="flex:none;height:64px;border-top:1px solid rgba(23,24,26,0.08);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:#f6f5f3">
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8a8d92;font-family:inherit"><i class="ph ph-house" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">홈</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#b8452a;font-family:inherit"><i class="ph-fill ph-calendar-blank" style="font-size:1.25rem"></i><span style="font-size:0.6875rem;font-weight:700">일정</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8a8d92;font-family:inherit"><i class="ph ph-chart-bar" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">분석</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8a8d92;font-family:inherit"><i class="ph ph-gear" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">설정</span></button>
+            </nav>
+
+
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="일정 탭 · 다크" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px">
+              <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em">일정</span>
+              <button style="width:44px;height:44px;border:none;background:none;color:#c2bbb3;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-bell"></i></button>
+            </header>
+
+            <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button onClick="{{ toggleYm }}" style="display:flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;border:none;border-radius:12px;background:none;color:{{ ymLabelColorD }};font-family:inherit;cursor:pointer">
+                <span style="font-size:1.0625rem;font-weight:700;font-variant-numeric:tabular-nums">{{ monthLabel }}</span>
+                <i class="ph ph-caret-right" style="font-size:0.8125rem;display:inline-block;transition:transform 0.24s ease;transform:{{ ymCaretRot }}"></i>
+              </button>
+              <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+              <span style="display:flex;animation:fadein 0.24s ease">
+                <button onClick="{{ prevMonth }}" aria-label="이전 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#c2bbb3;font-size:1rem;cursor:pointer"><i class="ph ph-caret-left"></i></button>
+                <button onClick="{{ nextMonth }}" aria-label="다음 달" style="width:44px;height:44px;border-radius:22px;border:none;background:none;color:#c2bbb3;font-size:1rem;cursor:pointer"><i class="ph ph-caret-right"></i></button>
+              </span>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ ymMode }}" hint-placeholder-val="{{ no }}">
+              <div style="flex:none;position:relative;margin:8px 16px 0;height:180px;display:grid;grid-template-columns:repeat(2,72px);column-gap:12px;justify-content:center;animation:fadein 0.24s ease">
+                <span aria-hidden="true" style="position:absolute;left:0;right:0;top:72px;height:36px;border-radius:100px;background:#2b2724"></span>
+                <sc-for list="{{ ymWheelDark }}" as="col" hint-placeholder-count="2">
+                  <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                    <div style="height:72px"></div>
+                    <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                      <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                    </sc-for>
+                    <div style="height:72px"></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ dayMode }}" hint-placeholder-val="{{ yes }}">
+            <div style="flex:none;margin:8px 16px 0;display:grid;grid-template-columns:repeat(7,1fr);font-size:0.75rem;color:#9a948d;text-align:center;animation:fadein 0.24s ease">
+              <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7"><span style="color:{{ w.colorD }}">{{ w.label }}</span></sc-for>
+            </div>
+
+            <div style="flex:none;margin:4px 16px 0;display:grid;grid-template-columns:repeat(7,1fr);animation:fadein 0.24s ease">
+              <sc-for list="{{ cellsDark }}" as="c" hint-placeholder-count="42">
+                <button onClick="{{ c.pick }}" disabled="{{ c.dim }}" style="height:44px;border:none;background:none;padding:0;cursor:{{ c.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;position:relative">
+                  <span style="position:absolute;z-index:1;top:5px;left:50%;margin-left:8px;width:6px;height:6px;border-radius:3px;background:{{ c.dotBg }}"></span>
+                  <span style="width:24px;height:24px;border-radius:12px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:0.875rem;font-variant-numeric:tabular-nums;background:{{ c.numBg }};border:{{ c.numBorder }};color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.n }}</span>
+                </button>
+              </sc-for>
+            </div>
+            </sc-if>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;margin:10px 16px 0;display:flex;flex-direction:column;gap:8px;padding-bottom:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;min-height:36px">
+                <span style="font-size:0.9375rem;font-weight:700;white-space:nowrap">{{ dayLabel }}</span>
+                <button style="min-height:36px;padding:0 6px;border:none;background:none;color:#f0785a;font-size:0.8125rem;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap">일정 등록</button>
+              </div>
+
+              <sc-if value="{{ hasRemain }}" hint-placeholder-val="{{ yes }}">
+                <div style="border-radius:16px;background:#1c1a18;overflow:hidden">
+                  <sc-for list="{{ schedRemainD }}" as="e" hint-placeholder-count="3">
+                    <div style="position:relative;overflow:hidden;box-sizing:border-box;height:56px;border-bottom:{{ e.divider }}">
+                      <div style="position:absolute;top:0;left:0;bottom:0;z-index:2;display:flex;transform:{{ e.dx2 }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.del }}" style="width:72px;border:none;background:{{ e.delBg }};color:{{ e.delFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-trash" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">삭제</span></button>
+                      </div>
+                      <div style="position:absolute;top:0;right:0;bottom:0;z-index:2;display:flex;transform:{{ e.px }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.toggleDone }}" style="width:72px;border:none;background:{{ e.doneBg }};color:{{ e.doneFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="{{ e.doneIcon }}" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">{{ e.doneLabel }}</span></button>
+                        <button onClick="{{ e.edit }}" style="width:72px;border:none;background:{{ e.editBg }};color:{{ e.editFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-pencil-simple" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">수정</span></button>
+                      </div>
+                      <div onPointerDown="{{ e.down }}" onPointerMove="{{ e.move }}" onPointerUp="{{ e.up }}" onPointerCancel="{{ e.up }}" style="position:relative;display:flex;gap:11px;align-items:center;box-sizing:border-box;height:100%;padding:10px 16px;background:{{ e.rowBg }};touch-action:pan-y;cursor:grab;transform:{{ e.tx }};transition:{{ e.tr }}">
+                        <div style="flex:1;min-width:0;display:flex;gap:11px;align-items:center;opacity:{{ e.opacity }}">
+                          <span style="flex:none;width:48px;font-size:0.75rem;font-variant-numeric:tabular-nums;color:{{ e.timeColorD }};font-weight:{{ e.timeWeight }}">{{ e.timeLabel }}</span>
+                          <span style="flex:1;min-width:0;font-size:0.9375rem;color:#f2efec">{{ e.title }}</span>
+                          <span style="flex:none;font-size:0.75rem;color:#9a948d;white-space:nowrap">{{ e.meta }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ hasDone }}" hint-placeholder-val="{{ no }}">
+                <div style="border-radius:16px;background:#1c1a18;overflow:hidden">
+                  <sc-for list="{{ schedDoneD }}" as="e" hint-placeholder-count="1">
+                    <div style="position:relative;overflow:hidden;box-sizing:border-box;height:56px;border-bottom:{{ e.divider }}">
+                      <div style="position:absolute;top:0;left:0;bottom:0;z-index:2;display:flex;transform:{{ e.dx2 }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.del }}" style="width:72px;border:none;background:{{ e.delBg }};color:{{ e.delFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-trash" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">삭제</span></button>
+                      </div>
+                      <div style="position:absolute;top:0;right:0;bottom:0;z-index:2;display:flex;transform:{{ e.px }};transition:{{ e.tr }}">
+                        <button onClick="{{ e.toggleDone }}" style="width:72px;border:none;background:{{ e.doneBg }};color:{{ e.doneFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="{{ e.doneIcon }}" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">{{ e.doneLabel }}</span></button>
+                        <button onClick="{{ e.edit }}" style="width:72px;border:none;background:{{ e.editBg }};color:{{ e.editFg }};font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><i class="ph ph-pencil-simple" style="font-size:1.0625rem"></i><span style="font-size:0.6875rem;font-weight:600">수정</span></button>
+                      </div>
+                      <div onPointerDown="{{ e.down }}" onPointerMove="{{ e.move }}" onPointerUp="{{ e.up }}" onPointerCancel="{{ e.up }}" style="position:relative;display:flex;gap:11px;align-items:center;box-sizing:border-box;height:100%;padding:10px 16px;background:{{ e.rowBg }};touch-action:pan-y;cursor:grab;transform:{{ e.tx }};transition:{{ e.tr }}">
+                        <div style="flex:1;min-width:0;display:flex;gap:11px;align-items:center;opacity:{{ e.opacity }}">
+                          <span style="flex:none;width:48px;font-size:0.75rem;font-variant-numeric:tabular-nums;color:{{ e.timeColorD }};font-weight:{{ e.timeWeight }}">{{ e.timeLabel }}</span>
+                          <span style="flex:1;min-width:0;font-size:0.9375rem;color:#f2efec">{{ e.title }}</span>
+                          <span style="flex:none;font-size:0.75rem;color:#9a948d;white-space:nowrap">{{ e.meta }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ dayEmpty }}" hint-placeholder-val="{{ no }}">
+                <span style="padding:10px 2px;font-size:0.875rem;color:#9a948d">이 날에는 일정이 없습니다.</span>
+              </sc-if>
+
+            </div>
+
+            <sc-if value="{{ tabToast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:80px;z-index:8;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;color:#f2efec;animation:fadein 0.2s ease">{{ tabToast }}</div>
+            </sc-if>
+
+            <nav style="flex:none;height:64px;border-top:1px solid rgba(255,255,255,0.08);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:#121110">
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a948d;font-family:inherit"><i class="ph ph-house" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">홈</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#f0785a;font-family:inherit"><i class="ph-fill ph-calendar-blank" style="font-size:1.25rem"></i><span style="font-size:0.6875rem;font-weight:700">일정</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a948d;font-family:inherit"><i class="ph ph-chart-bar" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">분석</span></button>
+              <button style="border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a948d;font-family:inherit"><i class="ph ph-gear" style="font-size:1.25rem"></i><span style="font-size:0.6875rem">설정</span></button>
+            </nav>
+
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">오늘은 채움 원, 선택한 날은 톤 배경입니다. 점은 그 날에 일정이 있다는 표시이며 인접 월 셀은 선택할 수 없습니다. 오늘을 고르면 현재 시각 이후 첫 일정의 시간이 강조됩니다. 날짜 제목 오른쪽의 「일정 등록」이 그 날의 새 일정 편집기를 엽니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">02 · 일정 편집기 — ScheduleEditor (전체 화면 오버레이)</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT · 일정 등록</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="일정 편집기 · 일정 등록" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="닫기" style="width:44px;height:44px;border:none;background:none;color:#5c5f63;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">일정 등록</span>
+              <button onClick="{{ ed.save }}" style="height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">저장</button>
+            </header>
+
+            <sc-if value="{{ pk.open }}" hint-placeholder-val="{{ no }}">
+              <button onClick="{{ pk.close }}" aria-label="닫기" style="position:absolute;inset:0;z-index:5;border:none;padding:0;background:none;cursor:default"></button>
+            </sc-if>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:4px 16px 24px;display:flex;flex-direction:column;gap:18px">
+              <span style="font-size:0.8125rem;color:#8a8d92;font-variant-numeric:tabular-nums">{{ ed.dateLabel }}</span>
+
+              <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#eceef1;font-size:0.875rem;line-height:1.55;color:#33383f">
+                <i class="ph ph-bell-slash" style="flex:none;font-size:1.0625rem;color:#565d66;margin-top:1px"></i><span>알림 권한이 꺼져 있어 알람이 울리지 않습니다. <b style="color:#17181a">시스템 설정 열기</b></span>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ ed.customTop }};font-size:{{ ed.customSize }};color:{{ ed.customColorL }}">일정 제목</span>
+                  <input value="{{ ed.custom }}" onChange="{{ ed.setCustom }}" onFocus="{{ ed.focusCustom }}" onBlur="{{ ed.blurCustom }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+                </label>
+                <sc-if value="{{ ed.error }}" hint-placeholder-val="{{ no }}">
+                  <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#f8e4dd;font-size:0.875rem;line-height:1.55;color:#7a2118">
+                    <i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#b8452a;margin-top:1px"></i><span>{{ ed.error }}</span>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="position:relative;z-index:6;border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(23,24,26,0.06);overflow:hidden;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(23,24,26,0.07)">
+                  <span style="font-size:0.9375rem;color:#17181a">하루 종일</span>
+                  <button onClick="{{ ed.toggleAllDay }}" role="switch" aria-checked="{{ ed.allDay }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ ed.swBgL }};transition:background 0.18s">
+                    <span style="position:absolute;top:2px;left:{{ ed.swLeft }};width:28px;height:28px;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.22);transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+                  </button>
+                </div>
+
+                <sc-if value="{{ ed.timed }}" hint-placeholder-val="{{ yes }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(23,24,26,0.07)">
+                  <span style="font-size:0.9375rem;color:#17181a">시작</span>
+                  <button onClick="{{ ed.openStartTime }}" style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border:none;border-radius:100px;background:{{ ed.startChipBgL }};color:{{ ed.startChipFgL }};font-size:0.9375rem;font-weight:{{ ed.startChipFw }};font-family:inherit;cursor:pointer;font-variant-numeric:tabular-nums">{{ ed.startLabel }}</button>
+                </div>
+
+                <sc-if value="{{ ed.isStart }}" hint-placeholder-val="{{ no }}">
+                  <div style="position:relative;height:180px;border-bottom:1px solid rgba(23,24,26,0.07);padding:0 12px;display:grid;grid-template-columns:repeat(3,72px);column-gap:16px;justify-content:center">
+                    <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#efece8"></span>
+                    <sc-for list="{{ wheelLight }}" as="col" hint-placeholder-count="3">
+                      <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                        <div style="height:72px"></div>
+                        <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                          <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                        </sc-for>
+                        <div style="height:72px"></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(23,24,26,0.07)">
+                  <span style="font-size:0.9375rem;color:#17181a">종료</span>
+                  <button onClick="{{ ed.openEndTime }}" style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border:none;border-radius:100px;background:{{ ed.endChipBgL }};color:{{ ed.endChipFgL }};font-size:0.9375rem;font-weight:{{ ed.endChipFw }};font-family:inherit;cursor:pointer;font-variant-numeric:tabular-nums">{{ ed.endLabel }}</button>
+                </div>
+
+                <sc-if value="{{ ed.isEnd }}" hint-placeholder-val="{{ no }}">
+                  <div style="position:relative;height:180px;border-bottom:1px solid rgba(23,24,26,0.07);padding:0 12px;display:grid;grid-template-columns:repeat(3,72px);column-gap:16px;justify-content:center">
+                    <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#efece8"></span>
+                    <sc-for list="{{ wheelLight }}" as="col" hint-placeholder-count="3">
+                      <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                        <div style="height:72px"></div>
+                        <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                          <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                        </sc-for>
+                        <div style="height:72px"></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                </sc-if>
+
+                <div style="position:relative">
+                  <button onClick="{{ ed.openAlarm }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;height:52px;padding:7px 16px;border:none;border-bottom:1px solid rgba(23,24,26,0.07);background:none;font-family:inherit;cursor:pointer;text-align:left">
+                    <span style="font-size:0.9375rem;color:#17181a">알림</span>
+                    <span style="display:flex;align-items:center;gap:6px">
+                      <span style="font-size:0.9375rem;color:#8a8d92">{{ ed.alarm }}</span>
+                      <i class="ph ph-caret-down" style="font-size:0.6875rem;color:#8a8d92;transition:transform 0.16s;transform:{{ ed.caretAlarm }}"></i>
+                    </span>
+                  </button>
+                  <sc-if value="{{ ed.isAlarm }}" hint-placeholder-val="{{ no }}">
+                    <div style="position:relative;height:180px;border-bottom:1px solid rgba(23,24,26,0.07);padding:0 12px;display:grid;grid-template-columns:160px;justify-content:center;animation:fadein 0.24s ease">
+                      <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#efece8"></span>
+                      <sc-for list="{{ alarmWheelLight }}" as="col" hint-placeholder-count="1">
+                        <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                          <div style="height:72px"></div>
+                          <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="10">
+                            <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                          </sc-for>
+                          <div style="height:72px"></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="position:relative">
+                  <button onClick="{{ ed.openRepeat }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;height:52px;padding:7px 16px;border:none;background:none;font-family:inherit;cursor:pointer;text-align:left">
+                    <span style="font-size:0.9375rem;color:#17181a">반복</span>
+                    <span style="display:flex;align-items:center;gap:6px">
+                      <span style="font-size:0.9375rem;color:#8a8d92">{{ ed.repeat }}</span>
+                      <i class="ph ph-caret-down" style="font-size:0.6875rem;color:#8a8d92;transition:transform 0.16s;transform:{{ ed.caretRepeat }}"></i>
+                    </span>
+                  </button>
+                  <sc-if value="{{ ed.isRepeat }}" hint-placeholder-val="{{ no }}">
+                    <div style="position:relative;height:180px;border-top:1px solid rgba(23,24,26,0.07);padding:0 12px;display:grid;grid-template-columns:160px;justify-content:center;animation:fadein 0.24s ease">
+                      <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#efece8"></span>
+                      <sc-for list="{{ repeatWheelLight }}" as="col" hint-placeholder-count="1">
+                        <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                          <div style="height:72px"></div>
+                          <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="5">
+                            <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                          </sc-for>
+                          <div style="height:72px"></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+
+              <sc-if value="{{ ed.timeErr }}" hint-placeholder-val="{{ no }}">
+                <span style="display:flex;align-items:flex-start;gap:6px;font-size:0.8125rem;color:#7a2118"><i class="ph-fill ph-warning" style="flex:none;font-size:0.9375rem;color:#b8452a;margin-top:2px"></i>종료 시각이 시작 시각보다 이릅니다.</span>
+              </sc-if>
+              </div>
+
+            </div>
+
+            <sc-if value="{{ edToast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;color:#f4f3f1">{{ edToast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK · 일정 수정</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="일정 편집기 · 수정" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+
+            <header style="flex:none;height:56px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px">
+              <button aria-label="닫기" style="width:44px;height:44px;border:none;background:none;color:#c2bbb3;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              <span style="flex:1;min-width:0;font-size:1.0625rem;font-weight:700;letter-spacing:-0.01em">일정 수정</span>
+              <button onClick="{{ ed.save }}" style="height:40px;box-sizing:border-box;padding:0 18px;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.875rem;font-weight:600;font-family:inherit;cursor:pointer">저장</button>
+            </header>
+
+            <sc-if value="{{ pk.open }}" hint-placeholder-val="{{ no }}">
+              <button onClick="{{ pk.close }}" aria-label="닫기" style="position:absolute;inset:0;z-index:5;border:none;padding:0;background:none;cursor:default"></button>
+            </sc-if>
+
+            <div class="sy" style="flex:1;min-height:0;overflow-y:auto;padding:4px 16px 24px;display:flex;flex-direction:column;gap:18px">
+              <span style="font-size:0.8125rem;color:#9a948d;font-variant-numeric:tabular-nums">{{ ed.dateLabel }}</span>
+
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#211e1c;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ ed.customTop }};font-size:{{ ed.customSize }};color:{{ ed.customColorD }}">일정 제목</span>
+                  <input value="{{ ed.custom }}" onChange="{{ ed.setCustom }}" onFocus="{{ ed.focusCustom }}" onBlur="{{ ed.blurCustom }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+                </label>
+                <sc-if value="{{ ed.error }}" hint-placeholder-val="{{ no }}">
+                  <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#3a211c;font-size:0.875rem;line-height:1.55;color:#ffc7b8">
+                    <i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#f0785a;margin-top:1px"></i><span>{{ ed.error }}</span>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="position:relative;z-index:6;border-radius:18px;background:#1c1a18;overflow:hidden;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.07)">
+                  <span style="font-size:0.9375rem;color:#f2efec">하루 종일</span>
+                  <button onClick="{{ ed.toggleAllDay }}" role="switch" aria-checked="{{ ed.allDay }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ ed.swBgD }};transition:background 0.18s">
+                    <span style="position:absolute;top:2px;left:{{ ed.swLeft }};width:28px;height:28px;border-radius:14px;background:{{ ed.swKnobD }};transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+                  </button>
+                </div>
+
+                <sc-if value="{{ ed.timed }}" hint-placeholder-val="{{ yes }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.07)">
+                  <span style="font-size:0.9375rem;color:#f2efec">시작</span>
+                  <button onClick="{{ ed.openStartTime }}" style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border:none;border-radius:100px;background:{{ ed.startChipBgD }};color:{{ ed.startChipFgD }};font-size:0.9375rem;font-weight:{{ ed.startChipFw }};font-family:inherit;cursor:pointer;font-variant-numeric:tabular-nums">{{ ed.startLabel }}</button>
+                </div>
+
+                <sc-if value="{{ ed.isStart }}" hint-placeholder-val="{{ no }}">
+                  <div style="position:relative;height:180px;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 12px;display:grid;grid-template-columns:repeat(3,72px);column-gap:16px;justify-content:center">
+                    <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#3a332e"></span>
+                    <sc-for list="{{ wheelDark }}" as="col" hint-placeholder-count="3">
+                      <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                        <div style="height:72px"></div>
+                        <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                          <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                        </sc-for>
+                        <div style="height:72px"></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.07)">
+                  <span style="font-size:0.9375rem;color:#f2efec">종료</span>
+                  <button onClick="{{ ed.openEndTime }}" style="height:36px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;border:none;border-radius:100px;background:{{ ed.endChipBgD }};color:{{ ed.endChipFgD }};font-size:0.9375rem;font-weight:{{ ed.endChipFw }};font-family:inherit;cursor:pointer;font-variant-numeric:tabular-nums">{{ ed.endLabel }}</button>
+                </div>
+
+                <sc-if value="{{ ed.isEnd }}" hint-placeholder-val="{{ no }}">
+                  <div style="position:relative;height:180px;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 12px;display:grid;grid-template-columns:repeat(3,72px);column-gap:16px;justify-content:center">
+                    <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#3a332e"></span>
+                    <sc-for list="{{ wheelDark }}" as="col" hint-placeholder-count="3">
+                      <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                        <div style="height:72px"></div>
+                        <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="12">
+                          <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                        </sc-for>
+                        <div style="height:72px"></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                </sc-if>
+
+                <div style="position:relative">
+                  <button onClick="{{ ed.openAlarm }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;height:52px;padding:7px 16px;border:none;border-bottom:1px solid rgba(255,255,255,0.07);background:none;font-family:inherit;cursor:pointer;text-align:left">
+                    <span style="font-size:0.9375rem;color:#f2efec">알림</span>
+                    <span style="display:flex;align-items:center;gap:6px">
+                      <span style="font-size:0.9375rem;color:#9a948d">{{ ed.alarm }}</span>
+                      <i class="ph ph-caret-down" style="font-size:0.6875rem;color:#9a948d;transition:transform 0.16s;transform:{{ ed.caretAlarm }}"></i>
+                    </span>
+                  </button>
+                  <sc-if value="{{ ed.isAlarm }}" hint-placeholder-val="{{ no }}">
+                    <div style="position:relative;height:180px;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 12px;display:grid;grid-template-columns:160px;justify-content:center;animation:fadein 0.24s ease">
+                      <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#3a332e"></span>
+                      <sc-for list="{{ alarmWheelDark }}" as="col" hint-placeholder-count="1">
+                        <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                          <div style="height:72px"></div>
+                          <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="10">
+                            <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                          </sc-for>
+                          <div style="height:72px"></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="position:relative">
+                  <button onClick="{{ ed.openRepeat }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;height:52px;padding:7px 16px;border:none;background:none;font-family:inherit;cursor:pointer;text-align:left">
+                    <span style="font-size:0.9375rem;color:#f2efec">반복</span>
+                    <span style="display:flex;align-items:center;gap:6px">
+                      <span style="font-size:0.9375rem;color:#9a948d">{{ ed.repeat }}</span>
+                      <i class="ph ph-caret-down" style="font-size:0.6875rem;color:#9a948d;transition:transform 0.16s;transform:{{ ed.caretRepeat }}"></i>
+                    </span>
+                  </button>
+                  <sc-if value="{{ ed.isRepeat }}" hint-placeholder-val="{{ no }}">
+                    <div style="position:relative;height:180px;border-top:1px solid rgba(255,255,255,0.07);padding:0 12px;display:grid;grid-template-columns:160px;justify-content:center;animation:fadein 0.24s ease">
+                      <span aria-hidden="true" style="position:absolute;left:12px;right:12px;top:72px;height:36px;border-radius:100px;background:#3a332e"></span>
+                      <sc-for list="{{ repeatWheelDark }}" as="col" hint-placeholder-count="1">
+                        <div ref="{{ col.ref }}" class="sy" style="position:relative;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 62px,#000 118px,transparent 180px)">
+                          <div style="height:72px"></div>
+                          <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="5">
+                            <button onClick="{{ it.pick }}" style="width:100%;height:36px;scroll-snap-align:center;border:none;background:none;padding:0;cursor:{{ it.cursor }};font-family:inherit;display:flex;align-items:center;justify-content:center;font-size:{{ it.size }};font-weight:{{ it.fw }};color:{{ it.color }};font-variant-numeric:tabular-nums">{{ it.label }}</button>
+                          </sc-for>
+                          <div style="height:72px"></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;box-sizing:border-box;padding:7px 16px;border-top:1px solid rgba(255,255,255,0.07)">
+                  <span style="font-size:0.9375rem;color:#f2efec">완료</span>
+                  <button onClick="{{ ed.toggleDone }}" role="switch" aria-checked="{{ ed.done }}" style="flex:none;width:52px;height:32px;border-radius:16px;border:none;position:relative;cursor:pointer;padding:0;background:{{ ed.doneBgD }};transition:background 0.18s">
+                    <span style="position:absolute;top:2px;left:{{ ed.doneLeft }};width:28px;height:28px;border-radius:14px;background:{{ ed.doneKnobD }};transition:left 0.18s cubic-bezier(0.2,0,0,1)"></span>
+                  </button>
+                </div>
+              </div>
+
+              <sc-if value="{{ ed.timeErr }}" hint-placeholder-val="{{ no }}">
+                <span style="display:flex;align-items:flex-start;gap:6px;font-size:0.8125rem;color:#ffc7b8"><i class="ph-fill ph-warning" style="flex:none;font-size:0.9375rem;color:#f0785a;margin-top:2px"></i>종료 시각이 시작 시각보다 이릅니다.</span>
+              </sc-if>
+              </div>
+
+              <button onClick="{{ ed.remove }}" style="height:44px;box-sizing:border-box;border-radius:100px;border:none;background:rgba(255,139,139,0.14);color:#ff8b8b;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer">삭제</button>
+            </div>
+
+            <sc-if value="{{ edToast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;color:#f2efec">{{ edToast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">카탈로그 05-G 어법입니다 — 한 카드 안 다섯 행, 한 행에 한 요소, 날짜와 시각은 캡슐 칩 두 개. 시각 칩을 누르면 그 행 아래에 휠(오전·오후 / 시 / 1분 단위 분)이, 알림·반복 행을 누르면 한 열 휠이 같은 자리에 펼쳐집니다. 시작·종료 날짜는 탭 선택일을 초기값으로 받은 뒤 독립이며, 시작일을 종료일 뒤로 옮기면 종료일이 따라옵니다. 하루 종일을 켜면 시각 칩만 사라지고 날짜 칩은 남습니다. 수정 화면에는 「완료」 스위치 행이 하나 더 있으며, 저장하면 일정 탭 목록의 해당 항목(오늘 19:00)에 「완료」 표기와 흐림이 반영됩니다. 종류 칩 대신 「일정 제목」 텍스트 필드(카탈로그 02 채움 필드) 하나로 제목을 받습니다. 검증 순서 — 제목 누락 → 종료 시각 역전.</span>
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:950}}">
+// 수정 화면이 편집하는 항목 — 오늘 19:00 「심장 사상충 예방약」
+const EDIT_ID = 2;
+const ALARMS = ['정각', '5분 전', '10분 전', '15분 전', '30분 전', '1시간 전', '2시간 전', '12시간 전', '1일 전', '2일 전'];
+const REPEATS = ['안 함', '매일', '매주', '매월', '매년'];
+
+
+function iso(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const now = new Date();
+    const day = (n) => iso(new Date(now.getFullYear(), now.getMonth(), now.getDate() + n));
+    this.state = {
+      cursor: { y: now.getFullYear(), m: now.getMonth() },
+      selected: iso(now),
+      todayIso: iso(now),
+      nowTime: String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0'),
+      items: [
+        { id: 1, date: day(0), time: '08:30', title: '목욕', alarm: '10분 전', repeat: '안 함' },
+        { id: 2, date: day(0), time: '19:00', title: '심장 사상충 예방약', alarm: '30분 전', repeat: '매월', done: false },
+        { id: 3, date: day(0), allDay: true, title: '예방 접종', alarm: '1일 전', repeat: '매년' },
+        { id: 4, date: day(3), time: '11:00', title: '미용', alarm: '1시간 전', repeat: '안 함' },
+        { id: 5, date: day(9), time: '15:30', title: '병원', alarm: '2시간 전', repeat: '안 함' },
+        { id: 6, date: day(-4), time: '09:00', title: '발톱 정리', alarm: '정각', repeat: '안 함' },
+        { id: 7, date: day(0), time: '07:00', title: '아침 사료', alarm: '정각', repeat: '매일', done: true },
+        { id: 8, date: day(0), time: '09:30', title: '아침 산책', alarm: '10분 전', repeat: '매일', done: true },
+        { id: 9, date: day(0), time: '13:00', title: '양치', alarm: '정각', repeat: '매일', done: true },
+      ],
+      custom: '심장 사상충 예방약', customFocus: false, done: false,
+      allDay: false, start: '19:00', end: '19:30',
+      alarm: '30분 전', repeat: '매월', error: '', toast: '', picker: null,
+      ymMode: false, ymYear: null, swipeOpen: null, swipeSide: null, drag: null,
+    };
+  }
+
+  componentWillUnmount() { clearTimeout(this.toastTimer); }
+
+  toast(text) {
+    this.setState({ toast: text });
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+
+  moveMonth(delta) {
+    const d = new Date(this.state.cursor.y, this.state.cursor.m + delta, 1);
+    this.setState({ cursor: { y: d.getFullYear(), m: d.getMonth() } });
+  }
+
+  // 휠 한 열 — 실제로 굴러간다. 줄 36 · 위아래 여백 72로 첫·끝 값도 가운데 올 수 있다.
+  // 멈추면 가운데 줄이 값이 된다(스냅). 줄을 눌러 고르는 길도 남긴다.
+  wheelCol(key, labels, curIndex, ink, onPick, offAt) {
+    const K = '_w' + key;
+    return {
+      items: labels.map((label, i) => ({
+        label,
+        size: i === curIndex ? '1.0625rem' : '0.9375rem',
+        fw: '400',
+        color: ink,
+        off: offAt ? !!offAt(i) : false,
+        cursor: offAt && offAt(i) ? 'default' : 'pointer',
+        pick: () => { if (!(offAt && offAt(i))) onPick(i); },
+      })),
+      // 라이트·다크가 같은 열 데이터를 쓰므로 위치는 요소마다 따로 기억한다.
+      // 스크롤은 요소에 직접 걸어 굴림이 끊기지 않게 한다.
+      ref: (el) => {
+        if (!el) return;
+        el.__commit = () => {
+          // 접혀서 떨어져 나간 뒤에는 커밋하지 않는다 — 분리된 요소의 scrollTop은 0이라 첫 값으로 덮어쓴다
+          if (!el.isConnected) { clearTimeout(el.__t); return; }
+          const i = Math.max(0, Math.min(labels.length - 1, Math.round(el.scrollTop / 36)));
+          if (offAt && offAt(i)) { el.scrollTop = el.__wi * 36; return; }
+          if (i !== el.__wi) { el.__wi = i; onPick(i); }
+        };
+        if (!el.__bound) {
+          el.__bound = true;
+          el.addEventListener('scroll', () => {
+            clearTimeout(el.__t);
+            el.__t = setTimeout(() => el.__commit(), 130);
+          }, { passive: true });
+          el.addEventListener('scrollend', () => el.__commit());
+        }
+        // 줄이 다 그려지기 전엔 scrollTop이 잘린다 — 높이가 찰 때까지 미룬다
+        const place = () => {
+          if (!el.isConnected) return;
+          if (el.scrollHeight < 144 + labels.length * 36) { requestAnimationFrame(place); return; }
+          el.__wi = curIndex; el.scrollTop = curIndex * 36;
+        };
+        if (el.__wi !== curIndex) place();
+      },
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const { y, m } = s.cursor;
+
+    const dotDays = new Set(
+      s.items.filter((it) => it.date.startsWith(y + '-' + String(m + 1).padStart(2, '0'))).map((it) => Number(it.date.slice(8))),
+    );
+
+    const mkCells = (dark) => {
+      const first = new Date(y, m, 1);
+      const lead = first.getDay();
+      const prevLast = new Date(y, m, 0).getDate();
+      const last = new Date(y, m + 1, 0).getDate();
+      const list = [];
+      const dimNum = { n: 0 };
+      for (let i = lead - 1; i >= 0; i--) list.push({ n: prevLast - i, dim: true });
+      for (let n = 1; n <= last; n++) {
+        const d = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(n).padStart(2, '0');
+        list.push({ n, d, today: d === s.todayIso, picked: d === s.selected, dot: dotDays.has(n) });
+      }
+      let trail = 1;
+      while (list.length % 7 !== 0 || list.length < 42) list.push({ n: trail++, dim: true });
+      void dimNum;
+      // 두 축으로 나눈다 — 채움은 day.selected, 색은 day.today.
+      // 오늘·미선택: 강조색 글자. 선택: 잉크 채움 + 반전 글자. 오늘이면서 선택: 강조색 채움 + 반전 글자.
+      // 형태는 언제나 원 하나뿐이라 세 상태가 겹쳐도 읽힌다.
+      return list.map((c) => {
+        const ink = dark ? '#f2efec' : '#17181a';
+        const accent = dark ? '#f0785a' : '#b8452a';
+        const onFill = dark ? '#121110' : '#fff';
+        return {
+          n: String(c.n), dim: !!c.dim, cursor: c.dim ? 'default' : 'pointer',
+          dotBg: c.dot ? (dark ? '#9a948d' : '#8a8d92') : 'transparent',
+          numBg: c.picked ? (c.today ? accent : ink) : 'transparent',
+          numBorder: 'none',
+          numColor: c.dim ? (dark ? '#4a443f' : '#c9c5bf') : (c.picked ? onFill : (c.today ? accent : ink)),
+          numWeight: c.today || c.picked ? '700' : '400',
+          pick: () => { if (!c.dim) this.setState({ selected: c.d }); },
+        };
+      });
+    };
+
+    const dayItems = s.items
+      .filter((it) => it.date === s.selected)
+      .sort((a, b) => ((a.allDay ? '' : a.time) < (b.allDay ? '' : b.time) ? -1 : 1));
+    const nextId = s.selected === s.todayIso
+      ? (dayItems.find((e) => !e.allDay && !e.done && e.time >= s.nowTime) || {}).id
+      : null;
+    // 04 묶음 리스트 — 한 카드 안에 구분선으로 잇고 묶음의 마지막 행에는 구분선을 두지 않는다.
+    // 완료는 아래 묶음으로 내린다. 소제목은 두지 않는다 — 각 행의 「완료」 표기가 묶음의 이름을 대신한다.
+    const mkRow = (e) => ({
+      id: e.id, done: !!e.done,
+      timeLabel: e.allDay ? '종일' : e.time,
+      title: e.title,
+      meta: e.done ? '완료' : (e.repeat && e.repeat !== '안 함' ? e.repeat + ' · 알림 ' + e.alarm : (e.allDay ? '' : '알림 ' + e.alarm)),
+      opacity: e.done ? '0.55' : '1',
+      timeWeight: e.id === nextId ? '700' : '400',
+      timeColorL: e.id === nextId ? '#b8452a' : '#8a8d92',
+      timeColorD: e.id === nextId ? '#f0785a' : '#9a948d',
+    });
+    // 행을 왼쪽으로 밀면 오른쪽에서 동작 두 개가 드러난다(각 폭 72 · 합 144).
+    // 행 자체를 누르는 길은 없애고 꺾쇠도 지웠다 — 이동은 「수정」 동작이 맡는다.
+    // 왼쪽으로 밀면 오른쪽에서 「완료·수정」(72×2 = 144)이, 오른쪽으로 밀면 왼쪽에서 「삭제」(72)가
+    // 내용 위로 덮어 들어온다. 행 내용은 움직이지 않는다.
+    const PANEL = 144;
+    const DEL = 72;
+    const dr = s.drag;
+    const inCard = (list, dark) => list.map((r, i) => {
+      const open = s.swipeOpen === r.id;
+      const dragging = dr && dr.id === r.id;
+      const base = open ? (s.swipeSide === 'l' ? DEL : -PANEL) : 0;
+      const at = dragging ? base + dr.dx : base;
+      const accent = dark ? '#f0785a' : '#b8452a';
+      const onAccent = dark ? '#121110' : '#fff';
+      const ink = dark ? '#f2efec' : '#17181a';
+      const onInk = dark ? '#121110' : '#fff';
+      return {
+        ...r,
+        divider: i === list.length - 1 ? 'none' : (dark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(23,24,26,0.07)'),
+        rowBg: dark ? '#1c1a18' : '#fff',
+        // 행 내용은 손가락을 그대로 따라간다. 경계를 넘은 글자는 잘린다.
+        tx: 'translateX(' + at + 'px)',
+        px: 'translateX(' + (PANEL + Math.min(0, at)) + 'px)',
+        dx2: 'translateX(' + (-DEL + Math.max(0, at)) + 'px)',
+        tr: dragging ? 'none' : 'transform 0.22s cubic-bezier(0.2,0,0,1), opacity 0.22s ease',
+        down: (ev) => {
+          if (ev.currentTarget.setPointerCapture) ev.currentTarget.setPointerCapture(ev.pointerId);
+          this.setState({ drag: { id: r.id, x0: ev.clientX, dx: 0 } });
+        },
+        move: (ev) => {
+          this.setState((p) => {
+            if (!p.drag || p.drag.id !== r.id) return null;
+            const b = p.swipeOpen === r.id ? (p.swipeSide === 'l' ? DEL : -PANEL) : 0;
+            const v = Math.min(DEL, Math.max(-PANEL, b + (ev.clientX - p.drag.x0)));
+            return { drag: { ...p.drag, dx: v - b } };
+          });
+        },
+        up: () => {
+          this.setState((p) => {
+            if (!p.drag || p.drag.id !== r.id) return { drag: null };
+            const b = p.swipeOpen === r.id ? (p.swipeSide === 'l' ? DEL : -PANEL) : 0;
+            const v = b + p.drag.dx;
+            if (v < -PANEL / 2) return { swipeOpen: r.id, swipeSide: 'r', drag: null };
+            if (v > DEL / 2) return { swipeOpen: r.id, swipeSide: 'l', drag: null };
+            return { swipeOpen: null, swipeSide: null, drag: null };
+          });
+        },
+        // 완료는 켜고 끌 수 있다 — 끝난 행은 되돌리기가 같은 자리에 놓인다
+        doneLabel: r.done ? '되돌리기' : '완료',
+        doneIcon: r.done ? 'ph ph-arrow-counter-clockwise' : 'ph ph-check',
+        doneBg: ink, doneFg: onInk,
+        toggleDone: () => {
+          this.setState((p) => ({
+            items: p.items.map((it) => (it.id === r.id ? { ...it, done: !it.done } : it)),
+            swipeOpen: null, swipeSide: null, drag: null,
+          }));
+          this.toast(r.done ? '완료를 되돌렸습니다' : '완료로 표시했습니다');
+        },
+        // 위험 동작은 강조색 채움으로 가장 세게 말한다(컬러셋 방침) — 완료는 잉크, 수정은 중립 채움
+        editBg: dark ? '#3a332e' : '#e9e6e1', editFg: dark ? '#c2bbb3' : '#33383f',
+        edit: () => { this.setState({ swipeOpen: null, swipeSide: null, drag: null }); this.toast('일정 수정으로 이동합니다'); },
+        delBg: accent, delFg: onAccent,
+        del: () => {
+          this.setState((p) => ({
+            items: p.items.filter((it) => it.id !== r.id),
+            swipeOpen: null, swipeSide: null, drag: null,
+          }));
+          this.toast('일정을 삭제했습니다');
+        },
+      };
+    });
+    const remainItems = dayItems.filter((e) => !e.done).map(mkRow);
+    const doneItems = dayItems.filter((e) => e.done).map(mkRow);
+    const schedRemainL = inCard(remainItems, false), schedRemainD = inCard(remainItems, true);
+    const schedDoneL = inCard(doneItems, false), schedDoneD = inCard(doneItems, true);
+
+    // 연·월 휠 — 연도는 올해 ±50년(기본 전제), 월은 12개월 전부
+    const thisYear = Number(s.todayIso.slice(0, 4));
+    const YEARS = Array.from({ length: 101 }, (_, i) => thisYear - 50 + i);
+    const MONTHS = Array.from({ length: 12 }, (_, i) => i);
+    // 연 열은 초안(ymYear)을 굴리고, 월 열은 보고 있는 달에 바로 반영한다 — 편집기 달력과 같은 방식
+    const ymYd = s.ymYear == null ? y : s.ymYear;
+    const mkYmWheel = (dark) => {
+      const ink = dark ? '#f2efec' : '#17181a';
+      return [
+        this.wheelCol('sy', YEARS.map((v) => v + '년'), Math.max(0, YEARS.indexOf(ymYd)), ink,
+          (i) => this.setState({ ymYear: YEARS[i] })),
+        this.wheelCol('sm', MONTHS.map((v) => (v + 1) + '월'), m, ink,
+          (i) => this.setState((p) => ({ cursor: { y: p.ymYear == null ? p.cursor.y : p.ymYear, m: i } }))),
+      ];
+    };
+
+    const sel = new Date(Number(s.selected.slice(0, 4)), Number(s.selected.slice(5, 7)) - 1, Number(s.selected.slice(8)));
+
+    // 편집기에는 날짜 선택기가 없다 — 날짜는 달력에서 고른 하루로 고정이고 읽기 전용 라벨로만 보인다.
+    // 「시작·종료」는 시각뿐이며, 「반복」은 알람 예약 규칙이라 달력 회차를 만들지 않는다(useSchedules.js 주석).
+    const W = ['일', '월', '화', '수', '목', '금', '토'];
+
+    const timeErr = !s.allDay && s.end < s.start;
+
+    // 알림·반복도 시각과 같은 휠(한 열)로 그 행 아래에서 고른다 — 05-H 한 구조
+    const mkListWheel = (dark, key, list) => [
+      this.wheelCol(key, list, Math.max(0, list.indexOf(s[key])), dark ? '#f2efec' : '#17181a',
+        (i) => this.setState({ [key]: list[i], error: '' })),
+    ];
+
+    // 시각 휠 — 오전·오후 / 시(01~12) / 분(1분 단위 60칸). 창은 선택 위아래 두 칸씩.
+    const parse = (hhmm) => ({ h: Number(hhmm.slice(0, 2)), m: Number(hhmm.slice(3)) });
+    const fmt = (h, m) => String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    const label12 = (hhmm) => {
+      const { h, m } = parse(hhmm);
+      const mer = h < 12 ? '오전' : '오후';
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      return mer + ' ' + String(h12).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    };
+    const timeKey = s.picker === 'startTime' ? 'start' : (s.picker === 'endTime' ? 'end' : null);
+    const cur = parse(timeKey ? s[timeKey] : s.start);
+    const setTime = (h, m) => { if (timeKey) this.setState({ [timeKey]: fmt(h, m), error: '' }); };
+
+    const HOURS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const MINS = Array.from({ length: 60 }, (_, i) => i);
+    const isPm = cur.h >= 12;
+    const curH12 = cur.h % 12 === 0 ? 12 : cur.h % 12;
+    const to24 = (h12, pm) => (h12 === 12 ? (pm ? 12 : 0) : (pm ? h12 + 12 : h12));
+    const mkWheel = (dark) => {
+      const ink = dark ? '#f2efec' : '#17181a';
+      return [
+        this.wheelCol('ap' + s.picker, ['오전', '오후'], isPm ? 1 : 0, ink,
+          (i) => setTime(to24(curH12, i === 1), cur.m)),
+        this.wheelCol('h' + s.picker, HOURS.map((v) => String(v).padStart(2, '0')), HOURS.indexOf(curH12), ink,
+          (i) => setTime(to24(HOURS[i], isPm), cur.m)),
+        this.wheelCol('m' + s.picker, MINS.map((v) => String(v).padStart(2, '0')), cur.m, ink,
+          (i) => setTime(cur.h, MINS[i])),
+      ];
+    };
+
+    const save = () => {
+      if (!s.custom.trim()) { this.setState({ error: '일정 이름을 입력해야 저장할 수 있습니다.' }); return; }
+      if (timeErr) { this.setState({ error: '종료가 시작보다 빠릅니다. 시간을 확인하세요.' }); return; }
+      // 수정 화면은 EDIT_ID 항목을 편집한다 — 저장하면 제목·완료 상태가 목록에 반영된다
+      this.setState({
+        error: '',
+        items: s.items.map((e) => (e.id === EDIT_ID ? { ...e, title: s.custom.trim(), done: s.done } : e)),
+      });
+      this.toast('일정을 저장했습니다');
+    };
+
+    const customUp = s.customFocus || s.custom.length > 0;
+
+    return {
+      yes: true, no: false,
+      monthLabel: (s.ymMode ? ymYd : y) + '년 ' + (m + 1) + '월',
+      prevMonth: () => this.moveMonth(-1),
+      nextMonth: () => this.moveMonth(1),
+      // 연·월 선택은 달력 자리에서 펼친다 — 카드 밖으로 뜨는 층을 쓰지 않는다(05-G·05-H)
+      ymMode: s.ymMode, dayMode: !s.ymMode,
+      ymCaretRot: s.ymMode ? 'rotate(90deg)' : 'rotate(0deg)',
+      ymLabelColorL: s.ymMode ? '#b8452a' : '#17181a',
+      ymLabelColorD: s.ymMode ? '#f0785a' : '#f2efec',
+      // 휠은 고르는 층 — 접히는 순간 고른 연·월이 달력에 반영된다(05-H)
+      toggleYm: () => this.setState((p) => (p.ymMode
+        ? { ymMode: false, cursor: { y: p.ymYear == null ? p.cursor.y : p.ymYear, m: p.cursor.m }, ymYear: null }
+        : { ymMode: true, ymYear: p.cursor.y })),
+      ymWheelLight: mkYmWheel(false), ymWheelDark: mkYmWheel(true),
+      // 원본 .weekday-row는 7개 요일에 단일 중립색만 적용한다 — 주말 구분은 소스에 없다
+      weekdays: W.map((label) => ({ label, colorL: '#8a8d92', colorD: '#9a948d' })),
+      cellsLight: mkCells(false), cellsDark: mkCells(true),
+      dayLabel: (sel.getMonth() + 1) + '월 ' + sel.getDate() + '일 ' + W[sel.getDay()] + '요일',
+      schedRemainL, schedRemainD, schedDoneL, schedDoneD,
+      hasRemain: remainItems.length > 0, hasDone: doneItems.length > 0,
+      tabToast: s.toast,
+      dayEmpty: dayItems.length === 0,
+
+      pk: {
+        // 고르는 층(05-F) — 밖을 누르면 접히고 값은 그대로다
+        open: !!s.picker,
+        close: () => this.setState({ picker: null }),
+      },
+      wheelLight: mkWheel(false), wheelDark: mkWheel(true),
+      alarmWheelLight: mkListWheel(false, 'alarm', ALARMS), alarmWheelDark: mkListWheel(true, 'alarm', ALARMS),
+      repeatWheelLight: mkListWheel(false, 'repeat', REPEATS), repeatWheelDark: mkListWheel(true, 'repeat', REPEATS),
+      edToast: s.toast,
+
+      ed: {
+        // 날짜는 05-D 칩 표기를 따른다 — 카탈로그의 날짜 표기 규격이 하나이므로 라벨도 같다
+        dateLabel: s.selected.slice(0, 4) + '. ' + s.selected.slice(5, 7) + '. ' + s.selected.slice(8, 10) + '. ' + W[sel.getDay()] + '요일',
+        custom: s.custom, error: s.error, timeErr,
+        setCustom: (e) => this.setState({ custom: e.target.value }),
+        focusCustom: () => this.setState({ customFocus: true }),
+        blurCustom: () => this.setState({ customFocus: false }),
+        customTop: customUp ? '9px' : '18px',
+        customSize: customUp ? '0.6875rem' : '0.9375rem',
+        customColorL: s.customFocus ? '#b8452a' : (customUp ? '#7d8085' : '#8a8d92'),
+        customColorD: s.customFocus ? '#f0785a' : (customUp ? '#8f8880' : '#9a948d'),
+        allDay: s.allDay, timed: !s.allDay,
+        toggleAllDay: () => this.setState({ allDay: !s.allDay, error: '' }),
+        // 완료 — 수정 화면의 스위치로 켜고 끈다. 저장 시 목록 항목에 반영되어 「완료」 표기·흐림이 따라온다
+        done: s.done,
+        toggleDone: () => this.setState({ done: !s.done }),
+        doneLeft: s.done ? '22px' : '2px',
+        doneBgD: s.done ? '#f2efec' : '#3a332e',
+        doneKnobD: s.done ? '#121110' : '#9a948d',
+        swLeft: s.allDay ? '22px' : '2px',
+        swBgL: s.allDay ? '#17181a' : '#d6d1ca',
+        swBgD: s.allDay ? '#f2efec' : '#3a332e',
+        swKnobD: s.allDay ? '#121110' : '#9a948d',
+        start: s.start, end: s.end, alarm: s.alarm, repeat: s.repeat,
+        // 시각 칩을 누르면 그 행 아래에 휠이 펼쳐진다. 알림·반복은 목록 드롭다운.
+        openStartTime: () => this.setState({ picker: s.picker === 'startTime' ? null : 'startTime' }),
+        openEndTime: () => this.setState({ picker: s.picker === 'endTime' ? null : 'endTime' }),
+        openAlarm: () => this.setState({ picker: s.picker === 'alarm' ? null : 'alarm' }),
+        openRepeat: () => this.setState({ picker: s.picker === 'repeat' ? null : 'repeat' }),
+        isStart: s.picker === 'startTime', isEnd: s.picker === 'endTime',
+        isAlarm: s.picker === 'alarm', isRepeat: s.picker === 'repeat',
+        caretAlarm: s.picker === 'alarm' ? 'rotate(180deg)' : 'rotate(0deg)',
+        caretRepeat: s.picker === 'repeat' ? 'rotate(180deg)' : 'rotate(0deg)',
+        startLabel: label12(s.start), endLabel: label12(s.end),
+        startChipBgL: s.picker === 'startTime' ? 'rgba(184,69,42,0.10)' : '#e9e6e1',
+        startChipFgL: s.picker === 'startTime' ? '#a3271f' : '#17181a',
+        startChipBgD: s.picker === 'startTime' ? 'rgba(240,120,90,0.2)' : '#2b2724',
+        startChipFgD: s.picker === 'startTime' ? '#f0785a' : '#f2efec',
+        startChipFw: '400',
+        endChipBgL: timeErr ? '#f8e4dd' : (s.picker === 'endTime' ? 'rgba(184,69,42,0.10)' : '#e9e6e1'),
+        endChipFgL: timeErr ? '#a3271f' : (s.picker === 'endTime' ? '#a3271f' : '#17181a'),
+        endChipBgD: timeErr ? '#3a211c' : (s.picker === 'endTime' ? 'rgba(240,120,90,0.2)' : '#2b2724'),
+        endChipFgD: timeErr ? '#f0785a' : (s.picker === 'endTime' ? '#f0785a' : '#f2efec'),
+        endChipFw: '400',
+        endBgL: timeErr ? '#f8e4dd' : '#e9e6e1',
+        endBgD: timeErr ? '#3a211c' : '#211e1c',
+        endFgL: timeErr ? '#a3271f' : '#17181a',
+        endFgD: timeErr ? '#f0785a' : '#f2efec',
+        save,
+        remove: () => this.toast('일정을 삭제했습니다'),
+      },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

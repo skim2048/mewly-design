@@ -1,0 +1,20 @@
+.claude/
+
+# Claude Design 생성물 — 미리보기와 이미지 슬롯 상태 사이드카(재생성됨)
+.thumbnail
+.image-slots.state.json
+
+# 작업 중 붙인 스크린샷·이미지 — 시트에서 참조하지 않는다
+uploads/
+
+# 편집기·OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# 의존성·로그
+node_modules/
+*.log

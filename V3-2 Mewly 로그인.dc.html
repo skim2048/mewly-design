@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="./public/icons/phosphor/regular/style.css">
+<link rel="stylesheet" href="./public/icons/phosphor/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  body { margin: 0; background: #08090a; }
+  a { color: #f0785a; text-decoration: none; }
+  a:hover { color: #ff9276; }
+  @font-face { font-family: 'Patrick Hand'; font-weight: 400; font-display: swap; src: url('./public/fonts/patrickhand/patrickhand-latin.woff2') format('woff2'); }
+  button { transition: opacity 0.18s ease; }
+  button:active:not(:disabled) { opacity: 0.65; transition: opacity 0s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes sheetin { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .sy { scrollbar-width: none; -ms-overflow-style: none; }
+  .sy::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  /* 고정 높이 flex 컨테이너에서 자식이 압축되어 스크롤 영역이 생기지 않는 것을 막는다 */
+  .sy > * { flex: 0 0 auto; }
+  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  input[type='range'].r { -webkit-appearance:none; appearance:none; height:8px; width:100%; background-color:transparent; background-size:100% 8px; background-position:center; background-repeat:no-repeat; border-radius:999px; cursor:pointer; }
+  input[type='range'].r::-webkit-slider-runnable-track { height:8px; border-radius:999px; background:transparent; }
+  input[type='range'].r::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; margin-top:-7px; border-radius:50%; background:#b8452a; box-shadow:0 0 0 4px rgba(184,69,42,0.18); }
+  input[type='range'].rd::-webkit-slider-thumb { background:#f0785a; box-shadow:0 0 0 4px rgba(240,120,90,0.2); }
+</style>
+</helmet>
+
+<section style="min-height:100vh;background:#08090a;display:flex;flex-direction:column;align-items:center;gap:30px;padding:52px 32px 90px;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif">
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+    <span style="font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:#6b7178">Mewly · 로그인 · 비밀번호 변경 · 세션 만료 — v3 컴포넌트 적용</span>
+    <span style="max-width:66ch;font-size:0.8125rem;color:#8a9099;line-height:1.7;text-wrap:pretty">3단계 첫 묶음입니다. 로그인은 연결 실패까지, 비밀번호 변경은 세 가지 검증까지 실제로 동작합니다. 회전 전체화면과 PTZ 시트는 V3-3 홈 탭으로 옮겼습니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">01 · 로그인 — LoginView</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="로그인 · 라이트" style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:22px;padding:56px 24px 40px;background:#f6f5f3;color:#17181a;line-height:1.5">
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'Patrick Hand',cursive;font-size:2.125rem;color:#b8452a;line-height:1.2">Mewly</span>
+              <span style="font-size:0.875rem;color:#7d8085">반려견 건강 관리를 위한 AI 펫하우스</span>
+            </div>
+
+            <sc-if value="{{ loginNotice }}" hint-placeholder-val="{{ no }}">
+              <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#f8e4dd;font-size:0.875rem;line-height:1.55;color:#7a2118">
+                <i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#b8452a;margin-top:1px"></i><span>{{ loginNotice }}</span>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.user.top }};font-size:{{ f.user.size }};color:{{ f.user.colorL }}">아이디</span>
+                <input value="{{ user }}" onChange="{{ setUser }}" onFocus="{{ f.user.focus }}" onBlur="{{ f.user.blur }}" autoCapitalize="off" spellCheck="{{ no }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+              </label>
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.pw.top }};font-size:{{ f.pw.size }};color:{{ f.pw.colorL }}">비밀번호</span>
+                <input type="password" value="{{ pw }}" onChange="{{ setPw }}" onFocus="{{ f.pw.focus }}" onBlur="{{ f.pw.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+              </label>
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.host.top }};font-size:{{ f.host.size }};color:{{ f.host.colorL }}">백엔드 주소</span>
+                <input value="{{ host }}" onChange="{{ setHost }}" onFocus="{{ f.host.focus }}" onBlur="{{ f.host.blur }}" inputMode="url" autoCapitalize="off" spellCheck="{{ no }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+              </label>
+              <button onClick="{{ toggleRemember }}" style="display:flex;align-items:center;gap:9px;min-height:44px;border:none;background:none;padding:0;color:#33383f;font-size:0.875rem;font-family:inherit;cursor:pointer">
+                <span style="flex:none;width:20px;height:20px;border-radius:6px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:{{ rememberBorderL }};background:{{ rememberBgL }};color:#fff"><sc-if value="{{ remember }}" hint-placeholder-val="{{ no }}"><svg viewBox="0 0 12 12" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="2.5,6.5 5,9 9.5,3.5"></polyline></svg></sc-if></span>
+                로그인 유지
+              </button>
+            </div>
+
+            <button onClick="{{ submitLogin }}" disabled="{{ loginBusy }}" style="height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;opacity:{{ loginOpacity }}">
+              <sc-if value="{{ loginBusy }}" hint-placeholder-val="{{ no }}"><span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;animation:spin 0.7s linear infinite"></span></sc-if>{{ loginLabel }}
+            </button>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="로그인 · 다크" style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:22px;padding:56px 24px 40px;background:#121110;color:#f2efec;line-height:1.5">
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'Patrick Hand',cursive;font-size:2.125rem;color:#f0785a;line-height:1.2">Mewly</span>
+              <span style="font-size:0.875rem;color:#9a948d">반려견 건강 관리를 위한 AI 펫하우스</span>
+            </div>
+
+            <sc-if value="{{ loginNotice }}" hint-placeholder-val="{{ no }}">
+              <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#3a211c;font-size:0.875rem;line-height:1.55;color:#ffc7b8">
+                <i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#f0785a;margin-top:1px"></i><span>{{ loginNotice }}</span>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#211e1c;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.user.top }};font-size:{{ f.user.size }};color:{{ f.user.colorD }}">아이디</span>
+                <input value="{{ user }}" onChange="{{ setUser }}" onFocus="{{ f.user.focus }}" onBlur="{{ f.user.blur }}" autoCapitalize="off" spellCheck="{{ no }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+              </label>
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#211e1c;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.pw.top }};font-size:{{ f.pw.size }};color:{{ f.pw.colorD }}">비밀번호</span>
+                <input type="password" value="{{ pw }}" onChange="{{ setPw }}" onFocus="{{ f.pw.focus }}" onBlur="{{ f.pw.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+              </label>
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#211e1c;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.host.top }};font-size:{{ f.host.size }};color:{{ f.host.colorD }}">백엔드 주소</span>
+                <input value="{{ host }}" onChange="{{ setHost }}" onFocus="{{ f.host.focus }}" onBlur="{{ f.host.blur }}" inputMode="url" autoCapitalize="off" spellCheck="{{ no }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+              </label>
+              <button onClick="{{ toggleRemember }}" style="display:flex;align-items:center;gap:9px;min-height:44px;border:none;background:none;padding:0;color:#c2bbb3;font-size:0.875rem;font-family:inherit;cursor:pointer">
+                <span style="flex:none;width:20px;height:20px;border-radius:6px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:{{ rememberBorderD }};background:{{ rememberBgD }};color:#121110"><sc-if value="{{ remember }}" hint-placeholder-val="{{ no }}"><svg viewBox="0 0 12 12" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><polyline points="2.5,6.5 5,9 9.5,3.5"></polyline></svg></sc-if></span>
+                로그인 유지
+              </button>
+            </div>
+
+            <button onClick="{{ submitLogin }}" disabled="{{ loginBusy }}" style="height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;opacity:{{ loginOpacity }}">
+              <sc-if value="{{ loginBusy }}" hint-placeholder-val="{{ no }}"><span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(18,17,16,0.25);border-top-color:#121110;animation:spin 0.7s linear infinite"></span></sc-if>{{ loginLabel }}
+            </button>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">「연결」을 누르면 900ms 뒤 호스트 도달 실패로 떨어집니다. 세 필드가 모두 채워져 있으면 성공으로 처리해 경고를 지웁니다 — 그 뒤에 이어지는 강제 비밀번호 변경은 02에서 따로 봅니다. 필드는 원본처럼 비어서 시작하며, 라벨은 포커스나 입력이 생길 때 축소되며 올라갑니다.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <span style="font-size:0.75rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;color:#6b7178">02 · 강제 비밀번호 변경 · 세션 만료 — ChangePasswordPanel · SessionExpiryModal</span>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK · 최초 로그인</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="비밀번호 변경 모달 · 강제" style="position:relative;height:100%;display:flex;flex-direction:column;background:#121110;color:#f2efec;line-height:1.5">
+
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:22px;padding:56px 24px 40px;opacity:0.3">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-family:'Patrick Hand',cursive;font-size:2.125rem;color:#f0785a;line-height:1.2">Mewly</span>
+                <span style="font-size:0.875rem;color:#9a948d">Babycat 백엔드에 연결합니다.</span>
+              </div>
+            </div>
+
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:22px">
+              <div style="width:100%;background:#1c1a18;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:13px;box-shadow:0 20px 50px rgba(0,0,0,0.5)">
+                <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em">비밀번호 변경</span>
+                <span style="font-size:0.8125rem;color:#9a948d;line-height:1.6">최초 로그인입니다. 비밀번호를 변경해야 계속할 수 있습니다.</span>
+
+                <sc-if value="{{ pwError }}" hint-placeholder-val="{{ no }}">
+                  <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#3a211c;font-size:0.875rem;line-height:1.55;color:#ffc7b8">
+                    <i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#f0785a;margin-top:1px"></i><span>{{ pwError }}</span>
+                  </div>
+                </sc-if>
+
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.pwCur.top }};font-size:{{ f.pwCur.size }};color:{{ f.pwCur.colorD }}">현재 비밀번호</span>
+                  <input type="password" value="{{ pwCur }}" onChange="{{ setPwCur }}" onFocus="{{ f.pwCur.focus }}" onBlur="{{ f.pwCur.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+                </label>
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.pwNew.top }};font-size:{{ f.pwNew.size }};color:{{ f.pwNew.colorD }}">새 비밀번호</span>
+                  <input type="password" value="{{ pwNew }}" onChange="{{ setPwNew }}" onFocus="{{ f.pwNew.focus }}" onBlur="{{ f.pwNew.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+                </label>
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.pwConf.top }};font-size:{{ f.pwConf.size }};color:{{ f.pwConf.colorD }}">새 비밀번호 확인</span>
+                  <input type="password" value="{{ pwConf }}" onChange="{{ setPwConf }}" onFocus="{{ f.pwConf.focus }}" onBlur="{{ f.pwConf.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+                </label>
+
+                <button onClick="{{ submitPw }}" disabled="{{ pwBusy }}" style="height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;opacity:{{ pwOpacity }}">
+                  <sc-if value="{{ pwBusy }}" hint-placeholder-val="{{ no }}"><span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(18,17,16,0.25);border-top-color:#121110;animation:spin 0.7s linear infinite"></span></sc-if>{{ pwLabel }}
+                </button>
+              </div>
+            </div>
+
+            <sc-if value="{{ pwToast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;color:#f2efec">{{ pwToast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT · 세션 만료</span>
+        <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+          <div data-screen-label="세션 만료 모달" style="position:relative;height:100%;display:flex;flex-direction:column;background:#f6f5f3;color:#17181a;line-height:1.5">
+
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:16px;gap:12px;opacity:0.3">
+              <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em">분석</span>
+              <div style="height:120px;border-radius:16px;background:#fff"></div>
+              <div style="height:180px;border-radius:16px;background:#fff"></div>
+              <div style="height:96px;border-radius:16px;background:#fff"></div>
+            </div>
+
+            <div style="position:absolute;inset:0;background:rgba(23,24,26,0.42);display:flex;align-items:center;justify-content:center;padding:22px">
+              <div style="width:100%;background:#f6f5f3;border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,0.28)">
+                <span style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em">세션 만료 임박</span>
+                <span style="font-size:0.875rem;color:#565d66;line-height:1.6">남은 시간 <span style="color:#17181a;font-weight:600;font-variant-numeric:tabular-nums">{{ sessLabel }}</span> 후 자동으로 로그아웃됩니다. 계속 사용하려면 연장하세요.</span>
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ extendSession }}" disabled="{{ extending }}" style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;opacity:{{ extendOpacity }}">
+                    <sc-if value="{{ extending }}" hint-placeholder-val="{{ no }}"><span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;animation:spin 0.7s linear infinite"></span></sc-if>{{ extendLabel }}
+                  </button>
+                  <button style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:1px solid rgba(23,24,26,0.16);background:transparent;color:#17181a;font-size:0.9375rem;font-family:inherit;cursor:pointer">로그아웃</button>
+                </div>
+              </div>
+            </div>
+
+            <sc-if value="{{ sessToast }}" hint-placeholder-val="{{ no }}">
+              <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;color:#f4f3f1">{{ sessToast }}</div>
+            </sc-if>
+          </div>
+        </x-import>
+      </div>
+
+    </div>
+    <span style="max-width:70ch;font-size:0.75rem;color:#6b7178;line-height:1.7;text-align:center;text-wrap:pretty">검증 순서는 원본과 같습니다 — 현재와 동일 → 4자 미만 → 확인 불일치. 세션 카운트다운은 1초마다 줄고, 연장은 900ms 뒤 30분으로 되돌립니다.</span>
+  </div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    user: '', pw: '', host: '', remember: false, focusKey: null,
+    loginBusy: false, loginNotice: '',
+    pwCur: '', pwNew: '', pwConf: '', pwError: '', pwBusy: false, pwToast: '',
+    sessSec: 160, extending: false, sessToast: '',
+  };
+
+  componentDidMount() {
+    this.tick = setInterval(() => {
+      this.setState((s) => (s.sessSec > 0 ? { sessSec: s.sessSec - 1 } : { sessSec: 0 }));
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.tick); [this.t1, this.t2, this.t3].forEach(clearTimeout); }
+
+  toast(key, text) {
+    this.setState({ [key]: text });
+    clearTimeout(this['toast_' + key]);
+    this['toast_' + key] = setTimeout(() => this.setState({ [key]: '' }), 2400);
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    // — 로그인 —
+    const submitLogin = () => {
+      if (s.loginBusy) return;
+      this.setState({ loginBusy: true, loginNotice: '' });
+      clearTimeout(this.t1);
+      this.t1 = setTimeout(() => {
+        const ok = s.user.trim().length > 0 && s.pw.length > 0 && s.host.trim().length > 0;
+        this.setState({
+          loginBusy: false,
+          loginNotice: ok ? '' : '백엔드에 연결할 수 없습니다. 주소와 네트워크를 확인하세요.',
+        });
+      }, 900);
+    };
+
+    // — 비밀번호 변경: 원본과 같은 순서로 검증한다 —
+    const submitPw = () => {
+      if (s.pwBusy) return;
+      if (s.pwCur && s.pwCur === s.pwNew) {
+        this.setState({ pwError: '현재 비밀번호와 다른 비밀번호를 입력하세요.' }); return;
+      }
+      if (s.pwNew.length < 4) {
+        this.setState({ pwError: '새 비밀번호는 4자 이상이어야 합니다.' }); return;
+      }
+      if (s.pwNew !== s.pwConf) {
+        this.setState({ pwError: '새 비밀번호가 일치하지 않습니다.' }); return;
+      }
+      this.setState({ pwError: '', pwBusy: true });
+      clearTimeout(this.t2);
+      this.t2 = setTimeout(() => {
+        this.setState({ pwBusy: false, pwCur: '', pwNew: '', pwConf: '' });
+        this.toast('pwToast', '비밀번호를 변경했습니다');
+      }, 900);
+    };
+
+    const extendSession = () => {
+      if (s.extending) return;
+      this.setState({ extending: true });
+      clearTimeout(this.t3);
+      this.t3 = setTimeout(() => {
+        this.setState({ extending: false, sessSec: 1800 });
+        this.toast('sessToast', '세션을 연장했습니다');
+      }, 900);
+    };
+    const m = Math.floor(s.sessSec / 60);
+    const sec = s.sessSec % 60;
+
+    // 플로팅 라벨 — 비어 있고 포커스도 없으면 라벨이 필드 내용 자리를 채우고,
+    // 포커스나 입력이 생기면 축소되며 위로 올라간다.
+    const field = (k) => {
+      const up = s.focusKey === k || String(s[k] || '').length > 0;
+      const on = s.focusKey === k;
+      return {
+        top: up ? '9px' : '18px',
+        size: up ? '0.6875rem' : '0.9375rem',
+        colorL: on ? '#b8452a' : (up ? '#7d8085' : '#8a8d92'),
+        colorD: on ? '#f0785a' : (up ? '#8f8880' : '#9a948d'),
+        focus: () => this.setState({ focusKey: k }),
+        blur: () => this.setState((st) => (st.focusKey === k ? { focusKey: null } : null)),
+      };
+    };
+
+    return {
+      yes: true, no: false,
+      f: {
+        user: field('user'), pw: field('pw'), host: field('host'),
+        pwCur: field('pwCur'), pwNew: field('pwNew'), pwConf: field('pwConf'),
+      },
+
+      user: s.user, pw: s.pw, host: s.host, remember: s.remember,
+      setUser: (e) => this.setState({ user: e.target.value }),
+      setPw: (e) => this.setState({ pw: e.target.value }),
+      setHost: (e) => this.setState({ host: e.target.value }),
+      toggleRemember: () => this.setState({ remember: !s.remember }),
+      rememberBgL: s.remember ? '#17181a' : 'transparent',
+      rememberBorderL: s.remember ? '1px solid #17181a' : '1px solid rgba(23,24,26,0.26)',
+      rememberBgD: s.remember ? '#f2efec' : 'transparent',
+      rememberBorderD: s.remember ? '1px solid #f2efec' : '1px solid rgba(255,255,255,0.26)',
+      loginBusy: s.loginBusy, loginNotice: s.loginNotice, submitLogin,
+      loginLabel: s.loginBusy ? '연결 중 …' : '연결',
+      loginOpacity: s.loginBusy ? '0.6' : '1',
+
+      pwCur: s.pwCur, pwNew: s.pwNew, pwConf: s.pwConf, pwError: s.pwError,
+      setPwCur: (e) => this.setState({ pwCur: e.target.value }),
+      setPwNew: (e) => this.setState({ pwNew: e.target.value }),
+      setPwConf: (e) => this.setState({ pwConf: e.target.value }),
+      submitPw, pwBusy: s.pwBusy, pwToast: s.pwToast,
+      pwLabel: s.pwBusy ? '변경 중 …' : '변경',
+      pwOpacity: s.pwBusy ? '0.6' : '1',
+
+      sessLabel: m > 0 ? m + '분 ' + sec + '초' : sec + '초',
+      extending: s.extending, extendSession, sessToast: s.sessToast,
+      extendLabel: s.extending ? '연장 중…' : '연장',
+      extendOpacity: s.extending ? '0.6' : '1',
+    };
+  }
+}
+
+</script>
+</body>
+</html>

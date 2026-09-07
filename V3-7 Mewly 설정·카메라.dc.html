@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="./public/icons/phosphor/regular/style.css">
+<link rel="stylesheet" href="./public/icons/phosphor/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  body { margin: 0; background: #08090a; }
+  a { color: #f0785a; text-decoration: none; }
+  a:hover { color: #ff9276; }
+  button { transition: opacity 0.18s ease; }
+  button:active:not(:disabled) { opacity: 0.65; transition: opacity 0s; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalin { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  /* 스크롤바는 어떤 영역에서도 노출하지 않는다 — 순간 노출도 결함으로 본다 */
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  .sy { scrollbar-width: none; -ms-overflow-style: none; }
+  .sy::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</helmet>
+
+<section style="min-height:100vh;background:#08090a;display:flex;flex-direction:column;align-items:center;gap:30px;padding:52px 32px 90px;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif">
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+    <span style="font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:#6b7178">Mewly · 설정·카메라 — v3 컴포넌트 적용</span>
+    <span style="max-width:66ch;font-size:0.8125rem;color:#8a9099;line-height:1.7;text-wrap:pretty">설정 탭의 「카메라」 행에서 열리는 화면입니다. 카드 모달(05 — 반경 28 · 패딩 22)이고, 저장이 있는 「입력하는 층」이라 밖을 눌러도 닫히지 않습니다. 여섯 칸 모두 02 입력 필드입니다. 저장은 카메라가 꺼진 동안에만 되고, 저장이 끝나면 이어서 카메라를 켭니다 — 완료 안내는 토스트가 맡고, 실패만 인라인으로 남습니다. PTZ 조작은 이 화면이 아니라 V3-2 전체화면·PTZ 시트에 있습니다. 라이트·다크가 같은 상태를 공유합니다.</span>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">LIGHT</span>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ no }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+        <div data-screen-label="카메라 설정 · 라이트" style="position:relative;height:100%;background:#efece8;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif;line-height:1.5;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow:hidden">
+          <div style="position:absolute;inset:0;padding:20px;box-sizing:border-box">
+            <div style="border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(23,24,26,0.06)">
+              <button onClick="{{ openModal }}" style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;background:none;color:#17181a;cursor:pointer;font-family:inherit;text-align:left">
+                <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#efece8;display:flex;align-items:center;justify-content:center;color:#5c5f63;font-size:1.0625rem"><i class="ph ph-video-camera"></i></span>
+                <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">카메라</span>
+                <span style="font-size:0.8125rem;color:#8a8d92">{{ stateLabel }}</span>
+                <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#b3b6ba"></i>
+              </button>
+            </div>
+          </div>
+          <sc-if value="{{ open }}" hint-placeholder-val="{{ yes }}">
+          <div style="position:absolute;inset:0;background:rgba(23,24,26,0.42)"></div>
+          </sc-if>
+          <sc-if value="{{ open }}" hint-placeholder-val="{{ yes }}">
+          <div class="sy" style="position:relative;width:100%;max-height:100%;overflow-y:auto;background:#f6f5f3;border-radius:28px;box-shadow:0 20px 50px rgba(23,24,26,0.24);animation:modalin 0.16s ease-out">
+            <div style="padding:22px;display:flex;flex-direction:column;gap:14px">
+
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+                <span style="display:flex;flex-direction:column;gap:3px">
+                  <span style="font-size:1.25rem;font-weight:700;color:#17181a;letter-spacing:-0.01em">카메라 설정</span>
+                  <span style="display:flex;align-items:center;gap:9px;font-size:0.8125rem;color:{{ stateColL }}">
+                    <sc-if value="{{ camOn }}" hint-placeholder-val="{{ no }}">
+                      <span style="flex:none;width:7px;height:7px;border-radius:4px;background:#b8452a;animation:pulse 2s ease-in-out infinite"></span>
+                    </sc-if>
+                    {{ stateLabel }}
+                  </span>
+                </span>
+                <button onClick="{{ close }}" aria-label="닫기" style="flex:none;width:44px;height:44px;margin:-10px -10px 0 0;border:none;background:none;color:#5c5f63;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              </div>
+
+              <sc-if value="{{ error }}" hint-placeholder-val="{{ no }}">
+                <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#f8e4dd;font-size:0.875rem;line-height:1.55;color:#7a2118"><i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#b8452a;margin-top:1px"></i><span>{{ error }}</span></div>
+              </sc-if>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.user.top }};font-size:{{ f.user.size }};color:{{ f.user.colorL }}">아이디</span>
+                <input value="{{ user }}" onChange="{{ setUser }}" onFocus="{{ f.user.focus }}" onBlur="{{ f.user.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+              </label>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.pw.top }};font-size:{{ f.pw.size }};color:{{ f.pw.colorL }}">비밀번호</span>
+                <input type="password" value="{{ pw }}" onChange="{{ setPw }}" onFocus="{{ pwFocus }}" onBlur="{{ f.pw.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+                <sc-if value="{{ pwKept }}" hint-placeholder-val="{{ no }}">
+                  <span style="position:absolute;left:14px;top:23px;pointer-events:none;font-size:0.9375rem;color:#8a8d92">저장된 비밀번호 유지</span>
+                </sc-if>
+              </label>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.host.top }};font-size:{{ f.host.size }};color:{{ f.host.colorL }}">호스트</span>
+                <input inputmode="decimal" value="{{ host }}" onChange="{{ setHost }}" onFocus="{{ f.host.focus }}" onBlur="{{ f.host.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a;font-variant-numeric:tabular-nums">
+              </label>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.rtsp.top }};font-size:{{ f.rtsp.size }};color:{{ f.rtsp.colorL }}">RTSP 포트</span>
+                  <input type="number" inputmode="numeric" value="{{ rtsp }}" onChange="{{ setRtsp }}" onFocus="{{ f.rtsp.focus }}" onBlur="{{ f.rtsp.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a;font-variant-numeric:tabular-nums">
+                </label>
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.onvif.top }};font-size:{{ f.onvif.size }};color:{{ f.onvif.colorL }}">ONVIF 포트</span>
+                  <input type="number" inputmode="numeric" value="{{ onvif }}" onChange="{{ setOnvif }}" onFocus="{{ f.onvif.focus }}" onBlur="{{ f.onvif.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a;font-variant-numeric:tabular-nums">
+                </label>
+              </div>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#e9e6e1;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.path.top }};font-size:{{ f.path.size }};color:{{ f.path.colorL }}">스트림 경로</span>
+                <input value="{{ path }}" onChange="{{ setPath }}" onFocus="{{ f.path.focus }}" onBlur="{{ f.path.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#17181a;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#b8452a">
+              </label>
+
+              <span style="font-size:0.75rem;color:#8a8d92;line-height:1.6;text-wrap:pretty">ONVIF 포트를 비우면 PTZ 조작을 쓸 수 없습니다. 프로필은 카메라가 꺼진 동안에만 저장할 수 있습니다.</span>
+
+              <div style="display:flex;gap:8px">
+                <button onClick="{{ save }}" disabled="{{ saveOff }}" style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#17181a;color:#fff;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:{{ saveCursor }};opacity:{{ saveOp }};display:flex;align-items:center;justify-content:center;gap:8px">
+                  <sc-if value="{{ saving }}" hint-placeholder-val="{{ no }}">
+                    <span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;animation:spin 0.7s linear infinite"></span>
+                  </sc-if>
+                  {{ saveLabel }}
+                </button>
+                <button onClick="{{ toggleCam }}" disabled="{{ toggleOff }}" style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:1px solid rgba(23,24,26,0.16);background:transparent;color:#17181a;font-size:0.9375rem;font-family:inherit;cursor:{{ toggleCursor }};opacity:{{ toggleOp }};display:flex;align-items:center;justify-content:center;gap:8px">
+                  <sc-if value="{{ switching }}" hint-placeholder-val="{{ no }}">
+                    <span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(23,24,26,0.2);border-top-color:#17181a;animation:spin 0.7s linear infinite"></span>
+                  </sc-if>
+                  {{ toggleLabel }}
+                </button>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ toast }}" hint-placeholder-val="{{ no }}">
+            <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;padding:11px 16px;border-radius:100px;background:#17181a;box-shadow:0 6px 20px rgba(23,24,26,0.24);font-size:0.8125rem;line-height:1.5;color:#f4f3f1;animation:fadein 0.2s ease">{{ toast }}</div>
+          </sc-if>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <span style="font-size:0.6875rem;font-family:ui-monospace,monospace;letter-spacing:0.08em;padding:3px 10px;border-radius:6px;background:#1c1d20;color:#9aa1a9">DARK</span>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ yes }}" width="{{ 412 }}" height="{{ 892 }}" hint-size="428px,908px">
+        <div data-screen-label="카메라 설정 · 다크" style="position:relative;height:100%;background:#121110;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif;line-height:1.5;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow:hidden">
+          <div style="position:absolute;inset:0;padding:20px;box-sizing:border-box">
+            <div style="border-radius:16px;background:#1c1a18;overflow:hidden">
+              <button onClick="{{ openModal }}" style="display:flex;align-items:center;gap:13px;width:100%;box-sizing:border-box;min-height:56px;padding:10px 16px;border:none;background:none;color:#f2efec;cursor:pointer;font-family:inherit;text-align:left">
+                <span style="flex:none;width:34px;height:34px;border-radius:17px;background:#272320;display:flex;align-items:center;justify-content:center;color:#c2bbb3;font-size:1.0625rem"><i class="ph ph-video-camera"></i></span>
+                <span style="flex:1;min-width:0;font-size:0.9375rem;font-weight:500">카메라</span>
+                <span style="font-size:0.8125rem;color:#9a948d">{{ stateLabel }}</span>
+                <i class="ph ph-caret-right" style="flex:none;font-size:0.875rem;color:#6f6862"></i>
+              </button>
+            </div>
+          </div>
+          <sc-if value="{{ open }}" hint-placeholder-val="{{ yes }}">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6)"></div>
+          </sc-if>
+          <sc-if value="{{ open }}" hint-placeholder-val="{{ yes }}">
+          <div class="sy" style="position:relative;width:100%;max-height:100%;overflow-y:auto;background:#1c1a18;border-radius:28px;box-shadow:0 20px 50px rgba(0,0,0,0.5);animation:modalin 0.16s ease-out">
+            <div style="padding:22px;display:flex;flex-direction:column;gap:14px">
+
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+                <span style="display:flex;flex-direction:column;gap:3px">
+                  <span style="font-size:1.25rem;font-weight:700;color:#f2efec;letter-spacing:-0.01em">카메라 설정</span>
+                  <span style="display:flex;align-items:center;gap:9px;font-size:0.8125rem;color:{{ stateColD }}">
+                    <sc-if value="{{ camOn }}" hint-placeholder-val="{{ no }}">
+                      <span style="flex:none;width:7px;height:7px;border-radius:4px;background:#f0785a;animation:pulse 2s ease-in-out infinite"></span>
+                    </sc-if>
+                    {{ stateLabel }}
+                  </span>
+                </span>
+                <button onClick="{{ close }}" aria-label="닫기" style="flex:none;width:44px;height:44px;margin:-10px -10px 0 0;border:none;background:none;color:#c2bbb3;font-size:1.0625rem;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button>
+              </div>
+
+              <sc-if value="{{ error }}" hint-placeholder-val="{{ no }}">
+                <div style="display:flex;gap:10px;padding:13px 14px;border-radius:14px;background:#3a211c;font-size:0.875rem;line-height:1.55;color:#ffc7b8"><i class="ph-fill ph-warning" style="flex:none;font-size:1.0625rem;color:#f0785a;margin-top:1px"></i><span>{{ error }}</span></div>
+              </sc-if>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.user.top }};font-size:{{ f.user.size }};color:{{ f.user.colorD }}">아이디</span>
+                <input value="{{ user }}" onChange="{{ setUser }}" onFocus="{{ f.user.focus }}" onBlur="{{ f.user.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+              </label>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.pw.top }};font-size:{{ f.pw.size }};color:{{ f.pw.colorD }}">비밀번호</span>
+                <input type="password" value="{{ pw }}" onChange="{{ setPw }}" onFocus="{{ pwFocus }}" onBlur="{{ f.pw.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+                <sc-if value="{{ pwKept }}" hint-placeholder-val="{{ no }}">
+                  <span style="position:absolute;left:14px;top:23px;pointer-events:none;font-size:0.9375rem;color:#9a948d">저장된 비밀번호 유지</span>
+                </sc-if>
+              </label>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.host.top }};font-size:{{ f.host.size }};color:{{ f.host.colorD }}">호스트</span>
+                <input inputmode="decimal" value="{{ host }}" onChange="{{ setHost }}" onFocus="{{ f.host.focus }}" onBlur="{{ f.host.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a;font-variant-numeric:tabular-nums">
+              </label>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.rtsp.top }};font-size:{{ f.rtsp.size }};color:{{ f.rtsp.colorD }}">RTSP 포트</span>
+                  <input type="number" inputmode="numeric" value="{{ rtsp }}" onChange="{{ setRtsp }}" onFocus="{{ f.rtsp.focus }}" onBlur="{{ f.rtsp.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a;font-variant-numeric:tabular-nums">
+                </label>
+                <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                  <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.onvif.top }};font-size:{{ f.onvif.size }};color:{{ f.onvif.colorD }}">ONVIF 포트</span>
+                  <input type="number" inputmode="numeric" value="{{ onvif }}" onChange="{{ setOnvif }}" onFocus="{{ f.onvif.focus }}" onBlur="{{ f.onvif.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a;font-variant-numeric:tabular-nums">
+                </label>
+              </div>
+
+              <label style="position:relative;display:block;height:56px;border-radius:14px;background:#2b2724;cursor:text">
+                <span style="position:absolute;left:14px;pointer-events:none;transition:top 0.16s cubic-bezier(0.2,0,0,1),font-size 0.16s cubic-bezier(0.2,0,0,1);top:{{ f.path.top }};font-size:{{ f.path.size }};color:{{ f.path.colorD }}">스트림 경로</span>
+                <input value="{{ path }}" onChange="{{ setPath }}" onFocus="{{ f.path.focus }}" onBlur="{{ f.path.blur }}" style="position:absolute;inset:0;box-sizing:border-box;width:100%;border:none;background:transparent;color:#f2efec;padding:23px 14px 6px;font-size:0.9375rem;font-family:inherit;outline:none;caret-color:#f0785a">
+              </label>
+
+              <span style="font-size:0.75rem;color:#9a948d;line-height:1.6;text-wrap:pretty">ONVIF 포트를 비우면 PTZ 조작을 쓸 수 없습니다. 프로필은 카메라가 꺼진 동안에만 저장할 수 있습니다.</span>
+
+              <div style="display:flex;gap:8px">
+                <button onClick="{{ save }}" disabled="{{ saveOff }}" style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:none;background:#f2efec;color:#121110;font-size:0.9375rem;font-weight:600;font-family:inherit;cursor:{{ saveCursor }};opacity:{{ saveOpD }};display:flex;align-items:center;justify-content:center;gap:8px">
+                  <sc-if value="{{ saving }}" hint-placeholder-val="{{ no }}">
+                    <span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(18,17,16,0.25);border-top-color:#121110;animation:spin 0.7s linear infinite"></span>
+                  </sc-if>
+                  {{ saveLabel }}
+                </button>
+                <button onClick="{{ toggleCam }}" disabled="{{ toggleOff }}" style="flex:1;height:44px;box-sizing:border-box;border-radius:100px;border:1px solid rgba(255,255,255,0.16);background:transparent;color:#f2efec;font-size:0.9375rem;font-family:inherit;cursor:{{ toggleCursor }};opacity:{{ toggleOp }};display:flex;align-items:center;justify-content:center;gap:8px">
+                  <sc-if value="{{ switching }}" hint-placeholder-val="{{ no }}">
+                    <span style="width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);border-top-color:#f2efec;animation:spin 0.7s linear infinite"></span>
+                  </sc-if>
+                  {{ toggleLabel }}
+                </button>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ toast }}" hint-placeholder-val="{{ no }}">
+            <div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;align-items:center;padding:11px 16px;border-radius:100px;background:#2b2724;font-size:0.8125rem;line-height:1.5;color:#f2efec;animation:fadein 0.2s ease">{{ toast }}</div>
+          </sc-if>
+        </div>
+      </x-import>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1000, &quot;height&quot;: 1000}}">
+class Component extends DCLogic {
+  state = {
+    user: 'admin', pw: '', pwKept: true,
+    host: '192.168.1.101', rtsp: '554', onvif: '2020', path: 'stream1',
+    open: true, camOn: false, saving: false, switching: false,
+    error: '', toast: '', focusKey: null,
+  };
+
+  componentWillUnmount() {
+    clearTimeout(this.toastTimer);
+    clearTimeout(this.workTimer);
+  }
+
+  toast(text) {
+    this.setState({ toast: text });
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+
+  // 카탈로그 02 입력 필드 — 라벨이 떠오르는 칸(한 줄 56 · 라벨 0.6875rem · 값 0.9375rem)
+  field(k, filled) {
+    const s = this.state;
+    const up = s.focusKey === k || filled || String(s[k] || '').length > 0;
+    const on = s.focusKey === k;
+    return {
+      top: up ? '9px' : '18px',
+      size: up ? '0.6875rem' : '0.9375rem',
+      colorL: on ? '#b8452a' : (up ? '#7d8085' : '#8a8d92'),
+      colorD: on ? '#f0785a' : (up ? '#8f8880' : '#9a948d'),
+      focus: () => this.setState({ focusKey: k }),
+      blur: () => this.setState((st) => (st.focusKey === k ? { focusKey: null } : null)),
+    };
+  }
+
+  set(k) {
+    return (e) => this.setState({ [k]: e.target.value, error: '' });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const busy = s.saving || s.switching;
+
+    // 저장은 꺼진 동안에만 — 저장이 끝나면 이어서 켠다(원본 handleSave → turnOn).
+    const save = () => {
+      if (busy || s.camOn) return;
+      if (!s.host.trim()) { this.setState({ error: '호스트를 입력해야 저장할 수 있습니다.' }); return; }
+      this.setState({ saving: true, error: '' });
+      clearTimeout(this.workTimer);
+      this.workTimer = setTimeout(() => {
+        this.setState({ saving: false, pw: '', pwKept: true, switching: true });
+        this.toast('프로필을 저장했습니다. 카메라를 켭니다.');
+        this.workTimer = setTimeout(() => {
+          this.setState({ switching: false, camOn: true });
+          this.toast('카메라를 켰습니다. 라이브 시청, 추론, 이벤트 녹화가 시작됩니다.');
+        }, 900);
+      }, 700);
+    };
+
+    // 켜기·끄기의 완료 판정은 요청 성공이 아니라 상태 전환이다 — 라벨과 안내가 같은 순간에 바뀐다.
+    const toggleCam = () => {
+      if (busy) return;
+      this.setState({ switching: true, error: '' });
+      clearTimeout(this.workTimer);
+      this.workTimer = setTimeout(() => {
+        const next = !s.camOn;
+        this.setState({ switching: false, camOn: next });
+        this.toast(next
+          ? '카메라를 켰습니다. 라이브 시청, 추론, 이벤트 녹화가 시작됩니다.'
+          : '카메라를 껐습니다. 라이브 시청, 추론, 이벤트 녹화가 종료됩니다.');
+      }, 900);
+    };
+
+    const saveOff = busy || s.camOn;
+
+    return {
+      yes: true, no: false,
+      open: s.open,
+      openModal: () => this.setState({ open: true }),
+      // X는 화면을 닫고 설정 탭의 「카메라」 행으로 돌아간다 — 그 행을 다시 누르면 열린다.
+      close: () => this.setState({ open: false, focusKey: null }),
+      f: {
+        user: this.field('user'), pw: this.field('pw', s.pwKept), host: this.field('host'),
+        rtsp: this.field('rtsp'), onvif: this.field('onvif'), path: this.field('path'),
+      },
+      user: s.user, pw: s.pw, host: s.host, rtsp: s.rtsp, onvif: s.onvif, path: s.path,
+      setUser: this.set('user'), setPw: this.set('pw'), setHost: this.set('host'),
+      setRtsp: this.set('rtsp'), setOnvif: this.set('onvif'), setPath: this.set('path'),
+      pwKept: s.pwKept,
+      pwFocus: () => this.setState({ focusKey: 'pw', pwKept: false }),
+
+      camOn: s.camOn,
+      stateLabel: s.camOn ? '켜짐' : '꺼짐',
+      stateColL: s.camOn ? '#b8452a' : '#8a8d92',
+      stateColD: s.camOn ? '#f0785a' : '#9a948d',
+
+      error: s.error, toast: s.toast,
+      saving: s.saving, switching: s.switching,
+      save, toggleCam,
+      saveLabel: s.saving ? '저장 중' : '프로필 저장',
+      saveOff,
+      saveCursor: saveOff ? 'default' : 'pointer',
+      saveOp: saveOff ? '0.35' : '1',
+      saveOpD: saveOff ? '0.3' : '1',
+      toggleLabel: s.switching
+        ? (s.camOn ? '끄는 중' : '켜는 중')
+        : (s.camOn ? '카메라 끄기' : '카메라 켜기'),
+      toggleOff: busy,
+      toggleCursor: busy ? 'default' : 'pointer',
+      toggleOp: busy ? '0.45' : '1',
+    };
+  }
+}
+</script>
+</body>
+</html>
